@@ -796,8 +796,9 @@ function showSearchResults2(displayList, fullData) {
 }
 
 function showSecondaryOptions2(selectedItem) {
+    const wh_value = document.getElementById("warehouse_xuat").value
     // Filter based on selected item and availability
-    const filteredResults = onhand_data.filter(item => item[1] === selectedItem[1] && item[10] > 0);
+    const filteredResults = onhand_data.filter(item => item[1] === selectedItem[1] && item[10] > 0 && item[0] === wh_value);
     const modal = document.getElementById("secondaryModal");
     const modalOptions = document.getElementById("modalOptions");
     modalOptions.innerHTML = ''; // Clear old content
