@@ -205,29 +205,43 @@ function showSearchResults(displayList, fullData) {
 
 /// Hàm hiển thị modal với các lựa chọn từ secondaryOptions
 function showSecondaryOptions(selectedItem) {
-    console.log(selectedItem[0])
-    const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]); // Lọc các dòng dựa trên lựa chọn
+    console.log(selectedItem[0]);
+    const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]); // Filter rows based on selection
     const modal = document.getElementById("secondaryModal");
     const modalOptions = document.getElementById("modalOptions");
-    modalOptions.innerHTML = ''; // Xóa nội dung cũ
+    modalOptions.innerHTML = ''; // Clear old content
 
-    // Hiển thị modal với các lựa chọn
+    // Use a Set to store unique option keys
+    const uniqueOptions = new Set();
+
+    // Display modal with unique options
     filteredResults.forEach(option => {
-        const optionDiv = document.createElement("div");
-        optionDiv.classList.add("modal-option");
-        
-        // Hiển thị cả cột ID (mml_data[0]) và Mô tả (mml_data[2])
-        optionDiv.textContent = `${option[1]} - ${option[2]}`; // Ghép ID và Mô tả thành chuỗi
-        
-        optionDiv.addEventListener("click", () => {
-            handleModalSelection_nhap(option); // Gọi hàm khi người dùng chọn một tùy chọn
-        });
-        modalOptions.appendChild(optionDiv);
+        const optionKey = `${option[1]} - ${option[2]}`; // Create a unique key based on ID and description
+
+        // Check if this option has already been added
+        if (!uniqueOptions.has(optionKey)) {
+            uniqueOptions.add(optionKey); // Add the key to the Set to ensure uniqueness
+
+            const optionDiv = document.createElement("div");
+            optionDiv.classList.add("modal-option");
+
+            // Display both ID (mml_data[1]) and Description (mml_data[2])
+            optionDiv.textContent = optionKey; // Set the text content to the unique key
+
+            // Add event listener for selecting this option
+            optionDiv.addEventListener("click", () => {
+                handleModalSelection_nhap(option); // Call function when an option is selected
+            });
+
+            // Append the unique option to the modal
+            modalOptions.appendChild(optionDiv);
+        }
     });
 
-    // Hiển thị modal
+    // Display the modal
     modal.style.display = 'flex';
 }
+
 
 // Xử lý khi người dùng chọn một mục trong modal
 function handleModalSelection_nhap(selectedOption) {
@@ -782,28 +796,39 @@ function showSearchResults2(displayList, fullData) {
 }
 
 function showSecondaryOptions2(selectedItem) {
-    const filteredResults = onhand_data.filter(item => item[1] === selectedItem[1] && item[10] > 0); // Lọc các dòng dựa trên lựa chọn
+    // Filter based on selected item and availability
+    const filteredResults = onhand_data.filter(item => item[1] === selectedItem[1] && item[10] > 0);
     const modal = document.getElementById("secondaryModal");
     const modalOptions = document.getElementById("modalOptions");
-    modalOptions.innerHTML = ''; // Xóa nội dung cũ
+    modalOptions.innerHTML = ''; // Clear old content
 
-    // Hiển thị modal với các lựa chọn
+    // Use a Set to keep track of unique options
+    const uniqueOptions = new Set();
+
     filteredResults.forEach(option => {
-        const optionDiv = document.createElement("div");
-        optionDiv.classList.add("modal-option");
-        
-        // Hiển thị cả cột ID (mml_data[0]) và Mô tả (mml_data[2])
-        optionDiv.textContent = `${option[2]} | ${option[11]}`; // Ghép ID và Mô tả thành chuỗi
-        
-        optionDiv.addEventListener("click", () => {
-            handleModalSelection_nhap2(option); // Gọi hàm khi người dùng chọn một tùy chọn
-        });
-        modalOptions.appendChild(optionDiv);
+        const optionKey = `${option[2]} | ${option[11]}`; // Create a unique key based on ID and description
+
+        if (!uniqueOptions.has(optionKey)) {
+            uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
+
+            const optionDiv = document.createElement("div");
+            optionDiv.classList.add("modal-option");
+
+            // Set the text content using the unique ID and description
+            optionDiv.textContent = optionKey;
+
+            optionDiv.addEventListener("click", () => {
+                handleModalSelection_nhap2(option); // Call function when user selects an option
+            });
+
+            modalOptions.appendChild(optionDiv);
+        }
     });
 
-    // Hiển thị modal
+    // Display the modal
     modal.style.display = 'flex';
 }
+
 
 
 document.getElementById("material-type_xuat").addEventListener("input", debounce(handleMaterialTypeInput_xuat, 400));
