@@ -370,6 +370,7 @@ function submit_nhap() {
     setTimeout(() => {
         load_data_nhap_without_loading()
     }, 5000);
+    info("Nhập vật tư thành công !!!")
 }
 
 function reset_nhap() {
@@ -1033,5 +1034,6 @@ function submit_xuat() {
         load_onhand();
     }, 5000);
     reset_xuat()
+    info("Xuất vật tư thành công !!!")
     
 }
