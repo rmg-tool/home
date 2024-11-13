@@ -864,11 +864,11 @@ function handleModalSelection_nhap2(selectedOption) {
     var found_table_xuat = onhand_data
         .filter(item => item[10] > 0 && item[1] === type_xuat && item[2] === sku_id_xuat && item[0] === wh_value)
         .map(col => [
-            col[1],         // Type
-            col[3],         // Location
-            col[10],        // Quantity
-            col[4] || "-",  // Expiry Date, default to "-"
-            col[5]          // Inbound Date
+            col[1],                // Type
+            col[3],                // Location
+            Math.ceil(col[10] * 10000) / 10000, // Round quantity up to 4 decimal places
+            col[4] || "-",         // Expiry Date, default to "-"
+            col[5]                 // Inbound Date
         ]);
 
     found_table_xuat.sort((a, b) => {
@@ -895,6 +895,7 @@ function handleModalSelection_nhap2(selectedOption) {
     console.table(found_table_xuat);
     displayFoundTableModal(found_table_xuat);
 }
+
 
 
 function displayFoundTableModal(data) {
@@ -1060,6 +1061,27 @@ function submit_xuat() {
         load_onhand();
     }, 5000);
     reset_xuat()
-    info("Xuất vật tư thành công !!!")
-    
+    info("Xuất vật tư thành công !!!")   
+}
+
+let intervalId = null;
+
+function yourFunction() {
+    console.log("Function is running");
+    // Your function code here
+}
+
+function startInterval() {
+    if (!intervalId) {
+        intervalId = setInterval(yourFunction, 1000); // Run every 5 minutes
+        console.log("Interval started");
+    }
+}
+
+function stopInterval() {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+        console.log("Interval stopped");
+    }
 }
