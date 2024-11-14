@@ -60,6 +60,21 @@ function info(text_want_to_alert) {
     });
 }
 
+function warning(text_want_to_alert) {
+    Swal.fire({
+        // title: 'Thông báo!',
+        text: text_want_to_alert,
+        icon: 'warning', // Use 'success' or 'error' as needed
+        showConfirmButton: false, // Hide the confirm button
+        timer: 3000, // Auto-close after 5 seconds
+        timerProgressBar: true, // Show a progress bar indicating time remaining
+        position: 'top', // Position it as in the example image
+        toast: true, // Display as a toast-style alert
+        background: 'yellow',
+        color: 'black'
+    });
+}
+
 
 // Khởi tạo danh sách kho
 function create_wh_nhap() {
@@ -143,10 +158,9 @@ function create_wh_xuat() {
     });
 }
 
-function create_wh_onhand() {
-    document.getElementById("welcome").textContent = "Xin chào " + sessionStorage.getItem("fullname")
+function create_wh_xuat_export() {
     const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
-    const warehouseSelect = document.getElementById("warehouse_onhand");
+    const warehouseSelect = document.getElementById("selectFilter");
 
     if (!warehouseSelect) {
         console.error("Không tìm thấy combobox 'warehouse'");
@@ -167,7 +181,7 @@ function create_wh_onhand() {
     // Xác định danh sách các kho dựa trên giá trị của `wh`
     let options;
     if (wh === "All") {
-        options = ['HCM', 'QN', 'BN'];
+        options = ['All','HCM', 'QN', 'BN'];
     } else if (wh) {
         options = [wh];
     } else {
@@ -183,9 +197,93 @@ function create_wh_onhand() {
         warehouseSelect.appendChild(opt);
     });
 }
+
+function create_wh_nhap_export() {
+    const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
+    const warehouseSelect = document.getElementById("selectFilter2");
+
+    if (!warehouseSelect) {
+        console.error("Không tìm thấy combobox 'warehouse'");
+        return;
+    }
+
+    // Xóa tất cả các option hiện có trong combobox để làm mới
+    warehouseSelect.innerHTML = '';
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Chọn chi nhánh";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    warehouseSelect.appendChild(emptyOption);
+
+    // Xác định danh sách các kho dựa trên giá trị của `wh`
+    let options;
+    if (wh === "All") {
+        options = ['All','HCM', 'QN', 'BN'];
+    } else if (wh) {
+        options = [wh];
+    } else {
+        options = [];
+        console.warn("Danh sách kho trống.");
+    }
+
+    // Thêm các option vào combobox "Chọn kho"
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        warehouseSelect.appendChild(opt);
+    });
+}
+
+function create_wh_onhand_export() {
+    const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
+    const warehouseSelect = document.getElementById("selectFilter3");
+
+    if (!warehouseSelect) {
+        console.error("Không tìm thấy combobox 'warehouse'");
+        return;
+    }
+
+    // Xóa tất cả các option hiện có trong combobox để làm mới
+    warehouseSelect.innerHTML = '';
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Chọn chi nhánh";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    warehouseSelect.appendChild(emptyOption);
+
+    // Xác định danh sách các kho dựa trên giá trị của `wh`
+    let options;
+    if (wh === "All") {
+        options = ['All','HCM', 'QN', 'BN'];
+    } else if (wh) {
+        options = [wh];
+    } else {
+        options = [];
+        console.warn("Danh sách kho trống.");
+    }
+
+    // Thêm các option vào combobox "Chọn kho"
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        warehouseSelect.appendChild(opt);
+    });
+}
+
+
 create_wh_nhap()
 create_wh_xuat()
-create_wh_onhand()
+create_wh_xuat_export()
+create_wh_nhap_export()
+create_wh_onhand_export()
 
 
 // Hàm debounce để giới hạn số lần gọi tìm kiếm
@@ -535,6 +633,8 @@ let user_data = [];
 let mml_data = [];
 let location_data = [];
 let onhand_data = [];
+let xuat_data = [];
+let nhap_data = [];
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -568,9 +668,25 @@ async function load_onhand() {
         .then(res => res.json())
         .then(data => {
             onhand_data = data.content;
-            // onhand_data.shift()
-            // onhand_data = onhand_data.filter(row => row[10] > 0);
             console.log("Dữ liệu onhand đã tải xong.");
+        });
+}
+
+async function load_nhap() {
+    return fetch('https://script.google.com/macros/s/AKfycbzh8Igcb5eoL3itYKDQBL8l3LpuHaW0xQrWkTFNivzEhtjJLfBXwtCfx04xOyS_nQAEzQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            nhap_data = data.content;
+            console.log("Dữ liệu nhập đã tải xong.");
+        });
+}
+
+async function load_xuat() {
+    return fetch('https://script.google.com/macros/s/AKfycbxJUqqXlOU2Gbf84szDR9mEAvhoWlaQIB4rMcnC-Rfojr0sWVKh5jHyrPXqlVzHqQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            xuat_data = data.content;
+            console.log("Dữ liệu xuất đã tải xong.");
         });
 }
 
@@ -639,7 +755,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Gọi hàm khởi tạo combobox sau khi hoàn tất đăng nhập
         create_wh_nhap();
         create_wh_xuat()
-        create_wh_onhand()
+        create_wh_xuat_export()
+        create_wh_nhap_export()
+        create_wh_onhand_export()
+    
     }
     
 
@@ -688,6 +807,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 async function load_data_nhap() {
+    warning("Đang lấy dữ liệu")
     // Show the loading indicator
     document.getElementById("loadingIndicator").style.display = "block";
 
@@ -695,9 +815,11 @@ async function load_data_nhap() {
 
     // Hide the loading indicator once loading is complete
     document.getElementById("loadingIndicator").style.display = "none";
+    info("Lấy dữ liệu thành công")
 }
 
 async function load_data_xuat() {
+    warning("Đang lấy dữ liệu")
     // Show the loading indicator
     document.getElementById("loadingIndicator").style.display = "block";
 
@@ -705,6 +827,43 @@ async function load_data_xuat() {
 
     // Hide the loading indicator once loading is complete
     document.getElementById("loadingIndicator").style.display = "none";
+    info("Lấy dữ liệu thành công")
+}
+
+async function load_data_mml() {
+    warning("Đang lấy dữ liệu")
+    // Show the loading indicator
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await show_onhand()
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+    info("Lấy dữ liệu thành công")
+}
+
+async function load_data_xuat_export() {
+    warning("Đang lấy dữ liệu")
+    // Show the loading indicator
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await show_xuat()
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+    info("Lấy dữ liệu thành công")
+}
+
+async function load_data_nhap_export() {
+    warning("Đang lấy dữ liệu")
+    // Show the loading indicator
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await show_nhap()
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+    info("Lấy dữ liệu thành công")
 }
 
 function load_data_nhap_without_loading() {
@@ -736,6 +895,24 @@ function showFrame(id) {
             } else if (id === 'export') {
                 // Load data and then show the frame
                 load_data_xuat().then(() => {
+                    activeFrame.classList.add('active');
+                    console.log("Access granted to frame:", id);
+                });
+            } else if (id === 'onhand') {
+                // Load data and then show the frame
+                load_data_mml().then(() => {
+                    activeFrame.classList.add('active');
+                    console.log("Access granted to frame:", id);
+                });
+            } else if (id === 'transaction_xuat') {
+                // Load data and then show the frame
+                load_data_xuat_export().then(() => {
+                    activeFrame.classList.add('active');
+                    console.log("Access granted to frame:", id);
+                });
+            } else if (id === 'transaction_nhap') {
+                // Load data and then show the frame
+                load_data_nhap_export().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
                 });
@@ -1303,28 +1480,340 @@ async function show_onhand() {
 
 }
 
-document.getElementById("export_onhand").addEventListener("click", function() {
-    // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
-    var exportData = onhand_data//.slice(1);
-    // Giữ lại dòng đầu tiên
-    const headerRow = exportData[0];
+// document.getElementById("export_onhand").addEventListener("click", function() {
+//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
+//     var exportData = onhand_data//.slice(1);
+//     // Giữ lại dòng đầu tiên
+//     const headerRow = exportData[0];
 
-    // Lọc từ dòng thứ 2 trở đi, chỉ giữ các dòng có giá trị cột 11 > 0
-    const filteredRows = exportData.slice(1).filter(row => row[10] > 0);
+//     // Lọc từ dòng thứ 2 trở đi, chỉ giữ các dòng có giá trị cột 11 > 0
+//     const filteredRows = exportData.slice(1).filter(row => row[10] > 0);
 
-    // Kết hợp dòng đầu tiên với các dòng đã lọc
-    exportData = [headerRow, ...filteredRows];
+//     // Kết hợp dòng đầu tiên với các dòng đã lọc
+//     exportData = [headerRow, ...filteredRows];
 
 
-    // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
+//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
+//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+//     const workbook = XLSX.utils.book_new();
+//     XLSX.utils.book_append_sheet(workbook, worksheet, "Onhand Inventory");
+
+//     // Xuất file
+//     const now = new Date();
+//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+//     const filename = `Onhand_${formattedDate}_${formattedTime}.xlsx`;
+
+//     // Xuất file
+//     XLSX.writeFile(workbook, filename);
+// });
+
+document.getElementById("refresh_onhand").addEventListener("click", async function() {
+    await load_data_mml()
+});
+
+async function show_xuat() {
+    await load_xuat()
+    // Define columns based on the index of each data field
+    const columns = [
+        { title: 'Ngày xuất', formatter: (cell) => cell.getData()[0] },
+        { title: 'Thời gian xuất', formatter: (cell) => cell.getData()[1] },
+        { title: 'Mã chi nhánh', formatter: (cell) => cell.getData()[2] },
+        { title: 'Tên người xuất', formatter: (cell) => cell.getData()[3] },
+        { title: 'Tên khách hàng', formatter: (cell) => cell.getData()[4] },
+        { title: 'Mã đơn hàng', formatter: (cell) => cell.getData()[5] },
+        { title: 'Loại vật tư', formatter: (cell) => cell.getData()[6] },
+        { title: 'Số lượng', formatter: (cell) => cell.getData()[7] },
+        { title: 'Location', formatter: (cell) => cell.getData()[8] },
+        { title: 'Tên vật tư', formatter: (cell) => cell.getData()[9] },
+        { title: 'Mã vật tư', formatter: (cell) => cell.getData()[10] },
+        { title: 'Ngày hết hạn', formatter: (cell) => cell.getData()[11] },
+        { title: 'Ngày nhập', formatter: (cell) => cell.getData()[12] },
+        { title: 'Đơn giá', formatter: (cell) => cell.getData()[13] },
+        { title: 'Thành tiền', formatter: (cell) => cell.getData()[14] },
+        { title: 'Đơn vị', formatter: (cell) => cell.getData()[15] }
+
+    ];
+
+    const table = new Tabulator("#xuatTable", {
+        data: xuat_data,   // Dữ liệu của bảng
+        columns: columns,    // Cấu hình cột
+        layout: "fitDataTable",  // Tùy chọn layout
+        height: "800px",     // Đặt chiều cao để kích hoạt cuộn
+        virtualDom: true,    // Bật chế độ virtual DOM
+        pagination: "local",
+        paginationSize: 25,
+        paginationSizeSelector: [25, 50, 100],
+        movableColumns: true,
+        resizableRows: true,
+    });
+}
+
+// document.getElementById("export_xuat").addEventListener("click", function() {
+//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
+//     var exportData = xuat_data//.slice(1);
+//     // Giữ lại dòng đầu tiên
+//     const headerRow = exportData[0];
+
+
+//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
+//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+//     const workbook = XLSX.utils.book_new();
+//     XLSX.utils.book_append_sheet(workbook, worksheet, "Xuất");
+
+//     const now = new Date();
+//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+//     const filename = `Transaction_xuat_${formattedDate}_${formattedTime}.xlsx`;
+
+//     // Xuất file
+//     XLSX.writeFile(workbook, filename);
+// });
+
+document.getElementById("refresh_xuat").addEventListener("click", async function() {
+    await load_data_xuat_export()
+});
+
+document.getElementById("export_xuat").addEventListener("click", function() {
+    // Hiển thị modal
+    document.getElementById("filterModal").style.display = "block";
+});
+
+document.getElementById("closeModal").addEventListener("click", function() {
+    // Ẩn modal
+    document.getElementById("filterModal").style.display = "none";
+    document.getElementById("dateFrom").value = "";
+    document.getElementById("dateTo").value = "";
+});
+
+document.getElementById("closeModal2").addEventListener("click", function() {
+    // Ẩn modal
+    document.getElementById("filterModal2").style.display = "none";
+    document.getElementById("dateFrom2").value = "";
+    document.getElementById("dateTo2").value = "";
+});
+
+document.getElementById("closeModal3").addEventListener("click", function() {
+    // Ẩn modal
+    document.getElementById("filterModal3").style.display = "none";
+});
+
+document.getElementById("applyFilter").addEventListener("click", async function() {
+    warning("Đang xuất dữ liệu")
+    await load_xuat()
+    // Lấy giá trị từ các input trong modal
+    const selectValue = document.getElementById("selectFilter").value;
+    const dateFrom = document.getElementById("dateFrom").value;
+    const dateTo = document.getElementById("dateTo").value;
+
+    if ((dateFrom && !dateTo) || (!dateFrom && dateTo)) {
+        alert("Vui lòng điền đầy đủ cả 'Date From' và 'Date To' hoặc để trống cả hai.");
+        return; // Dừng lại nếu chỉ có một trong hai ngày được chọn
+    }
+
+    // Chuyển đổi ngày để so sánh
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+
+    const headerRow = xuat_data[0];
+
+    // Lọc dữ liệu dựa trên điều kiện
+    const filteredData = xuat_data.filter(row => {
+        const rowDate = new Date(row[0]); // Giả sử ngày ở cột đầu tiên (index 0)
+        
+        // Kiểm tra điều kiện ngày, nếu không chọn ngày thì bỏ qua lọc theo ngày
+        const isDateInRange = (!dateFrom && !dateTo) || (dateFrom && dateTo && rowDate >= fromDate && rowDate <= toDate);
+
+        // Kiểm tra điều kiện Select, nếu không chọn thì bỏ qua lọc theo Select
+        const isSelectMatch = !selectValue || selectValue === "All" || row[2] === selectValue; // Giả sử giá trị Select ở cột thứ 3 (index 2)
+
+        return isDateInRange && isSelectMatch;
+    });
+
+    const exportData = [headerRow, ...filteredData];
+
+
+    // Tạo và xuất file Excel với dữ liệu đã lọc
     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Onhand Inventory");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Xuất");
+
+    // Định dạng tên file với thời gian hiện tại
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+    const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+    const filename = `Transaction_xuat_${formattedDate}_${formattedTime}.xlsx`;
 
     // Xuất file
-    XLSX.writeFile(workbook, "onhand_inventory.xlsx");
+    XLSX.writeFile(workbook, filename);
+
+    // Ẩn modal
+    document.getElementById("filterModal").style.display = "none";
+    document.getElementById("dateFrom").value = "";
+    document.getElementById("dateTo").value = "";
 });
 
 
+document.getElementById("applyFilter2").addEventListener("click", async function() {
+    warning("Đang xuất dữ liệu")
+    await load_nhap()
+    // Lấy giá trị từ các input trong modal
+    const selectValue = document.getElementById("selectFilter2").value;
+    const dateFrom = document.getElementById("dateFrom2").value;
+    const dateTo = document.getElementById("dateTo2").value;
 
-show_onhand()
+    if ((dateFrom && !dateTo) || (!dateFrom && dateTo)) {
+        alert("Vui lòng điền đầy đủ cả 'Date From' và 'Date To' hoặc để trống cả hai.");
+        return; // Dừng lại nếu chỉ có một trong hai ngày được chọn
+    }
+
+    // Chuyển đổi ngày để so sánh
+    const fromDate = new Date(dateFrom);
+    const toDate = new Date(dateTo);
+
+    const headerRow = nhap_data[0];
+
+    // Lọc dữ liệu dựa trên điều kiện
+    const filteredData = nhap_data.filter(row => {
+        const rowDate = new Date(row[0]); // Giả sử ngày ở cột đầu tiên (index 0)
+        
+        // Kiểm tra điều kiện ngày, nếu không chọn ngày thì bỏ qua lọc theo ngày
+        const isDateInRange = (!dateFrom && !dateTo) || (dateFrom && dateTo && rowDate >= fromDate && rowDate <= toDate);
+
+        // Kiểm tra điều kiện Select, nếu không chọn thì bỏ qua lọc theo Select
+        const isSelectMatch = !selectValue || selectValue === "All" || row[2] === selectValue; // Giả sử giá trị Select ở cột thứ 3 (index 2)
+
+        return isDateInRange && isSelectMatch;
+    });
+
+    const exportData = [headerRow, ...filteredData];
+
+
+    // Tạo và xuất file Excel với dữ liệu đã lọc
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Nhập");
+
+    // Định dạng tên file với thời gian hiện tại
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+    const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+    const filename = `Transaction_nhap_${formattedDate}_${formattedTime}.xlsx`;
+
+    // Xuất file
+    XLSX.writeFile(workbook, filename);
+
+    // Ẩn modal
+    document.getElementById("filterModal2").style.display = "none";
+    document.getElementById("dateFrom2").value = "";
+    document.getElementById("dateTo2").value = "";
+});
+
+document.getElementById("applyFilter3").addEventListener("click", async function() {
+    warning("Đang xuất dữ liệu")
+    await load_onhand()
+    // Lấy giá trị từ các input trong modal
+    const selectValue = document.getElementById("selectFilter3").value;
+
+    const headerRow = onhand_data[0];
+
+    // Lọc dữ liệu dựa trên điều kiện
+    const filteredData = onhand_data.filter(row => {
+
+        // Kiểm tra điều kiện Select, nếu không chọn thì bỏ qua lọc theo Select
+        const isSelectMatch = !selectValue || selectValue === "All" || row[0] === selectValue; // Giả sử giá trị Select ở cột thứ 3 (index 2)
+
+        return isSelectMatch;
+    });
+
+    const exportData = [headerRow, ...filteredData];
+
+
+    // Tạo và xuất file Excel với dữ liệu đã lọc
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Onhand");
+
+    // Định dạng tên file với thời gian hiện tại
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+    const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+    const filename = `Onhand_${formattedDate}_${formattedTime}.xlsx`;
+
+    // Xuất file
+    XLSX.writeFile(workbook, filename);
+
+    // Ẩn modal
+    document.getElementById("filterModal3").style.display = "none";
+});
+
+document.getElementById("export_nhap").addEventListener("click", function() {
+    // Hiển thị modal
+    document.getElementById("filterModal2").style.display = "block";
+});
+
+document.getElementById("export_onhand").addEventListener("click", function() {
+    // Hiển thị modal
+    document.getElementById("filterModal3").style.display = "block";
+});
+
+async function show_nhap() {
+    await load_nhap()
+    // Define columns based on the index of each data field
+    const columns = [
+        { title: 'Ngày nhập', formatter: (cell) => cell.getData()[0] },
+        { title: 'Thời gian nhập', formatter: (cell) => cell.getData()[1] },
+        { title: 'Mã chi nhánh', formatter: (cell) => cell.getData()[2] },
+        { title: 'Tên người nhập', formatter: (cell) => cell.getData()[3] },
+        { title: 'Loại vật tư', formatter: (cell) => cell.getData()[4] },
+        { title: 'Mã nhà cung cấp', formatter: (cell) => cell.getData()[5] },
+        { title: 'Số lượng nhập', formatter: (cell) => cell.getData()[6] },
+        { title: 'Location', formatter: (cell) => cell.getData()[7] },
+        { title: 'Tên vật tư', formatter: (cell) => cell.getData()[8] },
+        { title: 'Mã vật tư', formatter: (cell) => cell.getData()[9] },
+        { title: 'Ngày hết hạn', formatter: (cell) => cell.getData()[10] },
+        { title: 'Đơn giá', formatter: (cell) => cell.getData()[11] },
+        { title: 'concat', formatter: (cell) => cell.getData()[12] },
+        { title: 'Thành tiền', formatter: (cell) => cell.getData()[13] },
+        { title: 'Đơn vị', formatter: (cell) => cell.getData()[14] }
+    ];
+
+    const table = new Tabulator("#nhapTable", {
+        data: nhap_data,   // Dữ liệu của bảng
+        columns: columns,    // Cấu hình cột
+        layout: "fitDataTable",  // Tùy chọn layout
+        height: "800px",     // Đặt chiều cao để kích hoạt cuộn
+        virtualDom: true,    // Bật chế độ virtual DOM
+        pagination: "local",
+        paginationSize: 25,
+        paginationSizeSelector: [25, 50, 100],
+        movableColumns: true,
+        resizableRows: true,
+    });
+}
+
+// document.getElementById("export_nhap").addEventListener("click", function() {
+//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
+//     var exportData = nhap_data//.slice(1);
+//     // Giữ lại dòng đầu tiên
+//     const headerRow = exportData[0];
+
+
+//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
+//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+//     const workbook = XLSX.utils.book_new();
+//     XLSX.utils.book_append_sheet(workbook, worksheet, "Nhập");
+
+//     // Xuất file
+//     const now = new Date();
+//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
+//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
+//     const filename = `Transaction_nhap_${formattedDate}_${formattedTime}.xlsx`;
+
+//     // Xuất file
+//     XLSX.writeFile(workbook, filename);
+// });
+
+document.getElementById("refresh_nhap").addEventListener("click", async function() {
+    await load_data_nhap_export()
+});
