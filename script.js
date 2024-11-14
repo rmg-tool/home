@@ -62,7 +62,7 @@ function info(text_want_to_alert) {
 
 
 // Khởi tạo danh sách kho
-function initializeWarehouseOptions() {
+function create_wh_nhap() {
     document.getElementById("welcome").textContent = "Xin chào " + sessionStorage.getItem("fullname")
     const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
     const warehouseSelect = document.getElementById("warehouse");
@@ -103,7 +103,7 @@ function initializeWarehouseOptions() {
     });
 }
 
-function initializeWarehouseOptions2() {
+function create_wh_xuat() {
     const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
     const warehouseSelect = document.getElementById("warehouse_xuat");
 
@@ -143,8 +143,50 @@ function initializeWarehouseOptions2() {
     });
 }
 
-initializeWarehouseOptions();
-initializeWarehouseOptions2()
+function create_wh_onhand() {
+    document.getElementById("welcome").textContent = "Xin chào " + sessionStorage.getItem("fullname")
+    const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
+    const warehouseSelect = document.getElementById("warehouse_onhand");
+
+    if (!warehouseSelect) {
+        console.error("Không tìm thấy combobox 'warehouse'");
+        return;
+    }
+
+    // Xóa tất cả các option hiện có trong combobox để làm mới
+    warehouseSelect.innerHTML = '';
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Chọn chi nhánh";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    warehouseSelect.appendChild(emptyOption);
+
+    // Xác định danh sách các kho dựa trên giá trị của `wh`
+    let options;
+    if (wh === "All") {
+        options = ['HCM', 'QN', 'BN'];
+    } else if (wh) {
+        options = [wh];
+    } else {
+        options = [];
+        console.warn("Danh sách kho trống.");
+    }
+
+    // Thêm các option vào combobox "Chọn kho"
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        warehouseSelect.appendChild(opt);
+    });
+}
+create_wh_nhap()
+create_wh_xuat()
+create_wh_onhand()
+
 
 // Hàm debounce để giới hạn số lần gọi tìm kiếm
 function debounce(func, delay) {
@@ -526,6 +568,8 @@ async function load_onhand() {
         .then(res => res.json())
         .then(data => {
             onhand_data = data.content;
+            // onhand_data.shift()
+            // onhand_data = onhand_data.filter(row => row[10] > 0);
             console.log("Dữ liệu onhand đã tải xong.");
         });
 }
@@ -562,7 +606,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             const permissions = {
                 import: user[4] === "x",
                 export: user[5] === "x",
-                export_data: user[6] === "x",
+                onhand: user[6] === "x",
+                transaction_nhap: user[6] === "x",
+                transaction_xuat: user[6] === "x",
                 mml: user[7] === "x"
             };
 
@@ -591,8 +637,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     
         // Gọi hàm khởi tạo combobox sau khi hoàn tất đăng nhập
-        initializeWarehouseOptions();
-        initializeWarehouseOptions2()
+        create_wh_nhap();
+        create_wh_xuat()
+        create_wh_onhand()
     }
     
 
@@ -1085,3 +1132,199 @@ function stopInterval() {
         console.log("Interval stopped");
     }
 }
+
+////// MML //////\
+function reset_mml() {
+    document.getElementById("material-type_mml").value = "";
+    document.getElementById("sku_name_mml").value = "";
+    document.getElementById("sku_id_mml").value = "";
+    document.getElementById("price_mml").value = "";
+    document.getElementById("supplier_id_mml").value = "";
+    document.getElementById("supplier_name_mml").value = "";
+    document.getElementById("unit_mml").value = "";
+    document.getElementById("material-type_mml").focus()
+}
+
+document.getElementById("material-type_mml").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("sku_name_mml").focus()
+    }
+});
+
+document.getElementById("sku_name_mml").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("sku_id_mml").focus()
+    }
+});
+
+document.getElementById("sku_id_mml").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("price_mml").focus()
+    }
+});
+
+document.getElementById("price_mml").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("supplier_id_mml").focus()
+    }
+});
+
+document.getElementById("supplier_id_mml").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("supplier_name_mml").focus()
+    }
+});
+
+function submit_mml() {
+    const type = document.getElementById("material-type_mml").value
+    const sku_name = document.getElementById("sku_name_mml").value
+    const sku_id = document.getElementById("sku_id_mml").value
+    const price = document.getElementById("price_mml").value
+    const supplier_id = document.getElementById("supplier_id_mml").value
+    const supplier_name = document.getElementById("supplier_name_mml").value
+    const unit = document.getElementById("unit_mml").value
+
+    if (type === "") {
+        alert("Bạn chưa nhập loại vật tư")
+        document.getElementById("material-type_mml").focus()
+        return
+    }
+
+    if (sku_name === "") {
+        alert("Bạn chưa nhập têm vật tư")
+        document.getElementById("sku_name_mml").focus()
+        return
+    }
+
+    if (sku_id === "") {
+        alert("Bạn chưa nhập mã vật tư")
+        document.getElementById("sku_id_mml").focus()
+        return
+    }
+    
+    if (price === "") {
+        alert("Bạn chưa nhập đơn giá")
+        document.getElementById("price_mml").focus()
+        return
+    }
+
+    if (price <= 0) {
+        alert("Đơn giá phải > 0")
+        document.getElementById("price_mml").value = ""
+        document.getElementById("price_mml").focus()
+        return
+    }
+
+    if (supplier_id === "") {
+        alert("Bạn chưa nhập mã nhà cung cấp")
+        document.getElementById("supplier_id_mml").focus()
+        return
+    }
+
+    if (supplier_name === "") {
+        alert("Bạn chưa nhập tên nhà cung cấp")
+        document.getElementById("supplier_name_mml").focus()
+        return
+    }
+
+    if (unit === "") {
+        alert("Bạn chưa chọn đơn vị")
+        document.getElementById("unit_mml").focus()
+        return
+    }
+    //
+    try {
+        let mml_table = new FormData();
+        mml_table.append("type", type.toUpperCase());
+        mml_table.append("sku_name", sku_name);
+        mml_table.append("sku_id", sku_id.toUpperCase());
+        mml_table.append("price", price);
+        mml_table.append("supplier_id", supplier_id.toUpperCase());
+        mml_table.append("supplier_name", supplier_name.toUpperCase());
+        mml_table.append("unit", unit);
+        mml_table.append("operator", sessionStorage.getItem("fullname"));
+
+        fetch('https://script.google.com/macros/s/AKfycbzCyWkpU08SF2hMz2i6k2TwMmukhYoJ2BdK1-oOqBqyHyvKE_yJNT-q_MSQw_Qut7DT-w/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: mml_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_mml()
+
+    info("Đã thêm vật tư mới thành công")
+}
+
+
+//// Export data
+/// onhand
+// Define the columns based on your headers
+async function show_onhand() {
+    await load_onhand()
+    // Define columns based on the index of each data field
+    const columns = [
+        { title: "Mã chi nhánh", formatter: (cell) => cell.getData()[0] },
+        { title: "Loại vật tư", formatter: (cell) => cell.getData()[1] },
+        { title: "Mã vật tư", formatter: (cell) => cell.getData()[2] },
+        { title: "Location", formatter: (cell) => cell.getData()[3] },
+        { title: "Ngày hết hạn", formatter: (cell) => cell.getData()[4] },
+        { title: "Ngày nhập", formatter: (cell) => cell.getData()[5] },
+        { title: "Đơn giá lúc nhập", formatter: (cell) => cell.getData()[6] },
+        { title: "Nhập", formatter: (cell) => cell.getData()[7] },
+        { title: "Tồn đầu", formatter: (cell) => cell.getData()[8] },
+        { title: "Xuất", formatter: (cell) => cell.getData()[9] },
+        { title: "Tồn cuối", formatter: (cell) => cell.getData()[10] },
+        { title: "Description / SKU", formatter: (cell) => cell.getData()[11] },
+        { title: "Đơn giá", formatter: (cell) => cell.getData()[12] },
+        { title: "Thành tiền", formatter: (cell) => cell.getData()[13] },
+        { title: "Đơn vị", formatter: (cell) => cell.getData()[14] },
+        { title: "Concat", formatter: (cell) => cell.getData()[15] }
+    ];
+
+
+    const table = new Tabulator("#onhandTable", {
+        data: onhand_data,   // Dữ liệu của bảng
+        columns: columns,    // Cấu hình cột
+        layout: "fitDataTable",  // Tùy chọn layout
+        height: "800px",     // Đặt chiều cao để kích hoạt cuộn
+        virtualDom: true,    // Bật chế độ virtual DOM
+        pagination: "local",
+        paginationSize: 25,
+        paginationSizeSelector: [25, 50, 100],
+        movableColumns: true,
+        resizableRows: true,
+    });
+
+
+}
+
+document.getElementById("export_onhand").addEventListener("click", function() {
+    // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
+    var exportData = onhand_data//.slice(1);
+    // Giữ lại dòng đầu tiên
+    const headerRow = exportData[0];
+
+    // Lọc từ dòng thứ 2 trở đi, chỉ giữ các dòng có giá trị cột 11 > 0
+    const filteredRows = exportData.slice(1).filter(row => row[10] > 0);
+
+    // Kết hợp dòng đầu tiên với các dòng đã lọc
+    exportData = [headerRow, ...filteredRows];
+
+
+    // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
+    const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Onhand Inventory");
+
+    // Xuất file
+    XLSX.writeFile(workbook, "onhand_inventory.xlsx");
+});
+
+
+
+show_onhand()
