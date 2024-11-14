@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"> -->
+    <link href="https://unpkg.com/tabulator-tables@5.4.4/dist/css/tabulator.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+
+
 </head>
 <body>
     <div id="loadingIndicator" style="display: none;">
@@ -102,7 +110,14 @@
                     </ul>
                 </li>
                 <li onclick="showFrame('bom_creation')">BOM Creation</li>
-                <li onclick="showFrame('export_data')">Export Data</li>
+                <li>
+                    Export Data
+                    <ul class="submenu">
+                        <li onclick="showFrame('onhand')">Onhand</li>
+                        <li onclick="showFrame('transaction_nhap')">Xuất</li>
+                        <li onclick="showFrame('transaction_xuat')">Nhập</li>
+                    </ul>
+                </li>
                 <li><button id="logout-btn" class="logout-btn">LOGOUT</button></li>
             </ul>
         </aside>
@@ -112,7 +127,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <label>Version 1.1113.0315</label>
+                <h4>Version 1.112.07</h4>
             </div>
                 
             <div id="import" class="frame">
@@ -246,7 +261,65 @@
 
                 <div id="tempLabel" style="display: none; background-color: red; color: white; padding: 5px;">Không có kết quả</div>
             </div>
-            <div id="mml" class="frame">MML Inventory Content</div>
+            <div id="mml" class="frame">
+                <h1>Meterials Master List</h1>
+                
+                <div class="form-row">
+                    <label for="material-type_mml">Loại vật tư</label>
+                    <input type="text" id="material-type_mml" placeholder="Nhập loại vật tư">
+                </div>
+
+                <div class="form-row">
+                    <label for="sku_name_mml">Tên vật tư</label>
+                    <input type="text" id="sku_name_mml" placeholder="Nhập Tên vật tư">
+                </div>
+
+                <div class="form-row">
+                    <label for="sku_id_mml">Mã vật tư</label>
+                    <input type="text" id="sku_id_mml" placeholder="Nhập Mã vật tư">
+                </div>
+
+                <div class="form-row">
+                    <label for="price_mml">Đơn giá</label>
+                    <input type="number" id="price_mml" placeholder="Đơn giá" oninput="validateInput(this)">
+                </div>
+
+                <div class="form-row">
+                    <label for="supplier_id_mml">Mã nhà cung cấp</label>
+                    <input type="text" id="supplier_id_mml" placeholder="Nhập Mã nhà cung cấp">
+                </div>
+
+                <div class="form-row">
+                    <label for="supplier_name_mml">Tên nhà cung cấp</label>
+                    <input type="text" id="supplier_name_mml" placeholder="Nhập Tên nhà cung cấp">
+                </div>
+
+                <div class="form-row">
+                    <label for="unit_mml">Đơn vị</label>
+                    <select id="unit_mml">
+                        <option value=""></option>
+                        <option value="Bịch">Bịch</option>
+                        <option value="Bộ">Bộ</option>
+                        <option value="Cái">Cái</option>
+                        <option value="Cây">Cây</option>
+                        <option value="Chai">Chai</option>
+                        <option value="Cuộn">Cuộn</option>
+                        <option value="Hộp">Hộp</option>
+                        <option value="Kg">Kg</option>
+                        <option value="Lit">Lit</option>
+                        <option value="Mét">Mét</option>
+                        <option value="Sợi">Sợi</option>
+                        <option value="Tấm">Tấm</option>
+                        <option value="Túi">Túi</option>
+                    </select>
+                </div>
+
+                <div id="button_group_mml">
+                    <button class="submit-btn" onclick="submit_mml()">Submit</button>
+                    <button class="reset-btn" onclick="reset_mml()">Reset</button>
+                </div>
+
+            </div>
             <div id="crm" class="frame">CRM OPS Management Content</div>
             <div id="survey" class="frame">KHẢO SÁT OPS Management Content</div>
             <div id="design" class="frame">DESIGN + BOM OPS Management Content</div>
@@ -256,7 +329,21 @@
             <div id="delivery" class="frame">DELIVERY OPS Management Content</div>
             <div id="payment" class="frame">PAYMENT OPS Management Content</div>
             <div id="bom_creation" class="frame">BOM Creation Content</div>
-            <div id="export_data" class="frame">Export Data Content</div>
+            <div id="onhand" class="frame">
+                
+                <h1>On-hand Inventory</h1>
+                <button id="export_onhand" class="refresh-btn">Export</button>
+                <button id="refresh_onhand" class="refresh-btn">Refresh</button>
+                <div class="scrollable-frame">
+                    <div id="tableContainer">
+                        <div class="table-wrapper">
+                            <div id="onhandTable"></div> <!-- Tabulator table goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="transaction_nhap" class="frame">transaction_nhap Data Content</div>
+            <div id="transaction_xuat" class="frame">transaction_xuat Data Content</div>
         </main>
     </div>
 
