@@ -114,8 +114,8 @@
                     Export Data
                     <ul class="submenu">
                         <li onclick="showFrame('onhand')">Onhand</li>
-                        <li onclick="showFrame('transaction_nhap')">Xuất</li>
-                        <li onclick="showFrame('transaction_xuat')">Nhập</li>
+                        <li onclick="showFrame('transaction_nhap')">Nhập</li>
+                        <li onclick="showFrame('transaction_xuat')">Xuất</li>
                     </ul>
                 </li>
                 <li><button id="logout-btn" class="logout-btn">LOGOUT</button></li>
@@ -127,7 +127,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 1.112.07</h4>
+                <h4>Version 1.443.07</h4>
             </div>
                 
             <div id="import" class="frame">
@@ -342,8 +342,87 @@
                     </div>
                 </div>
             </div>
-            <div id="transaction_nhap" class="frame">transaction_nhap Data Content</div>
-            <div id="transaction_xuat" class="frame">transaction_xuat Data Content</div>
+            <div id="transaction_nhap" class="frame">
+                <h1>Transaction nhập</h1>
+                <button id="export_nhap" class="refresh-btn">Export</button>
+                <button id="refresh_nhap" class="refresh-btn">Refresh</button>
+                <div class="scrollable-frame">
+                    <div id="tableContainer">
+                        <div class="table-wrapper">
+                            <div id="nhapTable"></div> <!-- Tabulator table goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="transaction_xuat" class="frame">
+                <h1>Transaction Xuất</h1>
+                <button id="export_xuat" class="refresh-btn">Export</button>
+                <button id="refresh_xuat" class="refresh-btn">Refresh</button>
+                <div class="scrollable-frame">
+                    <div id="tableContainer">
+                        <div class="table-wrapper">
+                            <div id="xuatTable"></div> <!-- Tabulator table goes here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Modal -->
+        <div id="filterModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Filter Options</h2>
+                
+                <label for="selectFilter">Chọn chi nhánh</label>
+                <select id="selectFilter">
+                    
+                </select>
+                
+                <label for="dateFrom">Date From</label>
+                <input type="date" id="dateFrom">
+                
+                <label for="dateTo">Date To</label>
+                <input type="date" id="dateTo">
+                
+                <button id="applyFilter">Apply Filter and Export</button>
+                <button id="closeModal">Close</button>
+            </div>
+        </div>
+
+        <div id="filterModal2" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Filter Options</h2>
+                
+                <label for="selectFilter">Chọn chi nhánh</label>
+                <select id="selectFilter2">
+                    
+                </select>
+                
+                <label for="dateFrom">Date From</label>
+                <input type="date" id="dateFrom2">
+                
+                <label for="dateTo">Date To</label>
+                <input type="date" id="dateTo2">
+                
+                <button id="applyFilter2">Apply Filter and Export</button>
+                <button id="closeModal2">Close</button>
+            </div>
+        </div>
+
+        <div id="filterModal3" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h2>Filter Options</h2>
+                
+                <label for="selectFilter">Chọn chi nhánh</label>
+                <select id="selectFilter3">
+                    
+                </select>
+                
+                <button id="applyFilter3">Apply Filter and Export</button>
+                <button id="closeModal3">Close</button>
+            </div>
+        </div>
+
+
         </main>
     </div>
 
