@@ -99,14 +99,6 @@ h2 {
     height: 100vh;
 }
 
-.sidebar {
-    width: 250px;
-    background-color: black;
-    color: #ecf0f1;
-    padding: 20px;
-    overflow-y: auto;
-}
-
 .sidebar ul {
     list-style-type: none;
     font-weight: bold;
@@ -599,4 +591,256 @@ button.pick-button:active {
 
 h1 {
     margin-bottom: 10px;
+}
+
+
+.sidebar {
+    width: 250px;
+    background-color: black;
+    color: #ecf0f1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.table-wrapper {
+    /* max-width: calc(100% - 250px); */
+    overflow-x: auto; /* Enables horizontal scrolling if the table is too wide */
+    border: 1px solid #ddd; /* Optional border for clarity */
+}
+
+/* Tabulator table */
+#onhandTable {
+    min-width: 1000px; /* Set a minimum width for the table */
+}
+
+.scrollable-frame {
+    width: 1364px;
+    height: auto;
+    overflow: auto; /* Cho phép cuộn hai chiều */
+    border: 1px solid #333;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.tabulator-paginator {
+    display: flex;
+    justify-content: flex-start; /* Di chuyển phân trang sang bên trái */
+    padding-left: 10px; /* Căn chỉnh khoảng cách nếu cần */
+}
+
+.tabulator {
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tabulator .tabulator-header {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #e9ecef !important;
+}
+
+.tabulator .tabulator-col {
+    font-weight: bold !important;
+    color: #495057 !important;
+}
+
+.tabulator .tabulator-row {
+    background-color: #fff !important;
+    border-bottom: 1px solid #e9ecef !important;
+    transition: background-color 0.3s !important;
+}
+
+.tabulator .tabulator-row:nth-child(even) {
+    background-color: #f8f9fa !important;
+}
+
+.tabulator .tabulator-row:hover {
+    background-color: #e2e6ea !important;
+}
+
+.tabulator .tabulator-cell {
+    padding: 10px !important;
+    color: #495057 !important;
+    border-right: 1px solid #e9ecef !important;
+}
+
+.tabulator .tabulator-cell:last-child {
+    border-right: none !important;
+}
+
+.tabulator .tabulator-paginator label,
+.tabulator .tabulator-paginator button {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 5px 10px !important;
+    margin: 2px !important;
+    transition: background-color 0.2s !important;
+}
+
+.tabulator .tabulator-paginator button:hover {
+    background-color: #d1d5db !important;
+}
+
+.tabulator .tabulator-paginator button.tabulator-page.active {
+    background-color: #007bff !important;
+    color: #fff !important;
+}
+
+.scrollable-frame {
+    margin-top: 20px;
+}
+
+
+/* Tiêu đề */
+#onhand h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Phần lọc */
+#filter_onhand {
+    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Dòng form */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Nhãn */
+.form-row label {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Dropdown list (select) */
+.form-row select {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #f3f6fa;
+    color: #333;
+    transition: border-color 0.3s;
+}
+
+.form-row select:focus {
+    border-color: #76d7c4;
+    outline: none;
+}
+
+#onhand .refresh-btn {
+    width: 150px;
+    padding: 10px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 18px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+/* MML*/
+
+#mml {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#mml .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+#mml label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+#mml input[type="text"],
+#mml input[type="number"],
+#mml input[type="date"],
+#mml select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#mml input[type="text"]:focus,
+#mml input[type="number"]:focus,
+#mml input[type="date"]:focus,
+#mml select:focus {
+    border-color: #11998e;
+}
+
+#mml select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#mml input[type="number"]::-webkit-inner-spin-button,
+#mml input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#mml .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#mml .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#button_group_mml {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
 }
