@@ -754,6 +754,32 @@ h1 {
     margin-top: 15px;
 }
 
+#transaction_nhap .refresh-btn {
+    width: 150px;
+    padding: 10px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 18px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#transaction_xuat .refresh-btn {
+    width: 150px;
+    padding: 10px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 18px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
 /* MML*/
 
 #mml {
@@ -843,4 +869,294 @@ h1 {
     align-items: center;
     margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
     gap: 5px;
+}
+
+/* modal xuat */
+
+/* CSS cho toàn bộ modal */
+#filterModal {
+    display: none; /* Mặc định ẩn modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    z-index: 1000; /* Đảm bảo modal ở trên cùng */
+}
+
+/* CSS cho nội dung modal */
+#filterModal .modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* Căn giữa modal */
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    text-align: center;
+}
+
+/* CSS cho tiêu đề modal */
+#filterModal h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* CSS cho nhãn */
+#filterModal label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* CSS cho dropdown (select) */
+#filterModal #selectFilter {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho các input date */
+#filterModal input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho nút trong modal */
+#filterModal button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+#filterModal #closeModal {
+    background-color: #dc3545; /* Màu đỏ cho nút đóng */
+}
+
+#filterModal button:hover {
+    background-color: #0056b3; /* Màu đậm hơn khi hover */
+}
+
+#filterModal #closeModal:hover {
+    background-color: #c82333; /* Màu đậm hơn cho nút đóng khi hover */
+}
+
+
+/* modal nhap */
+
+/* CSS cho toàn bộ modal */
+#filterModal2 {
+    display: none; /* Mặc định ẩn modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    z-index: 1000; /* Đảm bảo modal ở trên cùng */
+}
+
+/* CSS cho nội dung modal */
+#filterModal2 .modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* Căn giữa modal */
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    text-align: center;
+}
+
+/* CSS cho tiêu đề modal */
+#filterModal2 h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* CSS cho nhãn */
+#filterModal2 label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* CSS cho dropdown (select) */
+#filterModal2 #selectFilter2 {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho các input date */
+#filterModal2 input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho nút trong modal */
+#filterModal2 button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+#filterModal2 #closeModal2 {
+    background-color: #dc3545; /* Màu đỏ cho nút đóng */
+}
+
+#filterModal2 button:hover {
+    background-color: #0056b3; /* Màu đậm hơn khi hover */
+}
+
+#filterModal2 #closeModal2:hover {
+    background-color: #c82333; /* Màu đậm hơn cho nút đóng khi hover */
+}
+
+
+/* modal onhand */
+
+/* CSS cho toàn bộ modal */
+#filterModal3 {
+    display: none; /* Mặc định ẩn modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+    z-index: 1000; /* Đảm bảo modal ở trên cùng */
+}
+
+/* CSS cho nội dung modal */
+#filterModal3 .modal-content {
+    background-color: #ffffff;
+    margin: 10% auto; /* Căn giữa modal */
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    text-align: center;
+}
+
+/* CSS cho tiêu đề modal */
+#filterModal3 h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* CSS cho nhãn */
+#filterModal3 label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* CSS cho dropdown (select) */
+#filterModal3 #selectFilter3 {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho các input date */
+#filterModal3 input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* CSS cho nút trong modal */
+#filterModal3 button {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+#filterModal3 #closeModal3 {
+    background-color: #dc3545; /* Màu đỏ cho nút đóng */
+}
+
+#filterModal3 button:hover {
+    background-color: #0056b3; /* Màu đậm hơn khi hover */
+}
+
+#filterModal3 #closeModal3:hover {
+    background-color: #c82333; /* Màu đậm hơn cho nút đóng khi hover */
 }
