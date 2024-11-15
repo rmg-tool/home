@@ -891,13 +891,19 @@ function showFrame(id) {
                 load_data_nhap().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
+                    reset_nhap()
                 });
             } else if (id === 'export') {
                 // Load data and then show the frame
                 load_data_xuat().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
+                    reset_xuat()
                 });
+            } else if (id === 'mml') {
+                activeFrame.classList.add('active');
+                console.log("Access granted to frame:", id);
+                reset_mml()
             } else if (id === 'onhand') {
                 // Load data and then show the frame
                 load_data_mml().then(() => {
@@ -935,6 +941,7 @@ function clear_label_xuat() {
     document.getElementById("sku_name_xuat").textContent = ""
     document.getElementById("sku_id_xuat").textContent = ""
     document.getElementById("cur_onhand").textContent = ""
+    document.getElementById("price_at_xuat").textContent = ""
 }
 
 function reset_xuat() {
@@ -1092,7 +1099,8 @@ function handleModalSelection_nhap2(selectedOption) {
             col[3],                // Location
             Math.ceil(col[10] * 10000) / 10000, // Round quantity up to 4 decimal places
             col[4] || "-",         // Expiry Date, default to "-"
-            col[5]                 // Inbound Date
+            col[5],                 // Inbound Date
+            col[6]
         ]);
 
     found_table_xuat.sort((a, b) => {
@@ -1117,6 +1125,7 @@ function handleModalSelection_nhap2(selectedOption) {
     });
 
     console.table(found_table_xuat);
+    console.log(found_table_xuat[5])
     displayFoundTableModal(found_table_xuat);
 }
 
@@ -1130,7 +1139,7 @@ function displayFoundTableModal(data) {
         const tableRow = document.createElement("tr");
 
         // Append each data cell, excluding any previous status column
-        row.slice(0, 5).forEach(cellData => {
+        row.slice(0, 6).forEach(cellData => {
             const tableCell = document.createElement("td");
             tableCell.textContent = cellData;
             tableRow.appendChild(tableCell);
@@ -1138,7 +1147,7 @@ function displayFoundTableModal(data) {
 
         // Add the new status cell with the "Pick" button or "Không thể lấy" text
         const statusCell = document.createElement("td");
-        if (row[5] === "Pick") {
+        if (row[6] === "Pick") {
             const pickButton = document.createElement("button");
             pickButton.textContent = "Pick";
             pickButton.classList.add("pick-button");
@@ -1169,6 +1178,7 @@ function handlePick(selectedRow) {
     document.getElementById("exp_date_xuat").textContent = selectedRow[3]
     document.getElementById("ib_date_xuat").textContent = selectedRow[4]
     document.getElementById("cur_onhand").textContent = selectedRow[2]
+    document.getElementById("price_at_xuat").textContent = selectedRow[5]
     
     closeFoundTableModal();
 
@@ -1211,6 +1221,7 @@ function submit_xuat() {
     const sku_id_xuat = document.getElementById("sku_id_xuat").textContent;
     const expiry_date = document.getElementById("exp_date_xuat").textContent;
     const inbound_date = document.getElementById("ib_date_xuat").textContent;
+    const price = document.getElementById("price_at_xuat").textContent;
     // const qty_xuat_selected = document.getElementById("cur_onhand").textContent;
     
     if (warehouse === "") {
@@ -1270,7 +1281,8 @@ function submit_xuat() {
         stock_out_table.append("sku_id", sku_id_xuat);
         stock_out_table.append("exp_date", expiry_date);
         stock_out_table.append("ib_date", "'"+inbound_date);
-        fetch('https://script.google.com/macros/s/AKfycbz8quGPI1b-xknFdeiejUbJT2nNXWk5ZwqySgVq4bXehi16n5r-APdMfkd5oElPAcoPIA/exec', {
+        stock_out_table.append("price", price);
+        fetch('https://script.google.com/macros/s/AKfycbx6H32KzYyrM9G4sskPmMT90p9LZRiKUQzJ6hA88dRrF26Jw8Ntx5A6Gaci5l8TCwQsKQ/exec', {
             method: 'POST',
             mode: 'no-cors',
             body: stock_out_table
