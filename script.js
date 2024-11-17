@@ -495,7 +495,7 @@ function submit_nhap() {
         alert("Bạn chưa chọn vật tư")
         return
     }
-
+    const amount_nhao_cr = unit_price * quantity
     try {
         let stock_in_table = new FormData();
         stock_in_table.append("wh", warehouse);
@@ -508,8 +508,10 @@ function submit_nhap() {
         stock_in_table.append("sku_id", part_number_nhap);
         stock_in_table.append("expiry", expiry_date_nhap);
         stock_in_table.append("price", unit_price);
+        stock_in_table.append("amount", amount_nhao_cr);
+        stock_in_table.append("unit", unit_nhap);
 
-        fetch('https://script.google.com/macros/s/AKfycbx4Z3ko2bspVPllG2bmOqUpvaasTHT6Texb76HG7J3WX4a7WxHHAsgV12kxvw0FlnRv/exec', {
+        fetch('https://script.google.com/macros/s/AKfycbwu7OABpx4V_QzVuKt113RnWkhAtG09aQ9N1vYrTs7mxcWbQrqtnSb-ISm-CJgyjci8/exec', {
             method: 'POST',
             mode: 'no-cors',
             body: stock_in_table
@@ -892,39 +894,47 @@ function showFrame(id) {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
                     reset_nhap()
+                    stopInterval()
                 });
             } else if (id === 'export') {
                 // Load data and then show the frame
+                startInterval()
                 load_data_xuat().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
                     reset_xuat()
+                    
                 });
             } else if (id === 'mml') {
                 activeFrame.classList.add('active');
                 console.log("Access granted to frame:", id);
                 reset_mml()
+                stopInterval()
             } else if (id === 'onhand') {
                 // Load data and then show the frame
                 load_data_mml().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
+                    stopInterval()
                 });
             } else if (id === 'transaction_xuat') {
                 // Load data and then show the frame
                 load_data_xuat_export().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
+                    stopInterval()
                 });
             } else if (id === 'transaction_nhap') {
                 // Load data and then show the frame
                 load_data_nhap_export().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
+                    stopInterval()
                 });
             } else {
                 activeFrame.classList.add('active');
                 console.log("Access granted to frame:", id);
+                stopInterval()
             }
         }
     } else {
@@ -1267,6 +1277,9 @@ function submit_xuat() {
         return
     }
 
+    const amount_xuat_cr = price * quantity
+    console.log(amount_xuat_cr)
+
     try {
         let stock_out_table = new FormData();
         stock_out_table.append("wh", warehouse);
@@ -1279,10 +1292,12 @@ function submit_xuat() {
         stock_out_table.append("loc", storage_location);
         stock_out_table.append("sku_name", sku_name_xuat);
         stock_out_table.append("sku_id", sku_id_xuat);
-        stock_out_table.append("exp_date", expiry_date);
+        stock_out_table.append("exp_date", "'"+expiry_date);
         stock_out_table.append("ib_date", "'"+inbound_date);
         stock_out_table.append("price", price);
-        fetch('https://script.google.com/macros/s/AKfycbx6H32KzYyrM9G4sskPmMT90p9LZRiKUQzJ6hA88dRrF26Jw8Ntx5A6Gaci5l8TCwQsKQ/exec', {
+        stock_out_table.append("amount", amount_xuat_cr);
+        stock_out_table.append("unit", unit_xuat);
+        fetch('https://script.google.com/macros/s/AKfycbzVig-uAYGFBBJ9MLuyoAtUhUBxJgbPH03AKSJBtbWt0lKjDIJI1I9P5wnyTSO_C0Nx1A/exec', {
             method: 'POST',
             mode: 'no-cors',
             body: stock_out_table
@@ -1300,6 +1315,7 @@ function submit_xuat() {
     info("Xuất vật tư thành công !!!")   
 }
 
+/// Interval Xuất
 let intervalId = null;
 
 function yourFunction() {
@@ -1309,8 +1325,7 @@ function yourFunction() {
 
 function startInterval() {
     if (!intervalId) {
-        intervalId = setInterval(yourFunction, 1000); // Run every 5 minutes
-        console.log("Interval started");
+        intervalId = setInterval(load_onhand, 300000) //300000); // Run every 5 minutes
     }
 }
 
