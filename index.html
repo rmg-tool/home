@@ -101,7 +101,10 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2312.1230</h4>
+                <h4>Version 3.2412.102</h4>
+
+                <!-- Thêm hình ảnh -->
+                <img src="material/rmg.jpg" alt="RMG Technologies" style="width:100%;"/>
             </div>
             
                 
@@ -380,7 +383,7 @@
                             </div>
                             <div class="form-row">
                                 <label for="totalHours">Tổng giờ làm</label>
-                                <input type="text" id="totalHours" placeholder="Nhập tổng giờ làm">
+                                <input type="text" id="totalHours" placeholder="Nhập tổng giờ làm" oninput="validateInput(this)">
                             </div>
                             <div class="form-row">
                                 <label for="surveyContent">Nội dung</label>
@@ -447,7 +450,7 @@
 
                         <div class="form-row">
                             <label for="designTotalHour">Tổng giờ làm</label>
-                            <input type="text" id="designTotalHour" placeholder="Nhập tổng giờ làm">
+                            <input type="text" id="designTotalHour" placeholder="Nhập tổng giờ làm" oninput="validateInput(this)">
                         </div>
 
                         <div class="form-row">
@@ -504,7 +507,7 @@
 
                         <div class="form-row">
                             <label for="quotationTotalPrice">Giá trị đơn hàng + VAT</label>
-                            <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị đơn hàng + VAT" oninput="validateInput(this)"">
+                            <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị đơn hàng + VAT" oninput="validateInput(this)">
                         </div>
 
                         <div style="text-align: center; margin-top: 30px;">
