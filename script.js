@@ -2628,120 +2628,6 @@ async function get_survey_need_to_process() {
     document.getElementById("loadingIndicator").style.display = "none";
 }
 
-
-//////////////////////////////
-//////////////////////////////
-
-///* survey approval ///
-
-// async function survey_approval() {
-//     // Show the loading indicator
-//     document.getElementById("loadingIndicator").style.display = "block";
-
-//     await Promise.all([load_survey(), load_survey_approval()]); // Run both fetch calls in parallel
-
-//     // Hide the loading indicator once loading is complete
-//     document.getElementById("loadingIndicator").style.display = "none";
-
-//     survey_data.shift()
-//     // const filter_approve_request = survey_data
-//     //     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
-//     //     .filter(item => item[4] === sessionStorage.getItem("approver"));
-
-//     const filter_approve_request = survey_data
-//     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
-//     .filter(item => 
-//         item[4] === sessionStorage.getItem("approver") && // Điều kiện 1
-//         !survey_approval_data.some(approvedItem => approvedItem[5] === item[5]) // Điều kiện 2
-//     );
-
-//     console.log(filter_approve_request)
-//     let tableHTML = `
-//         <table border="1" style="border-collapse: collapse; width: 100%;">
-//             <thead>
-//                 <tr>
-//                     <th>Approve Type</th>
-//                     <th>CRM#</th>
-//                     <th>Survey#</th>
-//                     <th>Requestor</th>
-//                     <th>Actions</th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//     `;
-
-//     // Duyệt qua dữ liệu để tạo các hàng
-//     filter_approve_request.forEach((row) => {
-//         tableHTML += `
-//             <tr>
-//                 <td>${row[9]}</td>
-//                 <td>${row[6]}</td>
-//                 <td>${row[5]}</td>
-//                 <td>${row[2]}</td>
-//                 <td>
-//                     <button onclick="viewDetail(${row.originalIndex})">View Detail</button>
-//                 </td>
-//             </tr>
-//         `;
-//     });
-
-//     // Kết thúc bảng
-//     tableHTML += `
-//             </tbody>
-//         </table>
-//     `;
-
-//     // Thêm bảng vào một phần tử có ID 'tableContainer'
-//     document.getElementById('table_approve_survey').innerHTML = tableHTML;
-// }
-
-
-// // Hiển thị bảng sau khi tải trang
-// // window.onload = () => survey_approval();
-
-// let select_survey_to_approve = ""
-// function viewDetail(index) {
-//     // Lấy dữ liệu từ survey_data dựa trên index
-//     const row = survey_data[index];
-//     select_survey_to_approve = row
-
-//     console.log(row)
-//     console.log(select_survey_to_approve)
-
-//     // Gán dữ liệu vào các phần tử trong modal
-//     document.getElementById("operator_name_show").textContent = row[2];
-//     document.getElementById("request_time_show").textContent = row[0] + " " + row[1];
-//     document.getElementById("crm_show").textContent = row[6];
-//     document.getElementById("survey_show").textContent = row[5];
-//     document.getElementById("total_hours_show").textContent = row[7];
-//     document.getElementById("content_show").textContent = row[8];
-
-//     // Lấy phần tử link_show
-//     const linkElement = document.getElementById("link_show");
-
-//     // Tạo thẻ <a>
-//     const anchor = document.createElement("a");
-
-//     // Gán giá trị cho href từ row[10]
-//     anchor.href = row[10];
-
-//     // Gán nội dung hiển thị của link
-//     anchor.textContent = "Xem File đính kèm tại đây";
-
-//     // Đặt thuộc tính target để mở tab mới
-//     anchor.target = "_blank";
-
-//     // Xóa nội dung cũ của link_show (nếu cần)
-//     linkElement.textContent = "";
-
-//     // Thêm thẻ <a> vào link_show
-//     linkElement.appendChild(anchor);
-
-//     // Hiển thị modal và backdrop
-//     document.getElementById("detailModal").style.display = "block";
-//     document.getElementById("modalBackdrop").style.display = "block";
-// }
-
 // Hàm đóng modal
 function closeModal() {
     document.getElementById("secondaryModal").style.display = 'none';
@@ -2749,81 +2635,6 @@ function closeModal() {
     document.getElementById("detailModal").style.display = "none";
     document.getElementById("modalBackdrop").style.display = "none";
 }
-
-// Hàm xử lý khi nhấn Approve
-// async function approveSurvey() {
-//     try {
-//         let survey_table_approved = new FormData();
-
-//         survey_table_approved.append("operator", select_survey_to_approve[2])
-//         survey_table_approved.append("username", select_survey_to_approve[3])
-//         survey_table_approved.append("approver", select_survey_to_approve[4])
-
-//         survey_table_approved.append("survey_id", select_survey_to_approve[5])
-//         survey_table_approved.append("crm_id", select_survey_to_approve[6])
-//         survey_table_approved.append("total_hour", select_survey_to_approve[7])
-//         survey_table_approved.append("content", select_survey_to_approve[8])
-
-//         survey_table_approved.append("status", "Thiết kế")
-
-//         survey_table_approved.append("link", select_survey_to_approve[10])
-//         document.getElementById("loadingIndicator").style.display = "block";
-//         await fetch('https://script.google.com/macros/s/AKfycbwDK4k3oW8SrStcwMamUrBt5TKLeWojHDTcEi1hpazA_TD1jjF2mCaxTG530K3DG7x8/exec', {
-//             method: 'POST',
-//             mode: 'no-cors',
-//             body: survey_table_approved
-//         }).then(response => response.text)
-//             .then(result => console.log('Đã gửi data thành công'))
-//             .catch(error => console.error('Error:', error));
-//         }
-//     catch (error) {
-//         console.error('Error:', error);
-//     }
-//     load_approval_ticket()
-//     closeModal();
-//     info("Survey Ticket Approved")
-//     document.getElementById("loadingIndicator").style.display = "block";
-// }
-
-// // Hàm xử lý khi nhấn Reject
-// async function rejectSurvey() {
-//     try {
-//         let survey_table_rejected = new FormData();
-
-//         survey_table_rejected.append("operator", select_survey_to_approve[2])
-//         survey_table_rejected.append("username", select_survey_to_approve[3])
-//         survey_table_rejected.append("approver", select_survey_to_approve[4])
-
-//         survey_table_rejected.append("survey_id", select_survey_to_approve[5])
-//         survey_table_rejected.append("crm_id", select_survey_to_approve[6])
-//         survey_table_rejected.append("total_hour", select_survey_to_approve[7])
-//         survey_table_rejected.append("content", select_survey_to_approve[8])
-
-//         survey_table_rejected.append("status", "Khảo sát Rejected")
-
-//         survey_table_rejected.append("link", select_survey_to_approve[10])
-//         document.getElementById("loadingIndicator").style.display = "block";
-//         await fetch('https://script.google.com/macros/s/AKfycbwDK4k3oW8SrStcwMamUrBt5TKLeWojHDTcEi1hpazA_TD1jjF2mCaxTG530K3DG7x8/exec', {
-//             method: 'POST',
-//             mode: 'no-cors',
-//             body: survey_table_rejected
-//         }).then(response => response.text)
-//             .then(result => console.log('Đã gửi data thành công'))
-//             .catch(error => console.error('Error:', error));
-//         }
-//     catch (error) {
-//         console.error('Error:', error);
-//     }
-//     load_approval_ticket()
-//     info("Survey Ticket rejected!");
-//     closeModal();
-//     document.getElementById("loadingIndicator").style.display = "block";
-// }
-
-
-//////////////////////////////
-//////////////////////////////
-
 ///* Design + BOM ///
 
 function reset_design() {
@@ -3009,7 +2820,7 @@ async function submitForm_design() {
     }
 
 
-    const findCrm3 = design_approval_data.filter(item => item[6] === crm_id && item[11] ===  "Báo giá"); // Filter rows based on selection
+    const findCrm3 = design_approval_data.filter(item => item[6] === crm_id && item[11] ===  "BOM ĐÃ DUYỆT"); // Filter rows based on selection
     // console.table(findCrm2)
 
     if (findCrm3.length > 0) {
@@ -3017,23 +2828,6 @@ async function submitForm_design() {
         document.getElementById("loadingIndicator").style.display = "none";
         return
     }
-
-    // const findCrm = survey_data.filter(item => item[6] === crm_id); // Filter rows based on selection
-    // console.table(findCrm)
-    // if (findCrm.length === 0) {
-    //     alert("Sai CRM# hoặc CRM# chưa được duyệt")
-    //     document.getElementById("loadingIndicator").style.display = "none";
-    //     return
-    // }
-
-    // const findCrm2 = design_data.filter(item => item[6] === crm_id); // Filter rows based on selection
-    // console.table(findCrm2)
-    // console.table(design_approval_data)
-    // if (findCrm2.length >0) {
-    //     alert("CRM# này đã được yêu cầu báo giá")
-    //     document.getElementById("loadingIndicator").style.display = "none";
-    //     return
-    // }
 
     // Chuỗi ban đầu
     const inputString = crm_id
@@ -3317,7 +3111,7 @@ async function approveDesign() {
         design_table_approved.append("bom_id", select_design_to_approve[9])
         design_table_approved.append("total_price", select_design_to_approve[10])
 
-        design_table_approved.append("status", "Báo giá")
+        design_table_approved.append("status", "BOM ĐÃ DUYỆT")
 
         design_table_approved.append("link", select_design_to_approve[12])
         design_table_approved.append("design_id", select_design_to_approve[13])
@@ -3357,7 +3151,7 @@ async function rejectDesign() {
         design_table_rejected.append("bom_id", select_design_to_approve[9])
         design_table_rejected.append("total_price", select_design_to_approve[10])
 
-        design_table_rejected.append("status", "Thiết kế Rejected")
+        design_table_rejected.append("status", "BOM REJECTED")
 
         design_table_rejected.append("link", select_design_to_approve[12])
         design_table_rejected.append("design_id", select_design_to_approve[13])
@@ -3536,7 +3330,7 @@ async function submitForm_quotation() {
     }
 
 
-    const findCrm3 = quotation_approval_data.filter(item => item[6] === crm_id && item[10] ===  "Chờ nhận đơn hàng"); // Filter rows based on selection
+    const findCrm3 = quotation_approval_data.filter(item => item[6] === crm_id && item[10] ===  "BÁO GIÁ ĐÃ DUYỆT"); // Filter rows based on selection
     // console.table(findCrm2)
 
     if (findCrm3.length > 0) {
@@ -3839,7 +3633,7 @@ async function approveQuotation() {
 
         quotation_table_approved.append("total_price", select_quotation_to_approve[9])
 
-        quotation_table_approved.append("status", "Chờ nhận đơn hàng")
+        quotation_table_approved.append("status", "BÁO GIÁ ĐÃ DUYỆT")
 
         quotation_table_approved.append("folderUrl", select_quotation_to_approve[11])
         quotation_table_approved.append("bom_price", select_quotation_to_approve[12])
@@ -3878,7 +3672,7 @@ async function rejectQuotation() {
 
         quotation_table_rejected.append("total_price", select_quotation_to_approve[9])
 
-        quotation_table_rejected.append("status", "Báo giá Rejected")
+        quotation_table_rejected.append("status", "QUOTATION REJECTED")
 
         quotation_table_rejected.append("folderUrl", select_quotation_to_approve[11])
         quotation_table_rejected.append("bom_price", select_quotation_to_approve[12])
