@@ -51,35 +51,6 @@
             </div>
         </div>
     </div>
-
-    <div id="secondaryModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h3>Chọn vật tư</h3>
-            <div id="modalOptions"></div>
-        </div>
-    </div>
-
-    <div id="foundTableModal" style="display: none;" class="modal2">
-        <div class="modal-content2">
-            <span class="close-button" onclick="closeFoundTableModal()">×</span>
-            <h3>Thông tin tìm thấy</h3>
-            <table id="foundTable" border="1">
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Location</th>
-                        <th>Quantity</th>
-                        <th>Expiry Date</th>
-                        <th>Inbound Date</th>
-                        <th>Unit Price</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
     
 
     <!-- Main Dashboard Frame -->
@@ -126,13 +97,23 @@
 
         <!-- Main Content Area -->
         <main class="content">
+            
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2312.1115</h4>
+                <h4>Version 3.2312.1206</h4>
             </div>
+            
                 
             <div id="import" class="frame">
+                <div id="secondaryModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()">x</span>
+                        <h3>Chọn vật tư</h3>
+                        <div id="modalOptions"></div>
+                    </div>
+                </div>
+    
                 <h1>Nhập vật tư</h1>
                 <div class="form-row">
                     <label for="warehouse">Chọn chi nhánh</label>
@@ -194,6 +175,34 @@
             </div>
             
             <div id="export" class="frame">
+                <div id="secondaryModal2" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()">x</span>
+                        <h3>Chọn vật tư</h3>
+                        <div id="modalOptions2"></div>
+                    </div>
+                </div>
+            
+                <div id="foundTableModal" style="display: none;" class="modal2">
+                    <div class="modal-content2">
+                        <span class="close-button" onclick="closeFoundTableModal()">×</span>
+                        <h3>Thông tin tìm thấy</h3>
+                        <table id="foundTable" border="1">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Quantity</th>
+                                    <th>Expiry Date</th>
+                                    <th>Inbound Date</th>
+                                    <th>Unit Price</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
                 <h1>Xuất vật tư</h1>
                 <div class="form-row">
                     <label for="warehouse_xuat">Chọn chi nhánh</label>
