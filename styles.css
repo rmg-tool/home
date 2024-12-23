@@ -1474,6 +1474,43 @@ h1 {
     margin-bottom: 15px;
 }
 
+#import .modal-content {
+    width: 800px;
+    position: relative; /* Thêm dòng này */
+}
+
+#import .modal-content .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+
+#export .modal-content {
+    width: 800px;
+    position: relative; /* Thêm dòng này */
+}
+
+#export .modal-content .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 .modal-content input, .modal-content select {
     width: 90%;
     padding: 10px;
