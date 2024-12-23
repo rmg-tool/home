@@ -278,13 +278,55 @@ function create_wh_onhand_export() {
     });
 }
 
+function create_wh_crm() {
+    const wh = sessionStorage.getItem("wh"); // Lấy giá trị "wh" từ sessionStorage
+    const warehouseSelect = document.getElementById("wh_crm");
+
+    if (!warehouseSelect) {
+        console.error("Không tìm thấy combobox 'warehouse'");
+        return;
+    }
+
+    // Xóa tất cả các option hiện có trong combobox để làm mới
+    warehouseSelect.innerHTML = '';
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Chọn chi nhánh";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    warehouseSelect.appendChild(emptyOption);
+
+    // Xác định danh sách các kho dựa trên giá trị của `wh`
+    let options;
+    if (wh === "All") {
+        options = ['HCM', 'QN', 'BN','SG'];
+    } else if (wh) {
+        options = [wh,'SG'];
+    } else {
+        options = [];
+        console.warn("Danh sách kho trống.");
+    }
+
+    // Thêm các option vào combobox "Chọn kho"
+    options.forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        warehouseSelect.appendChild(opt);
+    });
+}
+
 
 create_wh_nhap()
 create_wh_xuat()
 create_wh_xuat_export()
 create_wh_nhap_export()
 create_wh_onhand_export()
+create_wh_crm()
 
+//////**** */ Nhập //////
 
 // Hàm debounce để giới hạn số lần gọi tìm kiếm
 function debounce(func, delay) {
@@ -371,6 +413,7 @@ function showSecondaryOptions(selectedItem) {
             // Add event listener for selecting this option
             optionDiv.addEventListener("click", () => {
                 handleModalSelection_nhap(option); // Call function when an option is selected
+                modal.style.display = 'none'
             });
 
             // Append the unique option to the modal
@@ -637,6 +680,18 @@ let location_data = [];
 let onhand_data = [];
 let xuat_data = [];
 let nhap_data = [];
+let customer_data = [];
+let crm_data = [];
+let survey_data = [];
+let survey_approval_data = []
+let design_data = []
+let design_approval_data = []
+let quotation_data = []
+let quotation_approval_data = []
+let order_data = []
+let mfg_data = []
+let delivery_data = []
+let payment_data = []
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -644,6 +699,115 @@ async function load_user() {
         .then(data => {
             user_data = data.content;
             console.log("Dữ liệu người dùng đã tải xong.");
+        });
+}
+
+async function load_customer() {
+    return fetch('https://script.google.com/macros/s/AKfycbxrXB9TnuVnxtVXLTuFUp4mrMp69mjSlbiDNfLJn34pmBNOw5SUfQBgb498XMz5WjVOag/exec')
+        .then(res => res.json())
+        .then(data => {
+            customer_data = data.content;
+            console.log("Dữ liệu khách hàng đã tải xong.");
+        });
+}
+load_customer()
+
+async function load_crm() {
+    return fetch('https://script.google.com/macros/s/AKfycbxIEht5La88KujgKJsi8Vus7JrxeOToaC1wPD4fRACGKbR0Y_bF5KItAAr4_WRtRgXt/exec')
+        .then(res => res.json())
+        .then(data => {
+            crm_data = data.content;
+            console.log("Dữ liệu khách hàng đã tải xong.");
+        });
+}
+
+async function load_survey() {
+    return fetch('https://script.google.com/macros/s/AKfycbx9PanmgLgH8z8_-5QgO7aJdZBmAxa1A8cXrjK6HcGcgMras7dqSUeKQ5V5hwid7r3p/exec')
+        .then(res => res.json())
+        .then(data => {
+            survey_data = data.content;
+            console.log("Dữ liệu Khảo sát đã tải xong.");
+        });
+}
+
+async function load_survey_approval() {
+    return fetch('https://script.google.com/macros/s/AKfycbyNOqkC7GT1wfmYBPz4tg9x4rLaZw5AhgNBv45ZQttnR6k2Cztj7OO7pNBang3hPyQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            survey_approval_data = data.content;
+            console.log("Dữ liệu Kháo sát Approval đã tải xong.");
+        });
+}
+
+async function load_design() {
+    return fetch('https://script.google.com/macros/s/AKfycbzzVbXsNhIoQG9gtjvv41rR5CQY06rBQgoNuFiNi6lGbKoPF1jpm1rR6EqbDqDPpthm/exec')
+        .then(res => res.json())
+        .then(data => {
+            design_data = data.content;
+            console.log("Dữ liệu Design đã tải xong.");
+        });
+}
+
+async function load_design_approval() {
+    return fetch('https://script.google.com/macros/s/AKfycbwfmTLbuvDjos7zZSz1uqrO1w-QQtA29n8NAEHKw9el9u2WIXNAtAmarlFf5-cgnQ1G/exec')
+        .then(res => res.json())
+        .then(data => {
+            design_approval_data = data.content;
+            console.log("Dữ liệu Design Approval đã tải xong.");
+        });
+}
+
+async function load_quotation() {
+    return fetch('https://script.google.com/macros/s/AKfycbwfL3l90BWwQHEaRl_hrkCBshV-Hd2yhvE9T2WAL_iV1_0BkViCxavmjxAax3MWT3BVNQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            quotation_data = data.content;
+            console.log("Dữ liệu quotation đã tải xong.");
+        });
+}
+
+async function load_quotation_approval() {
+    return fetch('https://script.google.com/macros/s/AKfycbyJAAvYF2pg4QYGrLB9v8TDH6bdeTLKJPwjtH60b6TOnrqAQrafrD8hdv-cIQnxy8YW/exec')
+        .then(res => res.json())
+        .then(data => {
+            quotation_approval_data = data.content;
+            console.log("Dữ liệu quotation Approval đã tải xong.");
+        });
+}
+
+async function load_order() {
+    return fetch('https://script.google.com/macros/s/AKfycbyuvJht2YZ7RbMtsLW-D8VHxRaOK1pANfUNkIEaf7r3XHPVD-yCIiPzee8WJIioyYQItA/exec')
+        .then(res => res.json())
+        .then(data => {
+            order_data = data.content;
+            console.log("Dữ liệu order đã tải xong.");
+        });
+}
+
+async function load_mfg() {
+    return fetch('https://script.google.com/macros/s/AKfycbz-MD7uedjreW1kCgktD6YlGjSWU7Yec9CJE8w3Mb3D0f0CKyhcjQeH9NPh9j2U7dvzgg/exec')
+        .then(res => res.json())
+        .then(data => {
+            mfg_data = data.content;
+            console.log("Dữ liệu mfg đã tải xong.");
+        });
+}
+
+async function load_delivery() {
+    return fetch('https://script.google.com/macros/s/AKfycbxLCUb4iOPUY2EgbfPePzwRUTIueXL0btwe75bWtJD6UWzlg2tvRuKkULWhAWGnAEMXfQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            delivery_data = data.content;
+            console.log("Dữ liệu delivery đã tải xong.");
+        });
+}
+
+async function load_payment() {
+    return fetch('https://script.google.com/macros/s/AKfycbxTLg9rKc-aB1xquQt9gCU6dMY64E6nCleYFMR2x17pDzoO1wnFtmMq_A5EC3KSfMTE/exec')
+        .then(res => res.json())
+        .then(data => {
+            payment_data = data.content;
+            console.log("Dữ liệu payment đã tải xong.");
         });
 }
 
@@ -692,7 +856,6 @@ async function load_xuat() {
         });
 }
 
-
 document.addEventListener("DOMContentLoaded", async () => {
     await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
 
@@ -720,6 +883,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (user) {
             const fullname = user[0];
             const wh = user[1]
+            const approver = user[17]
+            const dept = user[19]
             // Xác định quyền của user dựa trên các cột 4, 5, 6, 7 trong user_data
             const permissions = {
                 import: user[4] === "x",
@@ -727,7 +892,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 onhand: user[6] === "x",
                 transaction_nhap: user[6] === "x",
                 transaction_xuat: user[6] === "x",
-                mml: user[7] === "x"
+                mml: user[7] === "x",
+                crm: user[9] === "x",
+                survey: user[10] === "x",
+                design: user[11] === "x",
+                quotation: user[12] === "x",
+                order: user[13] === "x", 
+                mfg: user[14] === "x",
+                delivery: user[15] === "x",
+                payment:user[16] === "x",
+                approve_center:user[18] === "x"
             };
 
             // Ghi log quyền để kiểm tra
@@ -738,6 +912,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             sessionStorage.setItem("username", username);
             sessionStorage.setItem("fullname", fullname);
             sessionStorage.setItem("wh", wh);
+            sessionStorage.setItem("approver", approver);
+            sessionStorage.setItem("dept", dept);
             loginSuccess(username);
         } else {
             alert("Sai tên đăng nhập hoặc mật khẩu!");
@@ -806,6 +982,164 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Hàm hiển thị frame theo id, chỉ cho phép truy cập nếu có quyền
     
 });
+
+// document.addEventListener("DOMContentLoaded", async () => {
+//     await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
+
+//     const loginForm = document.getElementById("login-form");
+//     const usernameInput = document.getElementById("username");
+//     const passwordInput = document.getElementById("password");
+//     const loginFrame = document.getElementById("login-frame");
+//     const welcomeFrame = document.getElementById("welcome-frame");
+//     const welcomeMessage = document.getElementById("welcome-message");
+//     const logoutButton = document.getElementById("logout-btn");
+
+//     const EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000; // 3 ngày
+//     // const EXPIRATION_TIME = 1 * 60 * 1000; // 1 phút
+
+//     checkLoginStatus();
+//     // const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+//     // const expirationTime = sessionStorage.getItem("expirationTime");
+//     // const username = sessionStorage.getItem("username");
+
+//     // // Kiểm tra nếu đã đăng nhập và còn hiệu lực
+//     // if (isLoggedIn === "true" && expirationTime && Date.now() < parseInt(expirationTime)) {
+//     //     displayWelcomeFrame(); // Hiển thị khung chào mừng
+//     //     if (welcomeMessage) {
+//     //         welcomeMessage.textContent = "Welcome, " + (username || "User");
+//     //     }
+
+//     //     // Gọi các hàm cần thiết sau khi hiển thị khung chào mừng
+//     //     create_wh_nhap();
+//     //     create_wh_xuat();
+//     //     create_wh_xuat_export();
+//     //     create_wh_nhap_export();
+//     //     create_wh_onhand_export();
+//     //     create_wh_crm();
+//     // } else {
+//     //     // Nếu chưa đăng nhập hoặc hết hạn, thực hiện bước tải dữ liệu
+//     //     await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
+
+//     //     // Hiển thị khung đăng nhập
+//     //     displayLoginFrame();
+//     // }
+
+//     loginForm.addEventListener("submit", async (e) => {
+//         e.preventDefault();
+//         document.getElementById("loadingIndicator").style.display = "block";
+//         await load_user()
+        
+
+//         const username = usernameInput.value;
+//         const password = passwordInput.value;
+
+//         // Tìm user trong user_data dựa trên tên đăng nhập và mật khẩu
+//         const user = user_data.find(u => u[2] === username && u[3] === password);
+
+//         if (user) {
+//             const fullname = user[0];
+//             const wh = user[1]
+//             const approver = user[17]
+//             const dept = user[19]
+//             // Xác định quyền của user dựa trên các cột 4, 5, 6, 7 trong user_data
+//             const permissions = {
+//                 import: user[4] === "x",
+//                 export: user[5] === "x",
+//                 onhand: user[6] === "x",
+//                 transaction_nhap: user[6] === "x",
+//                 transaction_xuat: user[6] === "x",
+//                 mml: user[7] === "x",
+//                 crm: user[9] === "x",
+//                 survey: user[10] === "x",
+//                 design: user[11] === "x",
+//                 quotation: user[12] === "x",
+//                 order: user[13] === "x", 
+//                 mfg: user[14] === "x",
+//                 delivery: user[15] === "x",
+//                 payment:user[16] === "x",
+//                 approve_center:user[18] === "x"
+//             };
+
+//             // Ghi log quyền để kiểm tra
+//             console.log("Quyền truy cập của người dùng:", permissions);
+
+//             // Lưu quyền và thông tin người dùng vào sessionStorage
+//             sessionStorage.setItem("permissions", JSON.stringify(permissions));
+//             sessionStorage.setItem("username", username);
+//             sessionStorage.setItem("fullname", fullname);
+//             sessionStorage.setItem("wh", wh);
+//             sessionStorage.setItem("approver", approver);
+//             sessionStorage.setItem("dept", dept);
+//             loginSuccess(username);
+//         } else {
+//             alert("Sai tên đăng nhập hoặc mật khẩu!");
+//         }
+//     });
+
+//     function loginSuccess(username) {
+//         const expirationTime = Date.now() + EXPIRATION_TIME;
+//         sessionStorage.setItem("isLoggedIn", "true");
+//         sessionStorage.setItem("expirationTime", expirationTime.toString());
+    
+//         displayWelcomeFrame();
+//         if (welcomeMessage) {
+//             welcomeMessage.textContent = "Welcome, " + username;
+//         }
+    
+//         // Gọi hàm khởi tạo combobox sau khi hoàn tất đăng nhập
+//         create_wh_nhap();
+//         create_wh_xuat()
+//         create_wh_xuat_export()
+//         create_wh_nhap_export()
+//         create_wh_onhand_export()
+//         create_wh_crm()
+//         document.getElementById("loadingIndicator").style.display = "none";
+    
+//     }
+    
+
+//     function checkLoginStatus() {
+//         const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+//         const expirationTime = sessionStorage.getItem("expirationTime");
+//         const username = sessionStorage.getItem("username");
+        
+//         if (isLoggedIn === "true" && expirationTime && Date.now() < parseInt(expirationTime)) {
+//             displayWelcomeFrame();
+//             if (welcomeMessage) {
+//                 welcomeMessage.textContent = "Welcome, " + (username || "User");
+//             }
+//         } else {
+//             logout();
+//         }
+//     }
+
+//     function logout() {
+//         sessionStorage.clear(); // Xóa tất cả dữ liệu sessionStorage
+
+//         displayLoginFrame();
+//         // alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+
+//         usernameInput.value = "";
+//         passwordInput.value = "";
+//     }
+
+//     function displayLoginFrame() {
+//         loginFrame.style.display = "flex";
+//         welcomeFrame.style.display = "none";
+//     }
+
+//     function displayWelcomeFrame() {
+//         loginFrame.style.display = "none";
+//         welcomeFrame.style.display = "flex";
+//     }
+
+//     if (logoutButton) {
+//         logoutButton.addEventListener("click", logout);
+//     }
+
+//     // Hàm hiển thị frame theo id, chỉ cho phép truy cập nếu có quyền
+    
+// });
 
 
 async function load_data_nhap() {
@@ -931,6 +1265,34 @@ function showFrame(id) {
                     console.log("Access granted to frame:", id);
                     stopInterval()
                 });
+            } else if (id === 'crm') {
+                activeFrame.classList.add('active');
+                console.log("Access granted to frame:", id);
+            } else if (id === 'survey') {
+                get_survey_need_to_process()
+                activeFrame.classList.add('active');
+                console.log("Access granted to frame:", id);
+            } else if (id === 'approve_center') {
+                load_approval_ticket()
+                activeFrame.classList.add('active');
+            } else if (id === 'design') {
+                get_design_need_to_process()
+                activeFrame.classList.add('active');
+            } else if (id === 'quotation') {
+                get_quotation_need_to_process()
+                activeFrame.classList.add('active');
+            } else if (id === 'order') {
+                get_order_need_to_process()
+                activeFrame.classList.add('active');
+            } else if (id === 'mfg') {
+                get_mfg_need_to_process()
+                activeFrame.classList.add('active');
+            } else if (id === 'delivery') {
+                get_delivery_need_to_process()
+                activeFrame.classList.add('active');
+            } else if (id === 'payment') {
+                get_payment_need_to_process()
+                activeFrame.classList.add('active');
             } else {
                 activeFrame.classList.add('active');
                 console.log("Access granted to frame:", id);
@@ -943,7 +1305,7 @@ function showFrame(id) {
     }
 }
 
-///// XUẤT //////
+/////*** */ XUẤT //////
 function clear_label_xuat() {
     document.getElementById("loc_xuat").textContent = ""
     document.getElementById("exp_date_xuat").textContent = ""
@@ -1061,6 +1423,7 @@ function showSecondaryOptions2(selectedItem) {
 
             optionDiv.addEventListener("click", () => {
                 handleModalSelection_nhap2(option); // Call function when user selects an option
+                modal.style.display = 'none';
             });
 
             modalOptions.appendChild(optionDiv);
@@ -1465,7 +1828,7 @@ function submit_mml() {
 }
 
 
-//// Export data
+////*** */ Export data
 /// onhand
 // Define the columns based on your headers
 async function show_onhand() {
@@ -1507,33 +1870,6 @@ async function show_onhand() {
 
 }
 
-// document.getElementById("export_onhand").addEventListener("click", function() {
-//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
-//     var exportData = onhand_data//.slice(1);
-//     // Giữ lại dòng đầu tiên
-//     const headerRow = exportData[0];
-
-//     // Lọc từ dòng thứ 2 trở đi, chỉ giữ các dòng có giá trị cột 11 > 0
-//     const filteredRows = exportData.slice(1).filter(row => row[10] > 0);
-
-//     // Kết hợp dòng đầu tiên với các dòng đã lọc
-//     exportData = [headerRow, ...filteredRows];
-
-
-//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
-//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
-//     const workbook = XLSX.utils.book_new();
-//     XLSX.utils.book_append_sheet(workbook, worksheet, "Onhand Inventory");
-
-//     // Xuất file
-//     const now = new Date();
-//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
-//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
-//     const filename = `Onhand_${formattedDate}_${formattedTime}.xlsx`;
-
-//     // Xuất file
-//     XLSX.writeFile(workbook, filename);
-// });
 
 document.getElementById("refresh_onhand").addEventListener("click", async function() {
     await load_data_mml()
@@ -1576,26 +1912,6 @@ async function show_xuat() {
     });
 }
 
-// document.getElementById("export_xuat").addEventListener("click", function() {
-//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
-//     var exportData = xuat_data//.slice(1);
-//     // Giữ lại dòng đầu tiên
-//     const headerRow = exportData[0];
-
-
-//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
-//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
-//     const workbook = XLSX.utils.book_new();
-//     XLSX.utils.book_append_sheet(workbook, worksheet, "Xuất");
-
-//     const now = new Date();
-//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
-//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
-//     const filename = `Transaction_xuat_${formattedDate}_${formattedTime}.xlsx`;
-
-//     // Xuất file
-//     XLSX.writeFile(workbook, filename);
-// });
 
 document.getElementById("refresh_xuat").addEventListener("click", async function() {
     await load_data_xuat_export()
@@ -1819,28 +2135,2683 @@ async function show_nhap() {
     });
 }
 
-// document.getElementById("export_nhap").addEventListener("click", function() {
-//     // Tạo bản sao của dữ liệu mà không bao gồm dòng đầu tiên
-//     var exportData = nhap_data//.slice(1);
-//     // Giữ lại dòng đầu tiên
-//     const headerRow = exportData[0];
-
-
-//     // Chuyển đổi dữ liệu thành worksheet mà không cần thêm cột chỉ mục
-//     const worksheet = XLSX.utils.json_to_sheet(exportData, { skipHeader: true });
-//     const workbook = XLSX.utils.book_new();
-//     XLSX.utils.book_append_sheet(workbook, worksheet, "Nhập");
-
-//     // Xuất file
-//     const now = new Date();
-//     const formattedDate = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}_${String(now.getDate()).padStart(2, '0')}`;
-//     const formattedTime = `${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}`;
-//     const filename = `Transaction_nhap_${formattedDate}_${formattedTime}.xlsx`;
-
-//     // Xuất file
-//     XLSX.writeFile(workbook, filename);
-// });
 
 document.getElementById("refresh_nhap").addEventListener("click", async function() {
     await load_data_nhap_export()
 });
+
+///*** CRM ////
+
+document.getElementById("customer_crm").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        ocument.getElementById("content_crm").focus()
+    }
+});
+
+// Hàm để lọc dữ liệu theo ngày hiện tại
+// function filterTodayData(data) {
+//     const today = new Date().toISOString().slice(0, 10); // Lấy ngày hiện tại (YYYY-MM-DD)
+//     return data.filter(row => row[0] === today); // Giả sử cột đầu tiên là index 0
+// }
+
+function filterTodayData(data) {
+    // Lấy ngày giờ hiện tại
+    const now = new Date();
+
+    // Thêm 7 giờ
+    now.setHours(now.getHours() + 7);
+
+    // Chuyển đổi sang định dạng YYYY-MM-DD
+    const todayWithOffset = now.toISOString().slice(0, 10);
+
+    // Lọc dữ liệu
+    return data.filter(row => row[0] === todayWithOffset); // Giả sử cột đầu tiên là index 0
+}
+
+async function crm_post() {
+    const wh = document.getElementById("wh_crm").value
+    const customer = document.getElementById("customer_crm").value
+    const content = document.getElementById("content_crm").value
+
+    if (wh === "") {
+        alert("Bạn chưa chọn mã chi nhanh")
+        return
+    }
+
+    if (customer === "") {
+        alert("Bạn chưa nhập tên khách hàng")
+        document.getElementById("customer_crm").focus()
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập nội dung")
+        document.getElementById("content_crm").focus()
+        return
+    }
+
+    // Kiểm tra cột đầu tiên
+    const existsInFirstColumn = customer_data.some(row => row[0] === customer);
+
+    if (existsInFirstColumn) {
+        console.log('Customer exists in the first column');
+    } else {
+        console.log('Customer does not exist in the first column');
+        alert("Sai tên Khách hàng")
+        return
+    }
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+
+    const array = [1, 2, 3]; // Thay đổi nội dung mảng theo nhu cầu
+    await load_crm()
+
+    // Lọc các giá trị có ngày là hôm nay
+    const todayData = filterTodayData(crm_data);
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_crm = String(length).padStart(3, '0');
+
+    console.log(`Hôm nay có ${length} giá trị.`);
+    console.log(`STT (định dạng 3 chữ số): ${stt_crm}`);
+
+    const crm_id = "CRM"+"-"+wh+"-"+customer_id+"-"+datetime_id+"-"+stt_crm
+    console.log(crm_id)
+    try {
+        let crm_table = new FormData();
+        crm_table.append("wh", wh);
+        crm_table.append("operator_name", sessionStorage.getItem("fullname"));
+        crm_table.append("operator_id", sessionStorage.getItem("username"));
+        crm_table.append("customer", customer);
+        crm_table.append("customer_id", customer_id);
+        crm_table.append("crm_id", crm_id);
+        crm_table.append("content", content);
+        
+        fetch('https://script.google.com/macros/s/AKfycbxiadEptjY-QD5UVNUll7sCg7zt7FcrisleVS607ruXZ2YwrK_LmHAcE633KYAz4eQzyA/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: crm_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+
+    reset_crm()
+}
+
+function reset_crm() {
+    document.getElementById("customer_crm").value = ""
+    document.getElementById("content_crm").value = ""
+    document.getElementById("customer_id_crm").innerText = ""
+    document.getElementById("customer_crm").focus()
+}
+
+// Xử lý tìm kiếm "Loại vật tư"
+function handleMaterialTypeCrm(event) {
+    const searchTerm = removeAccents(event.target.value).toUpperCase(); // Chuyển đổi thành uppercase không dấu
+    const results = customer_data.filter(item => removeAccents(item[0]).toUpperCase().includes(searchTerm)); // Tìm kiếm không dấu
+
+    // Hiển thị kết quả tìm kiếm từ cột customer_data[1]
+    if (results.length > 0) {
+        showSearchResults_crm(results.map(item => item[0]), results); // Truyền danh sách tên vật tư và dữ liệu gốc
+    } else {
+        hideDropdown(); // Ẩn dropdown nếu không có kết quả
+        console.log("Không tìm thấy kết quả.");
+    }
+}
+
+let customer_name_a = ''
+let customer_id = ''
+
+// Hàm hiển thị kết quả tìm kiếm trong dropdown
+function showSearchResults_crm(displayList, fullData) {
+    console.table(fullData)
+    const dropdown = document.getElementById("dropdown_crm");
+    dropdown.innerHTML = ''; // Xóa nội dung cũ
+
+    // Hiển thị dropdown
+    dropdown.style.display = 'block';
+
+    // Sử dụng Set để giữ lại các giá trị duy nhất
+    const uniqueItems = [...new Set(displayList)];
+
+    // Tạo các mục dropdown từ danh sách uniqueItems
+    uniqueItems.forEach((item, index) => {
+        const dropdownItem = document.createElement("div");
+        dropdownItem.classList.add("dropdown-item");
+        dropdownItem.textContent = item;
+
+        // Lấy chỉ số của phần tử đầu tiên trong fullData tương ứng với item
+        const originalIndex = fullData.findIndex(dataItem => dataItem[0] === item);
+        
+        // Xử lý sự kiện khi người dùng chọn một mục từ dropdown
+        dropdownItem.addEventListener("click", () => {
+            document.getElementById("customer_crm").value = item; // Gán lựa chọn vào ô nhập liệu
+            dropdown.style.display = 'none'; // Ẩn dropdown sau khi chọn
+
+            const found_customer_id = customer_data.find(u => u[0] === item);
+            [customer_name_a,customer_id] = found_customer_id
+            document.getElementById("customer_id_crm").innerText = customer_id
+        });
+
+        dropdown.appendChild(dropdownItem);
+    });
+}
+
+document.getElementById("customer_crm").addEventListener("input", debounce(handleMaterialTypeCrm, 400));
+
+////* Survey */
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        console.error(`Modal with id ${modalId} not found`);
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function confirmCancel(modalId) {
+    let reason;
+    
+    if (modalId === 'reasonModalSurvey' || modalId === 'reasonModalDesignBom') {
+        // Lý do dạng input
+        reason = document.getElementById(modalId === 'reasonModalSurvey' ? 'cancelReasonSurvey' : 'cancelReasonDesignBom').value;
+        if (!reason) {
+            alert("Vui lòng nhập lý do hủy");
+            return;
+        }
+    } else if (modalId === 'reasonModalQuotation') {
+        // Lý do dạng dropdown cho QUOTATION
+        reason = document.getElementById('cancelReasonQuotation').value;
+    } else if (modalId === 'reasonModalOrderReceive') {
+        // Lý do dạng dropdown cho ORDER RECEIVE
+        reason = document.getElementById('cancelReasonOrderReceive').value;
+    }
+    
+    alert("Hủy thành công với lý do: " + reason);
+    closeModal(modalId);
+}
+
+function reset_survey() {
+    document.getElementById("surveyCrmNumber").value = ""
+    document.getElementById("totalHours").value = ""
+    document.getElementById("surveyContent").value = ""
+
+    document.getElementById("fileUpload").value = ""
+    document.getElementById("fileData").value = ""
+    document.getElementById("mimeType").value = ""
+    document.getElementById("fileName").value = ""
+
+    document.getElementById("surveyCrmNumber").focus()    
+
+}
+
+///////////////////
+// Upload Survey //
+var filesProcessed_survey = false;
+
+function LoadFile(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_survey').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_survey = false;
+        document.getElementById('submitButton_survey').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_survey = true;
+            // Enable submit button
+            document.getElementById('submitButton_survey').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("surveyCrmNumber").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("totalHours").focus()
+    }
+});
+
+document.getElementById("totalHours").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("surveyContent").focus()
+    }
+});
+
+async function submitForm_survey() {
+    if (filesProcessed_survey === false && document.getElementById("fileData").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const crm_id = document.getElementById("surveyCrmNumber").value
+    const total_hour = document.getElementById("totalHours").value
+    const content = document.getElementById("surveyContent").value
+
+    const fileData = document.getElementById("fileData").value
+    const mimeType = document.getElementById("mimeType").value
+    const fileName = document.getElementById("fileName").value
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã CRM")
+        document.getElementById("surveyCrmNumber").focus()
+        return
+    }
+
+    if (total_hour === "") {
+        alert("Bạn chưa nhập tổng số giờ làm")
+        document.getElementById("totalHours").focus()
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập nội dung")
+        document.getElementById("surveyContent").focus()
+        return
+    }
+
+    // Chuỗi ban đầu
+    const inputString = crm_id
+
+    // Split chuỗi bởi dấu "-"
+    const parts = inputString.split("-");
+
+    // Lấy phần thứ 2 và thứ 3 (chỉ số 1 và 2 trong mảng)
+    const result = parts.slice(1, 3).join("-");
+
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_survey(), load_crm()]);
+
+    const findCrm = crm_data.filter(item => item[7] === crm_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM#")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm2 = survey_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    console.table(findCrm2)
+    if (findCrm2.length >0) {
+        alert("CRM# này đã được yêu cầu thiết kế")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+    // Lọc các giá trị có ngày là hôm nay
+    const todayData = filterTodayData(survey_data);
+    console.table(todayData)
+
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_survey = String(length).padStart(3, '0');
+
+    console.log(`Hôm nay có ${length} giá trị.`);
+    console.log(`STT (định dạng 3 chữ số): ${stt_survey}`);
+
+    const survey_id = "KS"+"-"+result+"-"+datetime_id+"-"+stt_survey
+
+    try {
+        let survey_table = new FormData();
+        survey_table.append("survey_id", survey_id);
+        survey_table.append("crm_id", crm_id);
+        survey_table.append("total_hour", total_hour);
+        survey_table.append("content", content);
+
+        survey_table.append("operator", sessionStorage.getItem("fullname"));
+        survey_table.append("username", sessionStorage.getItem("username"));
+        survey_table.append("approver", sessionStorage.getItem("approver"));
+
+        survey_table.append("fileData", fileData);
+        survey_table.append("mimeType", mimeType);
+        survey_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbwp6iI5TfKnYGfcyjPUFP3Y_6s2a_UKr98B4Xvqkq1CrHCfiBaOrFIOK8nTWzo3peTL/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: survey_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_survey()
+    info("Gửi yêu cầu thiết kế thành công!")
+    get_survey_need_to_process()
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_survey_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_crm(), load_survey()]);
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const crmColumn = new Set(survey_data.map(row => row[6]));
+
+    const newArray = crm_data
+        .filter(row => !crmColumn.has(row[7]))
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[7],
+        row[6], // Cột thứ 10
+        row[5], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_survey");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["CRM#", "Mã KH", "Tên KH","Ngày tạo"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("surveyCrmNumber").value = row[0]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+//////////////////////////////
+//////////////////////////////
+
+///* survey approval ///
+
+// async function survey_approval() {
+//     // Show the loading indicator
+//     document.getElementById("loadingIndicator").style.display = "block";
+
+//     await Promise.all([load_survey(), load_survey_approval()]); // Run both fetch calls in parallel
+
+//     // Hide the loading indicator once loading is complete
+//     document.getElementById("loadingIndicator").style.display = "none";
+
+//     survey_data.shift()
+//     // const filter_approve_request = survey_data
+//     //     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
+//     //     .filter(item => item[4] === sessionStorage.getItem("approver"));
+
+//     const filter_approve_request = survey_data
+//     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
+//     .filter(item => 
+//         item[4] === sessionStorage.getItem("approver") && // Điều kiện 1
+//         !survey_approval_data.some(approvedItem => approvedItem[5] === item[5]) // Điều kiện 2
+//     );
+
+//     console.log(filter_approve_request)
+//     let tableHTML = `
+//         <table border="1" style="border-collapse: collapse; width: 100%;">
+//             <thead>
+//                 <tr>
+//                     <th>Approve Type</th>
+//                     <th>CRM#</th>
+//                     <th>Survey#</th>
+//                     <th>Requestor</th>
+//                     <th>Actions</th>
+//                 </tr>
+//             </thead>
+//             <tbody>
+//     `;
+
+//     // Duyệt qua dữ liệu để tạo các hàng
+//     filter_approve_request.forEach((row) => {
+//         tableHTML += `
+//             <tr>
+//                 <td>${row[9]}</td>
+//                 <td>${row[6]}</td>
+//                 <td>${row[5]}</td>
+//                 <td>${row[2]}</td>
+//                 <td>
+//                     <button onclick="viewDetail(${row.originalIndex})">View Detail</button>
+//                 </td>
+//             </tr>
+//         `;
+//     });
+
+//     // Kết thúc bảng
+//     tableHTML += `
+//             </tbody>
+//         </table>
+//     `;
+
+//     // Thêm bảng vào một phần tử có ID 'tableContainer'
+//     document.getElementById('table_approve_survey').innerHTML = tableHTML;
+// }
+
+
+// // Hiển thị bảng sau khi tải trang
+// // window.onload = () => survey_approval();
+
+// let select_survey_to_approve = ""
+// function viewDetail(index) {
+//     // Lấy dữ liệu từ survey_data dựa trên index
+//     const row = survey_data[index];
+//     select_survey_to_approve = row
+
+//     console.log(row)
+//     console.log(select_survey_to_approve)
+
+//     // Gán dữ liệu vào các phần tử trong modal
+//     document.getElementById("operator_name_show").textContent = row[2];
+//     document.getElementById("request_time_show").textContent = row[0] + " " + row[1];
+//     document.getElementById("crm_show").textContent = row[6];
+//     document.getElementById("survey_show").textContent = row[5];
+//     document.getElementById("total_hours_show").textContent = row[7];
+//     document.getElementById("content_show").textContent = row[8];
+
+//     // Lấy phần tử link_show
+//     const linkElement = document.getElementById("link_show");
+
+//     // Tạo thẻ <a>
+//     const anchor = document.createElement("a");
+
+//     // Gán giá trị cho href từ row[10]
+//     anchor.href = row[10];
+
+//     // Gán nội dung hiển thị của link
+//     anchor.textContent = "Xem File đính kèm tại đây";
+
+//     // Đặt thuộc tính target để mở tab mới
+//     anchor.target = "_blank";
+
+//     // Xóa nội dung cũ của link_show (nếu cần)
+//     linkElement.textContent = "";
+
+//     // Thêm thẻ <a> vào link_show
+//     linkElement.appendChild(anchor);
+
+//     // Hiển thị modal và backdrop
+//     document.getElementById("detailModal").style.display = "block";
+//     document.getElementById("modalBackdrop").style.display = "block";
+// }
+
+// Hàm đóng modal
+function closeModal() {
+    document.getElementById("detailModal").style.display = "none";
+    document.getElementById("modalBackdrop").style.display = "none";
+}
+
+// Hàm xử lý khi nhấn Approve
+// async function approveSurvey() {
+//     try {
+//         let survey_table_approved = new FormData();
+
+//         survey_table_approved.append("operator", select_survey_to_approve[2])
+//         survey_table_approved.append("username", select_survey_to_approve[3])
+//         survey_table_approved.append("approver", select_survey_to_approve[4])
+
+//         survey_table_approved.append("survey_id", select_survey_to_approve[5])
+//         survey_table_approved.append("crm_id", select_survey_to_approve[6])
+//         survey_table_approved.append("total_hour", select_survey_to_approve[7])
+//         survey_table_approved.append("content", select_survey_to_approve[8])
+
+//         survey_table_approved.append("status", "Thiết kế")
+
+//         survey_table_approved.append("link", select_survey_to_approve[10])
+//         document.getElementById("loadingIndicator").style.display = "block";
+//         await fetch('https://script.google.com/macros/s/AKfycbwDK4k3oW8SrStcwMamUrBt5TKLeWojHDTcEi1hpazA_TD1jjF2mCaxTG530K3DG7x8/exec', {
+//             method: 'POST',
+//             mode: 'no-cors',
+//             body: survey_table_approved
+//         }).then(response => response.text)
+//             .then(result => console.log('Đã gửi data thành công'))
+//             .catch(error => console.error('Error:', error));
+//         }
+//     catch (error) {
+//         console.error('Error:', error);
+//     }
+//     load_approval_ticket()
+//     closeModal();
+//     info("Survey Ticket Approved")
+//     document.getElementById("loadingIndicator").style.display = "block";
+// }
+
+// // Hàm xử lý khi nhấn Reject
+// async function rejectSurvey() {
+//     try {
+//         let survey_table_rejected = new FormData();
+
+//         survey_table_rejected.append("operator", select_survey_to_approve[2])
+//         survey_table_rejected.append("username", select_survey_to_approve[3])
+//         survey_table_rejected.append("approver", select_survey_to_approve[4])
+
+//         survey_table_rejected.append("survey_id", select_survey_to_approve[5])
+//         survey_table_rejected.append("crm_id", select_survey_to_approve[6])
+//         survey_table_rejected.append("total_hour", select_survey_to_approve[7])
+//         survey_table_rejected.append("content", select_survey_to_approve[8])
+
+//         survey_table_rejected.append("status", "Khảo sát Rejected")
+
+//         survey_table_rejected.append("link", select_survey_to_approve[10])
+//         document.getElementById("loadingIndicator").style.display = "block";
+//         await fetch('https://script.google.com/macros/s/AKfycbwDK4k3oW8SrStcwMamUrBt5TKLeWojHDTcEi1hpazA_TD1jjF2mCaxTG530K3DG7x8/exec', {
+//             method: 'POST',
+//             mode: 'no-cors',
+//             body: survey_table_rejected
+//         }).then(response => response.text)
+//             .then(result => console.log('Đã gửi data thành công'))
+//             .catch(error => console.error('Error:', error));
+//         }
+//     catch (error) {
+//         console.error('Error:', error);
+//     }
+//     load_approval_ticket()
+//     info("Survey Ticket rejected!");
+//     closeModal();
+//     document.getElementById("loadingIndicator").style.display = "block";
+// }
+
+
+//////////////////////////////
+//////////////////////////////
+
+///* Design + BOM ///
+
+function reset_design() {
+    document.getElementById("designCrmNumber").value = "";
+    document.getElementById("designBomNumber").value = "";
+    document.getElementById("designTotalPrice").value = "";
+    document.getElementById("designTotalHour").value = "";
+    document.getElementById("designProductName").value = "";
+
+    document.getElementById("fileUpload2").value = ""
+    document.getElementById("fileData2").value = ""
+    document.getElementById("mimeType2").value = ""
+    document.getElementById("fileName2").value = ""
+
+    document.getElementById("designCrmNumber").focus()  
+}
+
+var filesProcessed_design = false;
+
+function LoadFile2(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_design').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_design = false;
+        document.getElementById('submitButton_design').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData2').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType2').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName2').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_design = true;
+            // Enable submit button
+            document.getElementById('submitButton_design').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("designCrmNumber").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("designBomNumber").focus()
+    }
+});
+
+document.getElementById("designBomNumber").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("designTotalPrice").focus()
+    }
+});
+
+document.getElementById("designTotalPrice").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("designTotalHour").focus()
+    }
+});
+
+document.getElementById("designTotalHour").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("designProductName").focus()
+    }
+});
+
+async function submitForm_design() {
+    if (filesProcessed_design === false && document.getElementById("fileData2").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const crm_id = document.getElementById("designCrmNumber").value
+    const bom_id = document.getElementById("designBomNumber").value
+    const total_price = document.getElementById("designTotalPrice").value
+    const total_hour = document.getElementById("designTotalHour").value
+    const product_name = document.getElementById("designProductName").value
+
+    const fileData = document.getElementById("fileData2").value
+    const mimeType = document.getElementById("mimeType2").value
+    const fileName = document.getElementById("fileName2").value
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã CRM")
+        document.getElementById("designCrmNumber").focus()
+        return
+    }
+
+    if (bom_id === "") {
+        alert("Bạn chưa nhập mã BOM")
+        document.getElementById("designBomNumber").focus()
+        return
+    }
+
+    if (total_price === "") {
+        alert("Bạn chưa nhập tổng số giá trị BOM")
+        document.getElementById("designTotalPrice").focus()
+        return
+    }
+
+    if (total_hour === "") {
+        alert("Bạn chưa nhập tổng số giờ làm")
+        document.getElementById("designTotalHour").focus()
+        return
+    }
+
+    if (product_name === "") {
+        alert("Bạn chưa nhập tên sản phẩm")
+        document.getElementById("designProductName").focus()
+        return
+    }
+    
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_survey(), load_design(), load_design_approval()]); //, load_design_approval()
+
+    const findCrm = survey_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM# hoặc CRM# chưa được duyệt")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm1 = design_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    console.table(findCrm1)
+
+    const column0Array2 = design_approval_data.map(row => row[13]);
+    const uniqueArray1 = findCrm1.filter(row => !column0Array2.includes(row[13]));
+    console.log(uniqueArray1)
+
+    if (uniqueArray1.length > 0) {
+        const des_to_find = uniqueArray1[0][13];
+
+        const findCrm2 = design_approval_data.filter(item => item[5] === des_to_find); // Filter rows based on selection
+
+        if (findCrm2.length === 0) {
+            alert("CRM# này đang chờ duyệt");
+            document.getElementById("loadingIndicator").style.display = "none";
+            return;
+        }
+    } else {
+        console.log("tiếp tục");
+    }
+
+
+    const findCrm3 = design_approval_data.filter(item => item[6] === crm_id && item[11] ===  "Báo giá"); // Filter rows based on selection
+    // console.table(findCrm2)
+
+    if (findCrm3.length > 0) {
+        alert("CRM# này đã được duyệt")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    // const findCrm = survey_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    // console.table(findCrm)
+    // if (findCrm.length === 0) {
+    //     alert("Sai CRM# hoặc CRM# chưa được duyệt")
+    //     document.getElementById("loadingIndicator").style.display = "none";
+    //     return
+    // }
+
+    // const findCrm2 = design_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    // console.table(findCrm2)
+    // console.table(design_approval_data)
+    // if (findCrm2.length >0) {
+    //     alert("CRM# này đã được yêu cầu báo giá")
+    //     document.getElementById("loadingIndicator").style.display = "none";
+    //     return
+    // }
+
+    // Chuỗi ban đầu
+    const inputString = crm_id
+
+    // Split chuỗi bởi dấu "-"
+    const parts = inputString.split("-");
+
+    // Lấy phần thứ 2 và thứ 3 (chỉ số 1 và 2 trong mảng)
+    const site_id = parts[1];
+
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+
+    // Lọc các giá trị có ngày là hôm nay
+    const todayData = filterTodayData(design_data);
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_design = String(length).padStart(3, '0');
+
+    const dept_id = sessionStorage.getItem("dept")
+
+    const design_id = "DSB"+"-"+site_id+"-"+ dept_id +"-"+ datetime_id+"-"+stt_design
+
+    try {
+        let design_table = new FormData();
+        design_table.append("crm_id", crm_id);
+        design_table.append("bom_id", bom_id);
+        design_table.append("total_price", total_price);
+        design_table.append("total_hour", total_hour);
+        design_table.append("product_name", product_name);
+
+        design_table.append("dept", site_id+"-"+ dept_id);
+
+        design_table.append("design_id", design_id);
+
+        design_table.append("operator", sessionStorage.getItem("fullname"));
+        design_table.append("username", sessionStorage.getItem("username"));
+        design_table.append("approver", sessionStorage.getItem("approver"));
+
+        design_table.append("fileData", fileData);
+        design_table.append("mimeType", mimeType);
+        design_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbz5uaspF1KdhDyvPTCMstRvpuF0xpYMcCm_pfbblcV5KlDEyT1unes0zSO4Z0CjKW0BaA/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: design_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_design()
+    info("Gửi yêu cầu báo giá thành công!")
+    get_design_need_to_process()
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_design_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_survey(), load_design()]);
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const crmColumn = new Set(design_data.map(row => row[6]));
+
+    const newArray = survey_data
+        .filter(row => !crmColumn.has(row[6]))
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[6], // Cột thứ 10
+        row[5], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_design");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["CRM#", "SURVEY#", "Ngày tạo"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("designCrmNumber").value = row[0]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+///* Design approval ///
+
+async function design_approval() {
+    // Show the loading indicator
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await Promise.all([load_design(), load_design_approval()]); // Run both fetch calls in parallel
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    design_data.shift()
+
+
+    // const filter_approve_request = design_data
+    // .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
+    // .filter(item => 
+    //     item[4] === sessionStorage.getItem("approver") && // Điều kiện 1
+    //     !design_approval_data.some(approvedItem => approvedItem[6] === item[6]) // Điều kiện 2
+    // );
+
+    const filter_approve_request = design_data
+    .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
+    .filter(item => 
+        item[4] === sessionStorage.getItem("approver")  // Điều kiện 1
+        //&& quotation_approval_data.some(approvedItem => approvedItem[6] === item[6]) // Điều kiện 2
+    );
+    console.table(filter_approve_request)
+
+    const column0Array2 = design_approval_data.map(row => row[13]);
+    console.log(column0Array2)
+    const uniqueArray1 = filter_approve_request.filter(row => !column0Array2.includes(row[13]));
+
+    let tableHTML = `
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th>Approve Type</th>
+                    <th>CRM#</th>
+                    <th>Department</th>
+                    <th>Requestor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Duyệt qua dữ liệu để tạo các hàng
+    uniqueArray1.forEach((row) => {
+        tableHTML += `
+            <tr>
+                <td>${row[11]}</td>
+                <td>${row[6]}</td>
+                <td>${row[5]}</td>
+                <td>${row[2]}</td>
+                <td>
+                    <button onclick="viewDetaildesign(${row.originalIndex})">View Detail</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // Kết thúc bảng
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    // Thêm bảng vào một phần tử có ID 'tableContainer'
+    document.getElementById('table_approve_design').innerHTML = tableHTML;
+}
+
+// Hiển thị bảng sau khi tải trang
+// window.onload = () => design_approval();
+
+let select_design_to_approve = ""
+function viewDetaildesign(index) {
+    // Lấy dữ liệu từ survey_data dựa trên index
+    const row = design_data[index];
+    select_design_to_approve = row
+
+    // Gán dữ liệu vào các phần tử trong modal
+    document.getElementById("operator_name_show2").textContent = row[2];
+    document.getElementById("request_time_show2").textContent = row[0] + " " + row[1];
+    document.getElementById("crm_show2").textContent = row[6];
+    document.getElementById("total_hours_show2").textContent = row[7];
+    document.getElementById("content_show2").textContent = row[8];
+
+    document.getElementById("bom_show2").textContent = row[9];
+    document.getElementById("total_price_show2").textContent = row[10];
+
+    // Lấy phần tử link_show
+    const linkElement = document.getElementById("link_show2");
+
+    // Tạo thẻ <a>
+    const anchor = document.createElement("a");
+
+    // Gán giá trị cho href từ row[10]
+    anchor.href = row[12];
+
+    // Gán nội dung hiển thị của link
+    anchor.textContent = "Xem File đính kèm tại đây";
+
+    // Đặt thuộc tính target để mở tab mới
+    anchor.target = "_blank";
+
+    // Xóa nội dung cũ của link_show (nếu cần)
+    linkElement.textContent = "";
+
+    // Thêm thẻ <a> vào link_show
+    linkElement.appendChild(anchor);
+
+    // Hiển thị modal và backdrop
+    document.getElementById("detailModal2").style.display = "block";
+    document.getElementById("modalBackdrop2").style.display = "block";
+}
+
+// Hàm đóng modal
+function closeModal2() {
+    document.getElementById("detailModal2").style.display = "none";
+    document.getElementById("modalBackdrop2").style.display = "none";
+}
+
+// Hàm xử lý khi nhấn Approve
+async function approveDesign() {
+    try {
+        let design_table_approved = new FormData();
+
+        design_table_approved.append("operator", select_design_to_approve[2])
+        design_table_approved.append("username", select_design_to_approve[3])
+        design_table_approved.append("approver", select_design_to_approve[4])
+
+        design_table_approved.append("dept", select_design_to_approve[5])
+        design_table_approved.append("crm_id", select_design_to_approve[6])
+        design_table_approved.append("total_hour", select_design_to_approve[7])
+        design_table_approved.append("product_name", select_design_to_approve[8])
+
+        design_table_approved.append("bom_id", select_design_to_approve[9])
+        design_table_approved.append("total_price", select_design_to_approve[10])
+
+        design_table_approved.append("status", "Báo giá")
+
+        design_table_approved.append("link", select_design_to_approve[12])
+        design_table_approved.append("design_id", select_design_to_approve[13])
+
+        document.getElementById("loadingIndicator").style.display = "block";
+        await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: design_table_approved
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    load_approval_ticket()
+    closeModal2();
+    info("Design Ticket Approved")
+    document.getElementById("loadingIndicator").style.display = "block";
+}
+
+// Hàm xử lý khi nhấn Reject
+async function rejectDesign() {
+    try {
+        let design_table_rejected = new FormData();
+
+        design_table_rejected.append("operator", select_design_to_approve[2])
+        design_table_rejected.append("username", select_design_to_approve[3])
+        design_table_rejected.append("approver", select_design_to_approve[4])
+
+        design_table_rejected.append("dept", select_design_to_approve[5])
+        design_table_rejected.append("crm_id", select_design_to_approve[6])
+        design_table_rejected.append("total_hour", select_design_to_approve[7])
+        design_table_rejected.append("product_name", select_design_to_approve[8])
+
+        design_table_rejected.append("bom_id", select_design_to_approve[9])
+        design_table_rejected.append("total_price", select_design_to_approve[10])
+
+        design_table_rejected.append("status", "Thiết kế Rejected")
+
+        design_table_rejected.append("link", select_design_to_approve[12])
+        design_table_rejected.append("design_id", select_design_to_approve[13])
+
+        document.getElementById("loadingIndicator").style.display = "block";
+        await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: design_table_rejected
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    load_approval_ticket()
+    closeModal2();
+    info("Design Ticket Rejected")
+    document.getElementById("loadingIndicator").style.display = "block";
+}
+
+
+async function load_approval_ticket() {
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await Promise.all([design_approval(), quotation_approval()]); // Run both fetch calls in parallel
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+//////////////////////////////
+//////////////////////////////
+
+///* Quotation ///
+
+function reset_quotation() {
+    document.getElementById("quotationCrmNumber").value = "";
+    document.getElementById("quotationTotalPrice").value = "";
+
+    document.getElementById("fileUpload3").value = ""
+    document.getElementById("fileData3").value = ""
+    document.getElementById("mimeType3").value = ""
+    document.getElementById("fileName3").value = ""
+
+    document.getElementById("quotationCrmNumber").focus()  
+}
+
+var filesProcessed_quotation = false;
+
+function LoadFile3(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_quotation').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_quotation = false;
+        document.getElementById('submitButton_quotation').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData3').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType3').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName3').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_quotation = true;
+            // Enable submit button
+            document.getElementById('submitButton_quotation').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("quotationCrmNumber").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("quotationTotalPrice").focus()
+    }
+});
+
+async function submitForm_quotation() {
+    if (filesProcessed_quotation === false && document.getElementById("fileData3").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const crm_id = document.getElementById("quotationCrmNumber").value
+    const total_price = document.getElementById("quotationTotalPrice").value
+
+    const fileData = document.getElementById("fileData3").value
+    const mimeType = document.getElementById("mimeType3").value
+    const fileName = document.getElementById("fileName3").value
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã CRM")
+        document.getElementById("quotationCrmNumber").focus()
+        return
+    }
+
+    if (total_price === "") {
+        alert("Bạn chưa nhập báo giá")
+        document.getElementById("quotationTotalPrice").focus()
+        return
+    }
+
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_design_approval(), load_quotation(), load_quotation_approval()]);
+
+    const findCrm = design_approval_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    // console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM# hoặc CRM chưa được duyệt báo giá")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm1 = quotation_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    console.table(findCrm1)
+
+    const column0Array2 = quotation_approval_data.map(row => row[5]);
+    const uniqueArray1 = findCrm1.filter(row => !column0Array2.includes(row[5]));
+    console.log(uniqueArray1)
+
+    if (uniqueArray1.length > 0) {
+        const quota_to_find = uniqueArray1[0][5];
+
+        const findCrm2 = quotation_approval_data.filter(item => item[5] === quota_to_find); // Filter rows based on selection
+
+        if (findCrm2.length === 0) {
+            alert("CRM# này đang chờ duyệt");
+            document.getElementById("loadingIndicator").style.display = "none";
+            return;
+        }
+    } else {
+        console.log("tiếp tục");
+    }
+
+
+    const findCrm3 = quotation_approval_data.filter(item => item[6] === crm_id && item[10] ===  "Chờ nhận đơn hàng"); // Filter rows based on selection
+    // console.table(findCrm2)
+
+    if (findCrm3.length > 0) {
+        alert("CRM# này đã được duyệt")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const bom_id = findCrm[0][9]
+    const bom_price = findCrm[0][10]
+    const product_name = findCrm[0][8]
+    
+    // Chuỗi ban đầu
+    const inputString = crm_id
+
+    // Split chuỗi bởi dấu "-"
+    const parts = inputString.split("-");
+
+    // Lấy phần thứ 2 và thứ 3 (chỉ số 1 và 2 trong mảng)
+    const site_id = parts[1];
+
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+
+    // Lọc các giá trị có ngày là hôm nay
+    const todayData = filterTodayData(quotation_data);
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_quotation = String(length).padStart(3, '0');
+
+    const dept_id = sessionStorage.getItem("dept")
+
+    const quotation_id = "RMG"+"-"+site_id+"-"+ dept_id +"-"+ datetime_id+"-"+stt_quotation
+    
+    try {
+        let quotation_table = new FormData();
+
+        quotation_table.append("crm_id", crm_id);
+        quotation_table.append("total_price", total_price);
+
+        quotation_table.append("bom_id", bom_id);
+        quotation_table.append("bom_price", bom_price);
+        quotation_table.append("quotation_id", quotation_id);
+        quotation_table.append("product_name", product_name);
+
+        quotation_table.append("operator", sessionStorage.getItem("fullname"));
+        quotation_table.append("username", sessionStorage.getItem("username"));
+        quotation_table.append("approver", sessionStorage.getItem("approver"));
+
+        quotation_table.append("fileData", fileData);
+        quotation_table.append("mimeType", mimeType);
+        quotation_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbzu7yHZG_M2a5jG0lD4-DHQykqq9ssfB0x93rRTUOKq-wWYYemF8uyV7lp2CTbY4srK/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: quotation_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_quotation()
+    get_quotation_need_to_process()
+    info("Gửi yêu cầu chờ nhận đơn hàng thành công!")
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_quotation_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_design_approval(), load_quotation()]);
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const crmColumn = new Set(quotation_data.map(row => row[6]));
+
+    const newArray = design_approval_data
+        .filter(row => !crmColumn.has(row[6]) && row[11] === "Báo giá")
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[6], // Cột thứ 10
+        row[9], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_quotation");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["CRM#", "BOM#", "Ngày tạo"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("quotationCrmNumber").value = row[0]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+///* Quotation approval ///
+
+async function quotation_approval() {
+    // Show the loading indicator
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    await Promise.all([load_quotation(), load_quotation_approval()]); // Run both fetch calls in parallel
+
+    // Hide the loading indicator once loading is complete
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    quotation_data.shift()
+
+
+    const filter_approve_request = quotation_data
+    .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
+    .filter(item => 
+        item[4] === sessionStorage.getItem("approver")  // Điều kiện 1
+        //&& quotation_approval_data.some(approvedItem => approvedItem[6] === item[6]) // Điều kiện 2
+    );
+    console.table(filter_approve_request)
+
+    const column0Array2 = quotation_approval_data.map(row => row[5]);
+    console.log(column0Array2)
+    const uniqueArray1 = filter_approve_request.filter(row => !column0Array2.includes(row[5]));
+
+    console.table(uniqueArray1)
+    let tableHTML = `
+        <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+                <tr>
+                    <th>Approve Type</th>
+                    <th>CRM#</th>
+                    <th>BOM#</th>
+                    <th>Requestor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Duyệt qua dữ liệu để tạo các hàng
+    uniqueArray1.forEach((row) => {
+        tableHTML += `
+            <tr>
+                <td>${row[10]}</td>
+                <td>${row[6]}</td>
+                <td>${row[8]}</td>
+                <td>${row[2]}</td>
+                <td>
+                    <button onclick="viewDetailquotation(${row.originalIndex})">View Detail</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // Kết thúc bảng
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+
+    // Thêm bảng vào một phần tử có ID 'tableContainer'
+    document.getElementById('table_approve_quotation').innerHTML = tableHTML;
+}
+
+// Hiển thị bảng sau khi tải trang
+// window.onload = () => design_approval();
+
+let select_quotation_to_approve = ""
+function viewDetailquotation(index) {
+    // Lấy dữ liệu từ survey_data dựa trên index
+    const row = quotation_data[index];
+    select_quotation_to_approve = row
+
+    // Gán dữ liệu vào các phần tử trong modal
+    document.getElementById("operator_name_show3").textContent = row[2];
+    document.getElementById("request_time_show3").textContent = row[0] + " " + row[1];
+    document.getElementById("crm_show3").textContent = row[6];
+    document.getElementById("total_price_show3").textContent = row[9];
+    document.getElementById("total_bom_price_show3").textContent = row[12];
+    document.getElementById("content_show3").textContent = row[7];
+
+    document.getElementById("bom_show3").textContent = row[8];
+    document.getElementById("quotation_show3").textContent = row[5];
+
+    // Lấy phần tử link_show
+    const linkElement = document.getElementById("link_show3");
+
+    // Tạo thẻ <a>
+    const anchor = document.createElement("a");
+
+    // Gán giá trị cho href từ row[10]
+    anchor.href = row[11];
+
+    // Gán nội dung hiển thị của link
+    anchor.textContent = "Xem File đính kèm tại đây";
+
+    // Đặt thuộc tính target để mở tab mới
+    anchor.target = "_blank";
+
+    // Xóa nội dung cũ của link_show (nếu cần)
+    linkElement.textContent = "";
+
+    // Thêm thẻ <a> vào link_show
+    linkElement.appendChild(anchor);
+
+    // Chuyển đổi giá trị thành số để so sánh
+    const totalPrice = parseFloat(row[9]);
+    const totalBomPrice = parseFloat(row[12]);
+
+    // Kiểm tra nếu totalPrice >= totalBomPrice * 1.25
+    if (totalPrice >= totalBomPrice * 1.25) {
+        // Giá trị đạt yêu cầu, không làm gì hoặc đặt màu mặc định
+        document.getElementById("total_price_show3").style.color = ""; // Hoặc đặt màu mặc định
+        document.getElementById("total_price_show3").style.backgroundColor = "";
+
+    } else {
+        // Giá trị không đạt yêu cầu, làm nổi bật bằng màu đỏ
+        document.getElementById("total_price_show3").style.color = "white";
+        document.getElementById("total_price_show3").style.backgroundColor = "red";
+        document.getElementById("total_price_show3").style.padding = "5px";
+    }
+
+    // Hiển thị modal và backdrop
+    document.getElementById("detailModal3").style.display = "block";
+    document.getElementById("modalBackdrop3").style.display = "block";
+}
+
+// Hàm đóng modal
+function closeModal3() {
+    document.getElementById("detailModal3").style.display = "none";
+    document.getElementById("modalBackdrop3").style.display = "none";
+}
+
+// Hàm xử lý khi nhấn Approve
+async function approveQuotation() {
+    try {
+        let quotation_table_approved = new FormData();
+
+        quotation_table_approved.append("operator", select_quotation_to_approve[2])
+        quotation_table_approved.append("username", select_quotation_to_approve[3])
+        quotation_table_approved.append("approver", select_quotation_to_approve[4])
+
+        quotation_table_approved.append("quotation_id", select_quotation_to_approve[5])
+        quotation_table_approved.append("crm_id", select_quotation_to_approve[6])
+        quotation_table_approved.append("product_name", select_quotation_to_approve[7])
+        quotation_table_approved.append("bom_id", select_quotation_to_approve[8])
+
+        quotation_table_approved.append("total_price", select_quotation_to_approve[9])
+
+        quotation_table_approved.append("status", "Chờ nhận đơn hàng")
+
+        quotation_table_approved.append("folderUrl", select_quotation_to_approve[11])
+        quotation_table_approved.append("bom_price", select_quotation_to_approve[12])
+
+        document.getElementById("loadingIndicator").style.display = "block";
+        await fetch('https://script.google.com/macros/s/AKfycbwSxghu5wSRFWmYtivSqcZHnqKtl88MyOJ0anJTKg7X2YLAu4cPcGFSEXAAV_1T2w3O/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: quotation_table_approved
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    load_approval_ticket()
+    closeModal3();
+    info("Quotation Ticket Approved")
+    document.getElementById("loadingIndicator").style.display = "block";
+}
+
+// Hàm xử lý khi nhấn Reject
+async function rejectQuotation() {
+    try {
+        let quotation_table_rejected = new FormData();
+
+        quotation_table_rejected.append("operator", select_quotation_to_approve[2])
+        quotation_table_rejected.append("username", select_quotation_to_approve[3])
+        quotation_table_rejected.append("approver", select_quotation_to_approve[4])
+
+        quotation_table_rejected.append("quotation_id", select_quotation_to_approve[5])
+        quotation_table_rejected.append("crm_id", select_quotation_to_approve[6])
+        quotation_table_rejected.append("product_name", select_quotation_to_approve[7])
+        quotation_table_rejected.append("bom_id", select_quotation_to_approve[8])
+
+        quotation_table_rejected.append("total_price", select_quotation_to_approve[9])
+
+        quotation_table_rejected.append("status", "Báo giá Rejected")
+
+        quotation_table_rejected.append("folderUrl", select_quotation_to_approve[11])
+        quotation_table_rejected.append("bom_price", select_quotation_to_approve[12])
+
+        document.getElementById("loadingIndicator").style.display = "block";
+        await fetch('https://script.google.com/macros/s/AKfycbwSxghu5wSRFWmYtivSqcZHnqKtl88MyOJ0anJTKg7X2YLAu4cPcGFSEXAAV_1T2w3O/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: quotation_table_rejected
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    load_approval_ticket()
+    closeModal3();
+    info("Quotation Ticket Rejected")
+    document.getElementById("loadingIndicator").style.display = "block";
+}
+
+//////////////////////////////
+
+///* Order Receive ///
+
+function reset_order() {
+    document.getElementById("orderQuotationNumber").value = "";
+    document.getElementById("orderOrderID").value = "";
+    document.getElementById("orderDate").value = "";
+    
+
+    document.getElementById("fileUpload4").value = ""
+    document.getElementById("fileData4").value = ""
+    document.getElementById("mimeType4").value = ""
+    document.getElementById("fileName4").value = ""
+
+    document.getElementById("orderQuotationNumber").focus()  
+}
+
+var filesProcessed_order = false;
+
+function LoadFile4(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_order').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_order = false;
+        document.getElementById('submitButton_order').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData4').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType4').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName4').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_order = true;
+            // Enable submit button
+            document.getElementById('submitButton_order').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("orderQuotationNumber").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("orderOrderID").focus()
+    }
+});
+
+async function submitForm_order() {
+    if (filesProcessed_order === false && document.getElementById("fileData4").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const quotation_id = document.getElementById("orderQuotationNumber").value
+    const order_id = document.getElementById("orderOrderID").value
+    const date = document.getElementById("orderDate").value
+
+    const fileData = document.getElementById("fileData4").value
+    const mimeType = document.getElementById("mimeType4").value
+    const fileName = document.getElementById("fileName4").value
+
+    if (quotation_id === "") {
+        alert("Bạn chưa nhập mã Quotation")
+        document.getElementById("orderQuotationNumber").focus()
+        return
+    }
+
+    if (order_id === "") {
+        alert("Bạn chưa nhập mã đơn hàng")
+        document.getElementById("orderOrderID").focus()
+        return
+    }
+
+    if (date === "") {
+        alert("Bạn chưa chọn ngày giao hàng")
+        return
+    }
+
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_quotation_approval(), load_order()]);
+
+    const findCrm = quotation_approval_data.filter(item => item[5] === quotation_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai QUOTATION# hoặc QUOTATION# chưa được duyệt")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const crm_id = findCrm[0][6]
+
+    const findCrm2 = order_data.filter(item => item[3] === quotation_id); // Filter rows based on selection
+    console.table(findCrm2)
+    if (findCrm2.length >0) {
+        alert("QUOTATION# này đã được yêu cầu SX, đặt hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+    
+    try {
+        let order_receive_table = new FormData();
+
+        order_receive_table.append("operator", sessionStorage.getItem("fullname"));
+        order_receive_table.append("crm_id", crm_id);
+        order_receive_table.append("quotation_id", quotation_id);
+        order_receive_table.append("order_id", order_id);
+        order_receive_table.append("date", date);
+
+        order_receive_table.append("fileData", fileData);
+        order_receive_table.append("mimeType", mimeType);
+        order_receive_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbxnIkZqbKn5NE82h-lIsS_4cz2u2e7_PCQW8fgcenURmxHiLRZsquAGY-gvajw1BJCu/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: order_receive_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_order()
+    get_order_need_to_process()
+    info("Gửi yêu cầu SX - Đặt hàng thành công!")
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_order_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_quotation_approval(), load_order()]);
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const crmColumn = new Set(order_data.map(row => row[3]));
+
+    const newArray = quotation_approval_data
+        .filter(row => !crmColumn.has(row[5]) && row[10] === "Chờ nhận đơn hàng")
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[5], // Cột thứ 10
+        row[6], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_order");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["QUOTATION#", "CRM#", "Ngày tạo"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("orderQuotationNumber").value = row[0]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+///* MFG / PUR ///
+
+function reset_mfg() {
+    document.getElementById("mfgCrm").value = "";
+    document.getElementById("mfgContent").value = "";
+    
+    document.getElementById("mfgCustomerID").innerText = ""
+    document.getElementById("mfgCustomerName").innerText = ""
+
+    document.getElementById("fileUpload5").value = ""
+    document.getElementById("fileData5").value = ""
+    document.getElementById("mimeType5").value = ""
+    document.getElementById("fileName5").value = ""
+
+    document.getElementById("mfgCrm").focus()  
+}
+
+var filesProcessed_mfg = false;
+
+function LoadFile5(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_mfg').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_mfg = false;
+        document.getElementById('submitButton_mfg').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData5').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType5').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName5').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_mfg = true;
+            // Enable submit button
+            document.getElementById('submitButton_mfg').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("mfgCrm").addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Kiểm tra phím Enter
+        document.getElementById("mfgContent").focus()
+    }
+});
+
+async function submitForm_mfg() {
+    if (filesProcessed_mfg === false && document.getElementById("fileData5").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const crm_id = document.getElementById("mfgCrm").value
+    const content = document.getElementById("mfgContent").value
+
+    const vendor_id = document.getElementById("mfgCustomerID").textContent
+    const vendor_name = document.getElementById("mfgCustomerName").textContent
+
+    const fileData = document.getElementById("fileData5").value
+    const mimeType = document.getElementById("mimeType5").value
+    const fileName = document.getElementById("fileName5").value
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã Quotation")
+        document.getElementById("mfgCrm").focus()
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập mã đơn hàng")
+        document.getElementById("mfgContent").focus()
+        return
+    }
+
+
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_order(), load_mfg()]);
+
+    const findCrm = order_data.filter(item => item[6] === crm_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM# hoặc CRM# chưa được chờ nhận đơn hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm2 = mfg_data.filter(item => item[3] === crm_id); // Filter rows based on selection
+    console.table(findCrm2)
+    if (findCrm2.length >0) {
+        alert("CRM# này đã được yêu cầu giao hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+    
+    try {
+        let mfg_table = new FormData();
+
+        mfg_table.append("operator", sessionStorage.getItem("fullname"));
+        mfg_table.append("crm_id", crm_id);
+        mfg_table.append("vendor_id", vendor_id);
+        mfg_table.append("vendor_name", vendor_name);
+        mfg_table.append("content", content);
+
+        mfg_table.append("fileData", fileData);
+        mfg_table.append("mimeType", mimeType);
+        mfg_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbzWocGD20MXdcTDm2GehRBMG1cGw01liMw3AyMj2vgOY7wqwqC42Vv4rGmJi9aKY95w/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: mfg_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_mfg()
+    get_mfg_need_to_process()
+    info("Gửi yêu cầu giao hàng thành công!")
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_mfg_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_order(), load_mfg()]);
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const mfgColumn4 = new Set(mfg_data.map(row => row[3]));
+
+    // Lọc và xử lý dữ liệu từ order_data
+    const newArray = order_data
+        .filter(row => !mfgColumn4.has(row[6]))
+        .map(row => {
+            const splitData = row[6].split("-");
+            const thirdElement = splitData[2];
+            const foundCustomer = customer_data.find(customer => customer[1] === thirdElement);
+            const customerId = foundCustomer ? foundCustomer[0] : null;
+            return [...row, thirdElement, customerId];
+        });
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[9], // Cột thứ 10
+        row[4], // Cột thứ 5
+        row[0], // Cột thứ 1
+        row[5]?.slice(0, 10), // Cột thứ 6: Chỉ lấy 10 ký tự đầu
+        row[6]  // Cột thứ 7
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_mfg");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Ngày giao", "Mã CRM"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("mfgCrm").value = row[4]
+                    document.getElementById("mfgCustomerID").textContent = row[0]
+                    document.getElementById("mfgCustomerName").textContent = row[1]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+///* DELIVERY ///
+
+function reset_delivery() {
+    document.getElementById("deliveryCrm").value = "";
+    document.getElementById("deliveryContent").value = "";
+
+    document.getElementById("deliveryDate").value = "";
+    
+    document.getElementById("deliveryCustomerID").innerText = ""
+    document.getElementById("deliveryCustomerName").innerText = ""
+
+    document.getElementById("fileUpload6").value = ""
+    document.getElementById("fileData6").value = ""
+    document.getElementById("mimeType6").value = ""
+    document.getElementById("fileName6").value = ""
+
+    document.getElementById("deliveryCrm").focus()  
+}
+
+var filesProcessed_delivery = false;
+
+function LoadFile6(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    document.getElementById('submitButton_delivery').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_delivery = false;
+        document.getElementById('submitButton_delivery').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData6').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType6').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName6').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_delivery = true;
+            // Enable submit button
+            document.getElementById('submitButton_delivery').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+async function submitForm_delivery() {
+    if (filesProcessed_delivery === false && document.getElementById("fileData6").value !== "") {
+        alert('Vui lòng chờ đến khi các tệp được xử lý.');
+        return false;
+    }
+    /////////////////
+    const crm_id = document.getElementById("deliveryCrm").value
+    const delivery_date = document.getElementById("deliveryDate").value
+    const content = document.getElementById("deliveryContent").value
+
+    const vendor_id = document.getElementById("deliveryCustomerID").textContent
+    const vendor_name = document.getElementById("deliveryCustomerName").textContent
+
+    const fileData = document.getElementById("fileData6").value
+    const mimeType = document.getElementById("mimeType6").value
+    const fileName = document.getElementById("fileName6").value
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã Quotation")
+        document.getElementById("deliveryCrm").focus()
+        return
+    }
+
+    if (delivery_date === "") {
+        alert("Bạn chưa chọn ngày giao hàng")
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập mã đơn hàng")
+        document.getElementById("deliveryContent").focus()
+        return
+    }
+
+
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_mfg(), load_delivery()]);
+
+    const findCrm = mfg_data.filter(item => item[3] === crm_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM# hoặc CRM# chưa được sản xuất")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm2 = delivery_data.filter(item => item[3] === crm_id); // Filter rows based on selection
+    console.table(findCrm2)
+    if (findCrm2.length >0) {
+        alert("CRM# này đã được yêu cầu thanh toán")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+    
+    try {
+        let delivery_table = new FormData();
+
+        delivery_table.append("operator", sessionStorage.getItem("fullname"));
+        delivery_table.append("crm_id", crm_id);
+        delivery_table.append("vendor_id", vendor_id);
+        delivery_table.append("vendor_name", vendor_name);
+        delivery_table.append("delivery_date", delivery_date);
+
+        delivery_table.append("content", content);
+
+        delivery_table.append("fileData", fileData);
+        delivery_table.append("mimeType", mimeType);
+        delivery_table.append("fileName", fileName);
+
+        
+        await fetch('https://script.google.com/macros/s/AKfycbx6Za6GKMWWlvb1Li7Oe7OW9pAsu5mBQRYCx6upMCEGmWA6MTlFDCFkScRE3WDR1v_sTQ/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: delivery_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_delivery()
+    get_mfg_need_to_process()
+    info("Gửi yêu cầu thanh toán thành công!")
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_delivery_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_mfg(), load_delivery()]);
+
+    // Lấy giá trị từ cột thứ 4 của delivery_data
+    const deliveryColumn4 = new Set(delivery_data.map(row => row[3]));
+
+    // Lọc và xử lý dữ liệu từ order_data
+    const newArray = mfg_data
+        .filter(row => !deliveryColumn4.has(row[3]))
+        .map(row => {
+            const splitData = row[3].split("-");
+            const thirdElement = splitData[2];
+            const foundCustomer = customer_data.find(customer => customer[1] === thirdElement);
+            const customerId = foundCustomer ? foundCustomer[0] : null;
+            return [...row, thirdElement, customerId];
+        });
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[4],
+        row[5],
+        row[0],
+        row[3] 
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_delivery");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Mã CRM"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("deliveryCrm").value = row[3]
+                    document.getElementById("deliveryCustomerID").textContent = row[0]
+                    document.getElementById("deliveryCustomerName").textContent = row[1]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+///* PAYMENT ///
+
+function reset_payment() {
+    document.getElementById("paymentCrm").value = "";
+    document.getElementById("paymentContent").value = "";
+    
+    document.getElementById("paymentCustomerID").innerText = ""
+    document.getElementById("paymentCustomerName").innerText = ""
+
+    document.getElementById("paymentCrm").focus()  
+}
+
+async function submitForm_payment() {
+    const crm_id = document.getElementById("paymentCrm").value
+    const content = document.getElementById("paymentContent").value
+
+    const vendor_id = document.getElementById("paymentCustomerID").textContent
+    const vendor_name = document.getElementById("paymentCustomerName").textContent
+
+    if (crm_id === "") {
+        alert("Bạn chưa nhập mã CRM")
+        document.getElementById("paymentCrm").focus()
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập mã đơn hàng")
+        document.getElementById("paymentContent").focus()
+        return
+    }
+
+
+    document.getElementById("loadingIndicator").style.display = "block";
+
+    warning("Đang xử lý yêu cầu  ... ")
+
+    await Promise.all([load_delivery(), load_payment()]);
+
+    const findCrm = delivery_data.filter(item => item[3] === crm_id); // Filter rows based on selection
+    console.table(findCrm)
+    if (findCrm.length === 0) {
+        alert("Sai CRM# hoặc CRM# chưa được giao hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+
+    const findCrm2 = payment_data.filter(item => item[3] === crm_id); // Filter rows based on selection
+    console.table(findCrm2)
+    if (findCrm2.length >0) {
+        alert("CRM# này đã hoàn tất thanh toán")
+        document.getElementById("loadingIndicator").style.display = "none";
+        return
+    }
+    
+    try {
+        let payment_table = new FormData();
+
+        payment_table.append("operator", sessionStorage.getItem("fullname"));
+        payment_table.append("crm_id", crm_id);
+        payment_table.append("vendor_id", vendor_id);
+        payment_table.append("vendor_name", vendor_name);
+        payment_table.append("content", content);
+        
+        await fetch('https://script.google.com/macros/s/AKfycbyiNrVjoLDxbikY9YgdtmsNFQ7YOjuX75wyNFAokq3-KRvYkE1pdXhYZIyXXNlIDzo/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: payment_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    reset_payment()
+    get_payment_need_to_process()
+    info("Hoàn tất thanh toán!")
+    document.getElementById("loadingIndicator").style.display = "none";
+
+    return false; // Prevent the default form submission
+}
+
+async function get_payment_need_to_process() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_delivery(), load_payment()]);
+
+    // Lấy giá trị từ cột thứ 4 của payment_data
+    const paymentColumn4 = new Set(payment_data.map(row => row[3]));
+
+    // Lọc và xử lý dữ liệu từ order_data
+    const newArray = delivery_data
+        .filter(row => !paymentColumn4.has(row[3]))
+        .map(row => {
+            const splitData = row[3].split("-");
+            const thirdElement = splitData[2];
+            const foundCustomer = customer_data.find(customer => customer[1] === thirdElement);
+            const customerId = foundCustomer ? foundCustomer[0] : null;
+            return [...row, thirdElement, customerId];
+        });
+
+    // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const tableData = newArray.map(row => [
+        row[4],
+        row[5],
+        row[0],
+        row[3] 
+    ]);
+
+    // Tạo bảng
+    const tableContainer = document.getElementById("table-container_payment");
+    const table = document.createElement("table");
+    table.style.width = "100%";
+    table.style.borderCollapse = "collapse";
+    table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Mã CRM"];
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Tạo dữ liệu bảng
+    const tbody = document.createElement("tbody");
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("paymentCrm").value = row[3]
+                    document.getElementById("paymentCustomerID").textContent = row[0]
+                    document.getElementById("paymentCustomerName").textContent = row[1]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer.innerHTML = "";
+    tableContainer.appendChild(table);
+    document.getElementById("loadingIndicator").style.display = "none";
+}
