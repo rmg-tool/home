@@ -936,6 +936,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         create_wh_xuat_export()
         create_wh_nhap_export()
         create_wh_onhand_export()
+        create_wh_crm()
     
     }
     
