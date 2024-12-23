@@ -3200,10 +3200,11 @@ async function design_approval() {
     const filter_approve_request = design_data
     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
     .filter(item => 
-        item[4] === sessionStorage.getItem("approver")  // Điều kiện 1
+        item[4] === sessionStorage.getItem("username")  // Điều kiện 1
         //&& quotation_approval_data.some(approvedItem => approvedItem[6] === item[6]) // Điều kiện 2
     );
     console.table(filter_approve_request)
+    console.log(sessionStorage.getItem("username"))
 
     const column0Array2 = design_approval_data.map(row => row[13]);
     console.log(column0Array2)
@@ -3704,7 +3705,7 @@ async function quotation_approval() {
     const filter_approve_request = quotation_data
     .map((item, originalIndex) => ({ ...item, originalIndex })) // Lưu chỉ mục gốc
     .filter(item => 
-        item[4] === sessionStorage.getItem("approver")  // Điều kiện 1
+        item[4] === sessionStorage.getItem("username")  // Điều kiện 1
         //&& quotation_approval_data.some(approvedItem => approvedItem[6] === item[6]) // Điều kiện 2
     );
     console.table(filter_approve_request)
