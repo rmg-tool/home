@@ -648,10 +648,6 @@ function check_loc_nhap() {
 
 ///////////////////////////////////
 // Hàm đóng modal
-function closeModal() {
-    const modal = document.getElementById("secondaryModal");
-    modal.style.display = 'none';
-}
 
 // Hàm loại bỏ dấu tiếng Việt
 function removeAccents(str) {
@@ -1403,8 +1399,8 @@ function showSecondaryOptions2(selectedItem) {
     const wh_value = document.getElementById("warehouse_xuat").value
     // Filter based on selected item and availability
     const filteredResults = onhand_data.filter(item => item[1] === selectedItem[1] && item[10] > 0 && item[0] === wh_value);
-    const modal = document.getElementById("secondaryModal");
-    const modalOptions = document.getElementById("modalOptions");
+    const modal = document.getElementById("secondaryModal2");
+    const modalOptions = document.getElementById("modalOptions2");
     modalOptions.innerHTML = ''; // Clear old content
 
     // Use a Set to keep track of unique options
@@ -2748,6 +2744,8 @@ async function get_survey_need_to_process() {
 
 // Hàm đóng modal
 function closeModal() {
+    document.getElementById("secondaryModal").style.display = 'none';
+    document.getElementById("secondaryModal2").style.display = 'none';
     document.getElementById("detailModal").style.display = "none";
     document.getElementById("modalBackdrop").style.display = "none";
 }
