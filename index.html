@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2312.1215</h4>
+                <h4>Version 3.2312.1230</h4>
             </div>
             
                 
@@ -154,7 +154,7 @@
                 
                 <div class="form-row">
                     <label for="unit-price">Nhập đơn giá</label>
-                    <input type="number" id="unit-price" placeholder="Nhập đơn giá" oninput="validateInput(this)"">
+                    <input type="number" id="unit-price" placeholder="Nhập đơn giá" oninput="validateInput(this)">
                 </div>
                 
                 <div class="form-row">
@@ -503,8 +503,8 @@
                         </div>
 
                         <div class="form-row">
-                            <label for="quotationTotalPrice">Nhập báo giá</label>
-                            <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị báo giá">
+                            <label for="quotationTotalPrice">Giá trị đơn hàng + VAT</label>
+                            <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị đơn hàng + VAT" oninput="validateInput(this)"">
                         </div>
 
                         <div style="text-align: center; margin-top: 30px;">
@@ -674,7 +674,7 @@
             
                         <div id="button_group_delivery">
                             <button class="reset-btn" onclick="reset_delivery()">Reset</button>
-                            <button id="submitButton_delivery" class="submit-btn" onclick="submitForm_delivery()">Yêu cầu thanh toán</button>
+                            <button id="submitButton_delivery" class="submit-btn" onclick="submitForm_delivery()">Đã nhận thanh toán</button>
                         </div>
                     </div>
 
