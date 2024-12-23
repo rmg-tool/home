@@ -104,13 +104,14 @@
                         <li onclick="showFrame('survey')">KHẢO SÁT</li>
                         <li onclick="showFrame('design')">DESIGN + BOM</li>
                         <li onclick="showFrame('quotation')">QUOTATION</li>
-                        <li onclick="showFrame('order_release')">ORDER RELEASE</li>
-                        <li onclick="showFrame('final_inspection')">FINAL INSPECTION</li>
+                        <li onclick="showFrame('order')">ORDER RECEIVE</li>
+                        <li onclick="showFrame('mfg')">MFG / PUR</li>
                         <li onclick="showFrame('delivery')">DELIVERY</li>
                         <li onclick="showFrame('payment')">PAYMENT</li>
                     </ul>
                 </li>
                 <li onclick="showFrame('bom_creation')">BOM Creation</li>
+                <li onclick="showFrame('approve_center')">Approval Center</li>
                 <li>
                     Export Data
                     <ul class="submenu">
@@ -128,7 +129,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 2.302.171</h4>
+                <h4>Version 3.2312.917</h4>
             </div>
                 
             <div id="import" class="frame">
@@ -324,17 +325,575 @@
                     <button class="submit-btn" onclick="submit_mml()">Submit</button>
                     <button class="reset-btn" onclick="reset_mml()">Reset</button>
                 </div>
+            </div>
+
+            <div id="crm" class="frame">
+                <h1>CRM OPS Management</h1>
+                <div class="form-row">
+                    <label for="wh_crm">Chọn chi nhánh</label>
+                    <select id="wh_crm"></select>
+                </div>
+
+                <div class="form-row">
+                    <label for="customer_crm">Khách hàng</label>
+                    <div id="found_crm">
+                        <input type="text" id="customer_crm" placeholder="Nhập tên khách hàng">
+                        <div id="dropdown_crm" class="dropdown"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label>Mã khách hàng</label>
+                    <label id="customer_id_crm"></label>
+                </div>
+
+                <div class="form-row">
+                    <label for="content_crm">Nội dung</label>
+                    <textarea id="content_crm" placeholder="Nhập nội dung" rows="4"></textarea>
+                </div>
+
+                
+                <div id="button_group_crm">
+                    <button class="reset-btn" onclick="reset_crm()">Reset</button>
+                    <button class="submit-btn" onclick="crm_post()">Khảo sát</button>
+                </div>
+                
+            </div>
+
+            <div id="survey" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>KHẢO SÁT OPS Management</h1>
+                        <form id="uploadForm" method="post" action="https://script.google.com/macros/s/AKfycbz3sDtQ9BzRkwEzNdS6nIm8Vus3xqV-t8wqbQs3BsGdipihibNc3W_hJmPIfoIqImSBbg/exec" onsubmit="return submitForm_survey();">
+                            <div class="form-row">
+                                <label for="surveyCrmNumber">CRM #</label>
+                                <input type="text" id="surveyCrmNumber" placeholder="Nhập CRM#">
+                            </div>
+                            <div class="form-row">
+                                <label for="totalHours">Tổng giờ làm</label>
+                                <input type="text" id="totalHours" placeholder="Nhập tổng giờ làm">
+                            </div>
+                            <div class="form-row">
+                                <label for="surveyContent">Nội dung</label>
+                                <textarea id="surveyContent" placeholder="Nhập nội dung" rows="4"></textarea>
+                            </div>
+                        </form>
+
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload" onchange="LoadFile(event)" required multiple><br><br>
+
+                            <input type="hidden" id="fileData" name="fileData">
+                            <input type="hidden" id="mimeType" name="mimeType">
+                            <input type="hidden" id="fileName" name="fileName">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+
+                        <div id="button_group_survey">
+                            <button class="reset-btn" onclick="reset_survey()">Reset</button>
+                            <button id="submitButton_survey" class="submit-btn" onclick="submitForm_survey()">Thiết kế</button>
+                        </div>
+                        <!-- <button onclick="openModal('reasonModalSurvey')" class="cancel-btn">CANCEL</button> -->
+
+                        <!-- Modal for Survey and Design + BOM (input reason) -->
+                        <div id="reasonModalSurvey" class="modal">
+                            <div class="modal-content">
+                                <h3>Lý do hủy</h3>
+                                <!-- <input type="text" id="cancelReasonSurvey" placeholder="Nhập lý do hủy"> -->
+                                <textarea id="cancelReasonSurvey" placeholder="Nhập nội dung" rows="4"></textarea>
+                                <button onclick="confirmCancel('reasonModalSurvey')">Xác nhận hủy</button>
+                                <button onclick="closeModal('reasonModalSurvey')">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_survey" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                    </div>
+                </div> 
+            </div>
+
+            <div id="design" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>DESIGN + BOM</h1>
+
+                        <div class="form-row">
+                            <label for="designCrmNumber">CRM#</label>
+                            <input type="text" id="designCrmNumber" placeholder="Nhập CRM#">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="designBomNumber">BOM#</label>
+                            <input type="text" id="designBomNumber" placeholder="Nhập BOM#">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="designTotalPrice">Tổng giá trị BOM</label>
+                            <input type="text" id="designTotalPrice" placeholder="Nhập tổng giá trị BOM">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="designTotalHour">Tổng giờ làm</label>
+                            <input type="text" id="designTotalHour" placeholder="Nhập tổng giờ làm">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="designProductName">Tên sản phẩm</label>
+                            <textarea id="designProductName" placeholder="Nhập tên sản phẩm" rows="4"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload2" onchange="LoadFile2(event)" required multiple><br><br>
+
+                            <input type="hidden" id="fileData2" name="fileData2">
+                            <input type="hidden" id="mimeType2" name="mimeType2">
+                            <input type="hidden" id="fileName2" name="fileName2">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+
+
+                        <div id="button_group_design">
+                            <button class="reset-btn" onclick="reset_design()">Reset</button>
+                            <button id="submitButton_design" class="submit-btn" onclick="submitForm_design()">Báo giá</button>
+                        </div>
+                        <!-- <button onclick="openModal('reasonModalDesignBom')" class="cancel-btn">CANCEL</button> -->
+
+                        <div id="reasonModalDesignBom" class="modal">
+                            <div class="modal-content">
+                                <h3>Lý do hủy</h3>
+                                <input type="text" id="cancelReasonDesignBom" placeholder="Nhập lý do hủy">
+                                <button onclick="confirmCancel('reasonModalDesignBom')">Xác nhận hủy</button>
+                                <button onclick="closeModal('reasonModalDesignBom')">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_design" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                    </div>
+                </div> 
 
             </div>
-            <div id="crm" class="frame">CRM OPS Management Content</div>
-            <div id="survey" class="frame">KHẢO SÁT OPS Management Content</div>
-            <div id="design" class="frame">DESIGN + BOM OPS Management Content</div>
-            <div id="quotation" class="frame">QUOTATION OPS Management Content</div>
-            <div id="order_release" class="frame">ORDER RELEASE OPS Management Content</div>
-            <div id="final_inspection" class="frame">FINAL INSPECTION OPS Management Content</div>
-            <div id="delivery" class="frame">DELIVERY OPS Management Content</div>
-            <div id="payment" class="frame">PAYMENT OPS Management Content</div>
+
+            <div id="quotation" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>QUOTATION</h1>
+
+                        <div class="form-row">
+                            <label for="quotationCrmNumber">CRM#</label>
+                            <input type="text" id="quotationCrmNumber" placeholder="Nhập CRM#">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="quotationTotalPrice">Nhập báo giá</label>
+                            <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị báo giá">
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload3" onchange="LoadFile3(event)" required multiple><br><br>
+
+                            <input type="hidden" id="fileData3" name="fileData3">
+                            <input type="hidden" id="mimeType3" name="mimeType3">
+                            <input type="hidden" id="fileName3" name="fileName3">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+
+                        <!-- <button onclick="openModal('reasonModalQuotation')" class="submit-btn">CANCEL</button> -->
+                        <!-- <button class="submit-btn">CHỜ NHẬN ĐƠN HÀNG</button> -->
+                        <div id="button_group_quotation">
+                            <button class="reset-btn" onclick="reset_quotation()">Reset</button>
+                            <button id="submitButton_quotation" class="submit-btn" onclick="submitForm_quotation()">Chờ nhận đơn hàng</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_quotation" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="order" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>ORDER RECEIVE</h1>
+
+                        <div class="form-row">
+                            <label for="orderQuotationNumber">QUOTATION#</label>
+                            <input type="text" id="orderQuotationNumber" placeholder="Nhập QUOTATION#">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="orderOrderID">CUSTOMER ORDER #</label>
+                            <input type="text" id="orderOrderID" placeholder="Nhập mã đơn hàng">
+                        </div>
+
+                        <div class="form-row">
+                            <label for="orderDate">Ngày giao hàng</label>
+                            <input type="date" id="orderDate" placeholder="Chọn ngày giao hàng">
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload4" onchange="LoadFile4(event)" required multiple><br><br>
+
+                            <input type="hidden" id="fileData4" name="fileData4">
+                            <input type="hidden" id="mimeType4" name="mimeType4">
+                            <input type="hidden" id="fileName4" name="fileName4">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+
+                        <div id="button_group_order">
+                            <button class="reset-btn" onclick="reset_order()">Reset</button>
+                            <button id="submitButton_order" class="submit-btn" onclick="submitForm_order()">MFG / PUR</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_order" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div id="mfg" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>MFG / PUR</h1>
+            
+                        <div class="form-row">
+                            <label for="mfgCrm">CRM#</label>
+                            <input type="text" id="mfgCrm" placeholder="Nhập CRM#">
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã khách hàng</label>
+                            <label id="mfgCustomerID"></label>
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã đơn hàng</label>
+                            <label id="mfgCustomerName"></label>
+                        </div>
+            
+                        <div class="form-row">
+                            <label for="mfgContent">Nội dung</label>
+                            <textarea id="mfgContent" placeholder="Nhập nội dung" rows="4"></textarea>
+                        </div>
+            
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload5" onchange="LoadFile5(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData5" name="fileData5">
+                            <input type="hidden" id="mimeType5" name="mimeType5">
+                            <input type="hidden" id="fileName5" name="fileName5">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+            
+                        <div id="button_group_mfg">
+                            <button class="reset-btn" onclick="reset_mfg()">Reset</button>
+                            <button id="submitButton_mfg" class="submit-btn" onclick="submitForm_mfg()">Yêu cầu giao hàng</button>
+                        </div>
+                    </div>
+            
+                    
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_mfg" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            
+
+            <div id="delivery" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>DELIVERY</h1>
+
+                        <div class="form-row">
+                            <label for="deliveryCrm">CRM#</label>
+                            <input type="text" id="deliveryCrm" placeholder="Nhập CRM#">
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã khách hàng</label>
+                            <label id="deliveryCustomerID"></label>
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã đơn hàng</label>
+                            <label id="deliveryCustomerName"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="deliveryDate">Ngày giao hàng</label>
+                            <input type="date" id="deliveryDate">
+                        </div>
+            
+                        <div class="form-row">
+                            <label for="deliveryContent">Nội dung</label>
+                            <textarea id="deliveryContent" placeholder="Nhập nội dung" rows="4"></textarea>
+                        </div>
+            
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload6" onchange="LoadFile6(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData6" name="fileData6">
+                            <input type="hidden" id="mimeType6" name="mimeType6">
+                            <input type="hidden" id="fileName6" name="fileName6">
+                        </div>
+                        <label>Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+            
+                        <div id="button_group_delivery">
+                            <button class="reset-btn" onclick="reset_delivery()">Reset</button>
+                            <button id="submitButton_delivery" class="submit-btn" onclick="submitForm_delivery()">Yêu cầu thanh toán</button>
+                        </div>
+                    </div>
+
+                    <div id="div2">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_delivery" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="payment" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PAYMENT</h1>
+
+                        <div class="form-row">
+                            <label for="paymentCrm">CRM#</label>
+                            <input type="text" id="paymentCrm" placeholder="Nhập CRM#">
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã khách hàng</label>
+                            <label id="paymentCustomerID"></label>
+                        </div>
+            
+                        <div class="form-row">
+                            <label>Mã đơn hàng</label>
+                            <label id="paymentCustomerName"></label>
+                        </div>
+            
+                        <div class="form-row">
+                            <label for="paymentContent">Nội dung</label>
+                            <textarea id="paymentContent" placeholder="Nhập nội dung" rows="4"></textarea>
+                        </div>
+            
+            
+                        <div id="button_group_payment">
+                            <button class="reset-btn" onclick="reset_payment()">Reset</button>
+                            <button id="submitButton_payment" class="submit-btn" onclick="submitForm_payment()">Yêu cầu thanh toán</button>
+                        </div>
+                    </div>
+
+                    <div id="div2">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="bom_creation" class="frame">BOM Creation Content</div>
+            <div id="approve_center" class="frame">
+                <h1>Approval Center</h1>
+                
+                <button class="submit-btn" onclick="load_approval_ticket()">Refresh</button>
+                <!-- Vùng hiển thị bảng -->
+                <div id="table_approve_survey"></div>
+
+                <!-- Modal container -->
+                <div id="detailModal" style="display: none;">
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                    <h2>Survey Details</h2>
+                
+                    <div class="form-row">
+                        <label>Requestor:</label>
+                        <label id="operator_name_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Request Time:</label>
+                        <label id="request_time_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>CRM#:</label>
+                        <label id="crm_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Survey#:</label>
+                        <label id="survey_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Total Hours:</label>
+                        <label id="total_hours_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Content:     </label>
+                        <label id="content_show"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Link Reference:</label>
+                        <label id="link_show"></label>
+                    </div>
+                
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="action-btn approve-btn" onclick="approveSurvey()">Approve</button>
+                        <button class="action-btn reject-btn" onclick="rejectSurvey()">Reject</button>
+                    </div>
+                </div>
+                
+                <div id="modalBackdrop" style="display: none;" onclick="closeModal()"></div>
+
+                <!-- Vùng hiển thị bảng -->
+                <div id="table_approve_design"></div>
+
+                <!-- Modal container -->
+                <div id="detailModal2" style="display: none;">
+                    <button class="close-btn" onclick="closeModal2()">×</button>
+                    <h2>Design Details</h2>
+                
+                    <div class="form-row">
+                        <label>Requestor:</label>
+                        <label id="operator_name_show2"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Request Time:</label>
+                        <label id="request_time_show2"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>CRM#:</label>
+                        <label id="crm_show2"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>BOM#:</label>
+                        <label id="bom_show2"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Total Price:</label>
+                        <label id="total_price_show2"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Total Hours:</label>
+                        <label id="total_hours_show2"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Product Name:     </label>
+                        <label id="content_show2"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Link Reference:</label>
+                        <label id="link_show2"></label>
+                    </div>
+                
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="action-btn approve-btn" onclick="approveDesign()">Approve</button>
+                        <button class="action-btn reject-btn" onclick="rejectDesign()">Reject</button>
+                    </div>
+                </div>
+                
+                <div id="modalBackdrop2" style="display: none;" onclick="closeModal2()"></div>
+
+                <!-- Vùng hiển thị bảng -->
+                <div id="table_approve_quotation"></div>
+
+                <!-- Modal container -->
+                <div id="detailModal3" style="display: none;">
+                    <button class="close-btn" onclick="closeModal3()">×</button>
+                    <h2>Quotation Details</h2>
+                
+                    <div class="form-row">
+                        <label>Requestor:</label>
+                        <label id="operator_name_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Request Time:</label>
+                        <label id="request_time_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>CRM#:</label>
+                        <label id="crm_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>BOM#:</label>
+                        <label id="bom_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>QUOTATION#:</label>
+                        <label id="quotation_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Quotation Price:</label>
+                        <label id="total_price_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>BOM Price:</label>
+                        <label id="total_bom_price_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Product Name:     </label>
+                        <label id="content_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Link Reference:</label>
+                        <label id="link_show3"></label>
+                    </div>
+                
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="action-btn approve-btn" onclick="approveQuotation()">Approve</button>
+                        <button class="action-btn reject-btn" onclick="rejectQuotation()">Reject</button>
+                    </div>
+                </div>
+                
+                <div id="modalBackdrop3" style="display: none;" onclick="closeModal3()"></div>
+                
+                
+            </div>
             <div id="onhand" class="frame">
                 
                 <h1>On-hand Inventory</h1>
@@ -435,4 +994,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
