@@ -2137,7 +2137,7 @@ document.getElementById("refresh_nhap").addEventListener("click", async function
     await load_data_nhap_export()
 });
 
-///*** CRM ////
+///* CRM ////
 
 document.getElementById("customer_crm").addEventListener("keyup", function(event) {
     if (event.keyCode === 13) { // Kiểm tra phím Enter
@@ -2187,6 +2187,9 @@ async function crm_post() {
         return
     }
 
+    document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById("button_crm").disabled = true;
+
     // Kiểm tra cột đầu tiên
     const existsInFirstColumn = customer_data.some(row => row[0] === customer);
 
@@ -2195,6 +2198,8 @@ async function crm_post() {
     } else {
         console.log('Customer does not exist in the first column');
         alert("Sai tên Khách hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("button_crm").disabled = false;
         return
     }
     const now = new Date();
@@ -2216,9 +2221,6 @@ async function crm_post() {
 
     // Chuyển length thành chuỗi với định dạng 3 chữ số
     const stt_crm = String(length).padStart(3, '0');
-
-    console.log(`Hôm nay có ${length} giá trị.`);
-    console.log(`STT (định dạng 3 chữ số): ${stt_crm}`);
 
     const crm_id = "CRM"+"-"+wh+"-"+customer_id+"-"+datetime_id+"-"+stt_crm
     console.log(crm_id)
@@ -2245,6 +2247,8 @@ async function crm_post() {
     }
 
     reset_crm()
+    document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById("button_crm").disabled = false;
 }
 
 function reset_crm() {
@@ -2486,6 +2490,7 @@ async function submitForm_survey() {
 
     const datetime_id = `${year}/${month}/${day}`;
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById("submitButton_survey").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -2496,6 +2501,7 @@ async function submitForm_survey() {
     if (findCrm.length === 0) {
         alert("Sai CRM#")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_survey").disabled = false;
         return
     }
 
@@ -2504,6 +2510,7 @@ async function submitForm_survey() {
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu thiết kế")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_survey").disabled = false;
         return
     }
     // Lọc các giá trị có ngày là hôm nay
@@ -2553,6 +2560,7 @@ async function submitForm_survey() {
     info("Gửi yêu cầu thiết kế thành công!")
     get_survey_need_to_process()
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById("submitButton_survey").disabled = false;
 
     return false; // Prevent the default form submission
 }
@@ -2785,6 +2793,7 @@ async function submitForm_design() {
     }
     
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById("submitButton_design").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -2795,6 +2804,7 @@ async function submitForm_design() {
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được duyệt")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_design").disabled = false;
         return
     }
 
@@ -2813,6 +2823,7 @@ async function submitForm_design() {
         if (findCrm2.length === 0) {
             alert("CRM# này đang chờ duyệt");
             document.getElementById("loadingIndicator").style.display = "none";
+            document.getElementById("submitButton_design").disabled = false;
             return;
         }
     } else {
@@ -2826,6 +2837,7 @@ async function submitForm_design() {
     if (findCrm3.length > 0) {
         alert("CRM# này đã được duyệt")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_design").disabled = false;
         return
     }
 
@@ -2895,24 +2907,92 @@ async function submitForm_design() {
     info("Gửi yêu cầu báo giá thành công!")
     get_design_need_to_process()
     document.getElementById("loadingIndicator").style.display = "none";
-
+    document.getElementById("submitButton_design").disabled = false;
     return false; // Prevent the default form submission
 }
 
 async function get_design_need_to_process() {
     document.getElementById("loadingIndicator").style.display = "block";
-    await Promise.all([load_survey(), load_design()]);
+    await Promise.all([load_survey(), load_design(), load_design_approval()]);
+
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(design_data.map(row => row[6]));
 
     const newArray = survey_data
         .filter(row => !crmColumn.has(row[6]))
+    ////////////
+    // Bước 1: Xác định các crm_id có trạng thái "approve"
+    const approvedCrmIds = new Set();
+
+    design_approval_data.forEach(row => {
+        if (row[11] === "BOM ĐÃ DUYỆT") { // Kiểm tra status
+            approvedCrmIds.add(row[6]); // Lưu crm_id có trạng thái approve
+        }
+    });
+
+    // Bước 2: Lọc design_approval_data, chỉ giữ các dòng có status "reject" và không thuộc crm_id đã được approve
+    const filteredRejects = design_approval_data.filter(
+        row => row[11] === "BOM REJECTED" && !approvedCrmIds.has(row[6])
+    );
+
+    // Bước 3: Chỉ giữ lại dòng có thời gian mới nhất cho mỗi crm_id
+    const latestRejects = {};
+
+    filteredRejects.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestRejects[crm_id] ||
+            new Date(`${latestRejects[crm_id][0]}T${latestRejects[crm_id][1]}`) < dateTime
+        ) {
+            latestRejects[crm_id] = row;
+        }
+    });
+
+    // Bước 4: Lọc trước `survey_data` để chỉ giữ thời gian mới nhất cho mỗi `crm_id`
+    const latestSurveyData = {};
+    design_data.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestSurveyData[crm_id] ||
+            new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`) < dateTime
+        ) {
+            latestSurveyData[crm_id] = row;
+        }
+    });
+
+    console.log(latestSurveyData)
+
+    // Bước 5: Loại bỏ các crm_id khỏi `latestRejects` nếu `survey_data` có thời gian lớn hơn
+    const reprocess = Object.values(latestRejects).filter(row => {
+        const crm_id = row[6];
+        const designDateTime = new Date(`${row[0]}T${row[1]}`); // Thời gian của dòng `latestReject`
+
+        if (latestSurveyData[crm_id]) {
+            const surveyDateTime = new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`);
+            return surveyDateTime <= designDateTime; // Loại bỏ nếu surveyDateTime lớn hơn
+        }
+
+        // Giữ lại nếu không có dòng nào trong survey_data khớp crm_id
+        return true;
+    });
+
+    
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
     const tableData = newArray.map(row => [
         row[6], // Cột thứ 10
         row[5], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    const tableData2 = reprocess.map(row => [
+        row[6], // Cột thứ 10
+        row[13], // Cột thứ 5
         row[0], // Cột thứ 1
     ]);
 
@@ -2966,6 +3046,59 @@ async function get_design_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
+
+
+    // Tạo bảng
+    const tableContainer2 = document.getElementById("table-container_design2");
+    const table2 = document.createElement("table");
+    table2.style.width = "100%";
+    table2.style.borderCollapse = "collapse";
+    table2.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers2 = ["CRM#", "SURVEY#", "Ngày tạo"];
+    const thead2 = document.createElement("thead");
+    const headerRow2 = document.createElement("tr");
+    headers2.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow2.appendChild(th);
+    });
+    thead2.appendChild(headerRow2);
+    table2.appendChild(thead2);
+
+    // Tạo dữ liệu bảng
+    const tbody2 = document.createElement("tbody");
+    tableData2.forEach((row, index) => {
+        const tr2 = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("designCrmNumber").value = row[0]
+                });
+            }
+            tr2.appendChild(td);
+        });
+        tbody2.appendChild(tr2);
+    });
+    table2.appendChild(tbody2);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer2.innerHTML = "";
+    tableContainer2.appendChild(table2);
+
     document.getElementById("loadingIndicator").style.display = "none";
 }
 
@@ -3295,6 +3428,7 @@ async function submitForm_quotation() {
     }
 
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById("submitButton_quotation").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -3305,6 +3439,7 @@ async function submitForm_quotation() {
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM chưa được duyệt báo giá")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_quotation").disabled = false;
         return
     }
 
@@ -3323,6 +3458,7 @@ async function submitForm_quotation() {
         if (findCrm2.length === 0) {
             alert("CRM# này đang chờ duyệt");
             document.getElementById("loadingIndicator").style.display = "none";
+            document.getElementById("submitButton_quotation").disabled = false;
             return;
         }
     } else {
@@ -3336,6 +3472,7 @@ async function submitForm_quotation() {
     if (findCrm3.length > 0) {
         alert("CRM# này đã được duyệt")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("submitButton_quotation").disabled = false;
         return
     }
 
@@ -3408,24 +3545,92 @@ async function submitForm_quotation() {
     get_quotation_need_to_process()
     info("Gửi yêu cầu chờ nhận đơn hàng thành công!")
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById("submitButton_quotation").disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_quotation_need_to_process() {
     document.getElementById("loadingIndicator").style.display = "block";
-    await Promise.all([load_design_approval(), load_quotation()]);
+    await Promise.all([load_design_approval(), load_quotation(), load_quotation_approval()]);
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(quotation_data.map(row => row[6]));
 
     const newArray = design_approval_data
-        .filter(row => !crmColumn.has(row[6]) && row[11] === "Báo giá")
+        .filter(row => !crmColumn.has(row[6]) && row[11] === "BOM ĐÃ DUYỆT")
+
+    ////////////
+    // Bước 1: Xác định các crm_id có trạng thái "approve"
+    const approvedCrmIds = new Set();
+
+    quotation_approval_data.forEach(row => {
+        if (row[10] === "BÁO GIÁ ĐÃ DUYỆT") { // Kiểm tra status
+            approvedCrmIds.add(row[6]); // Lưu crm_id có trạng thái approve
+        }
+    });
+
+    // Bước 2: Lọc quotation_approval_data, chỉ giữ các dòng có status "reject" và không thuộc crm_id đã được approve
+    const filteredRejects = quotation_approval_data.filter(
+        row => row[10] === "QUOTATION REJECTED" && !approvedCrmIds.has(row[6])
+    );
+
+    // Bước 3: Chỉ giữ lại dòng có thời gian mới nhất cho mỗi crm_id
+    const latestRejects = {};
+
+    filteredRejects.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestRejects[crm_id] ||
+            new Date(`${latestRejects[crm_id][0]}T${latestRejects[crm_id][1]}`) < dateTime
+        ) {
+            latestRejects[crm_id] = row;
+        }
+    });
+
+    // Bước 4: Lọc trước `survey_data` để chỉ giữ thời gian mới nhất cho mỗi `crm_id`
+    const latestSurveyData = {};
+    quotation_data.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestSurveyData[crm_id] ||
+            new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`) < dateTime
+        ) {
+            latestSurveyData[crm_id] = row;
+        }
+    });
+
+    console.log(latestSurveyData)
+
+    // Bước 5: Loại bỏ các crm_id khỏi `latestRejects` nếu `survey_data` có thời gian lớn hơn
+    const reprocess = Object.values(latestRejects).filter(row => {
+        const crm_id = row[6];
+        const quotationDateTime = new Date(`${row[0]}T${row[1]}`); // Thời gian của dòng `latestReject`
+
+        if (latestSurveyData[crm_id]) {
+            const surveyDateTime = new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`);
+            return surveyDateTime <= quotationDateTime; // Loại bỏ nếu surveyDateTime lớn hơn
+        }
+
+        // Giữ lại nếu không có dòng nào trong survey_data khớp crm_id
+        return true;
+    });
+
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
     const tableData = newArray.map(row => [
         row[6], // Cột thứ 10
         row[9], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    const tableData2 = reprocess.map(row => [
+        row[6], // Cột thứ 10
+        row[8], // Cột thứ 5
         row[0], // Cột thứ 1
     ]);
 
@@ -3479,6 +3684,57 @@ async function get_quotation_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
+
+    // Tạo bảng
+    const tableContainer2 = document.getElementById("table-container_quotation2");
+    const table2 = document.createElement("table");
+    table2.style.width = "100%";
+    table2.style.borderCollapse = "collapse";
+    table2.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
+
+    // Tạo tiêu đề bảng
+    const headers2 = ["CRM#", "BOM#", "Ngày tạo"];
+    const thead2 = document.createElement("thead");
+    const headerRow2 = document.createElement("tr");
+    headers2.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        th.style.border = "1px solid #ddd";
+        th.style.padding = "8px";
+        th.style.whiteSpace = "nowrap"; // Giữ nội dung không xuống dòng
+        headerRow2.appendChild(th);
+    });
+    thead2.appendChild(headerRow2);
+    table2.appendChild(thead2);
+
+    // Tạo dữ liệu bảng
+    const tbody2 = document.createElement("tbody");
+    tableData2.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        row.forEach((cell, cellIndex) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.style.border = "1px solid #ddd";
+            td.style.padding = "8px";
+
+            // Thêm sự kiện click vào cột đầu tiên (cột 10)
+            if (cellIndex === 0) {
+                td.style.cursor = "pointer"; // Thay đổi con trỏ để báo hiệu có thể bấm
+                td.style.color = "blue"; // Thêm màu để dễ nhận biết
+                td.addEventListener("click", () => {
+                    // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
+                    document.getElementById("quotationCrmNumber").value = row[0]
+                });
+            }
+            tr.appendChild(td);
+        });
+        tbody2.appendChild(tr);
+    });
+    table2.appendChild(tbody2);
+
+    // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
+    tableContainer2.innerHTML = "";
+    tableContainer2.appendChild(table2);
     document.getElementById("loadingIndicator").style.display = "none";
 }
 
@@ -3813,6 +4069,7 @@ async function submitForm_order() {
     }
 
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById('submitButton_order').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -3823,6 +4080,7 @@ async function submitForm_order() {
     if (findCrm.length === 0) {
         alert("Sai QUOTATION# hoặc QUOTATION# chưa được duyệt")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_order').disabled = false;
         return
     }
 
@@ -3833,6 +4091,7 @@ async function submitForm_order() {
     if (findCrm2.length >0) {
         alert("QUOTATION# này đã được yêu cầu SX, đặt hàng")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_order').disabled = false;
         return
     }
     
@@ -3865,6 +4124,7 @@ async function submitForm_order() {
     get_order_need_to_process()
     info("Gửi yêu cầu SX - Đặt hàng thành công!")
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById('submitButton_order').disabled = false;
 
     return false; // Prevent the default form submission
 }
@@ -3877,7 +4137,7 @@ async function get_order_need_to_process() {
     const crmColumn = new Set(order_data.map(row => row[3]));
 
     const newArray = quotation_approval_data
-        .filter(row => !crmColumn.has(row[5]) && row[10] === "Chờ nhận đơn hàng")
+        .filter(row => !crmColumn.has(row[5]) && row[10] === "BÁO GIÁ ĐÃ DUYỆT")
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
     const tableData = newArray.map(row => [
@@ -4055,7 +4315,7 @@ async function submitForm_mfg() {
 
 
     document.getElementById("loadingIndicator").style.display = "block";
-
+    document.getElementById('submitButton_mfg').disabled = true;
     warning("Đang xử lý yêu cầu  ... ")
 
     await Promise.all([load_order(), load_mfg()]);
@@ -4065,6 +4325,7 @@ async function submitForm_mfg() {
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được chờ nhận đơn hàng")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_mfg').disabled = false;
         return
     }
 
@@ -4073,6 +4334,7 @@ async function submitForm_mfg() {
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu giao hàng")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_mfg').disabled = false;
         return
     }
     
@@ -4105,6 +4367,7 @@ async function submitForm_mfg() {
     get_mfg_need_to_process()
     info("Gửi yêu cầu giao hàng thành công!")
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById('submitButton_mfg').disabled = false;
 
     return false; // Prevent the default form submission
 }
@@ -4291,7 +4554,7 @@ async function submitForm_delivery() {
     const fileName = document.getElementById("fileName6").value
 
     if (crm_id === "") {
-        alert("Bạn chưa nhập mã Quotation")
+        alert("Bạn chưa nhập mã CRM")
         document.getElementById("deliveryCrm").focus()
         return
     }
@@ -4302,13 +4565,14 @@ async function submitForm_delivery() {
     }
 
     if (content === "") {
-        alert("Bạn chưa nhập mã đơn hàng")
+        alert("Bạn chưa nhập nội dung")
         document.getElementById("deliveryContent").focus()
         return
     }
 
 
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById('submitButton_delivery').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -4319,6 +4583,7 @@ async function submitForm_delivery() {
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được sản xuất")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_delivery').disabled = false;
         return
     }
 
@@ -4327,6 +4592,7 @@ async function submitForm_delivery() {
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu thanh toán")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_delivery').disabled = false;
         return
     }
     
@@ -4361,6 +4627,7 @@ async function submitForm_delivery() {
     get_mfg_need_to_process()
     info("Gửi yêu cầu thanh toán thành công!")
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById('submitButton_delivery').disabled = false;
 
     return false; // Prevent the default form submission
 }
@@ -4480,6 +4747,7 @@ async function submitForm_payment() {
 
 
     document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById('submitButton_payment').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -4490,6 +4758,7 @@ async function submitForm_payment() {
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được giao hàng")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_payment').disabled = false;
         return
     }
 
@@ -4498,6 +4767,7 @@ async function submitForm_payment() {
     if (findCrm2.length >0) {
         alert("CRM# này đã hoàn tất thanh toán")
         document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById('submitButton_payment').disabled = false;
         return
     }
     
@@ -4525,6 +4795,7 @@ async function submitForm_payment() {
     get_payment_need_to_process()
     info("Hoàn tất thanh toán!")
     document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById('submitButton_payment').disabled = false;
 
     return false; // Prevent the default form submission
 }
