@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2412.102</h4>
+                <h4>Version 3.2612.324</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -367,7 +367,7 @@
                 
                 <div id="button_group_crm">
                     <button class="reset-btn" onclick="reset_crm()">Reset</button>
-                    <button class="submit-btn" onclick="crm_post()">Khảo sát</button>
+                    <button class="submit-btn" onclick="crm_post()" id="button_crm">Khảo sát</button>
                 </div>
                 
             </div>
@@ -490,6 +490,12 @@
                         <div id="table-container_design" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
                             <!-- Table will be dynamically generated and added here -->
                         </div>
+
+                        <h1 style="margin-top: 50px;">Danh sách bị Reject</h1>
+
+                        <div id="table-container_design2" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
                     </div>
                 </div> 
 
@@ -531,6 +537,12 @@
                         <h1>Danh sách chờ xử lý</h1>
 
                         <div id="table-container_quotation" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <!-- Table will be dynamically generated and added here -->
+                        </div>
+
+                        <h1 style="margin-top: 50px;">Danh sách bị Reject</h1>
+
+                        <div id="table-container_quotation2" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
                             <!-- Table will be dynamically generated and added here -->
                         </div>
                     </div>
