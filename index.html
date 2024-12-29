@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2612.324</h4>
+                <h4>Version 3.3012.119</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -369,7 +369,7 @@
                     <button class="reset-btn" onclick="reset_crm()">Reset</button>
                     <button class="submit-btn" onclick="crm_post()" id="button_crm">Khảo sát</button>
                 </div>
-                
+                <button class="submit-btn" onclick="crm_to_design()" id="button_crm_to_quotation" style="background-color: yellow; color: black;">Báo giá</button>
             </div>
 
             <div id="survey" class="frame">
@@ -380,6 +380,14 @@
                             <div class="form-row">
                                 <label for="surveyCrmNumber">CRM #</label>
                                 <input type="text" id="surveyCrmNumber" placeholder="Nhập CRM#">
+                            </div>
+                            <div class="form-row">
+                                <label>Người tạo</label>
+                                <label id="operator_show_survey"></label>
+                            </div>
+                            <div class="form-row">
+                                <label>Nội dung</label>
+                                <label id="content_show_survey"></label>
                             </div>
                             <div class="form-row">
                                 <label for="totalHours">Tổng giờ làm</label>
@@ -436,6 +444,19 @@
                         <div class="form-row">
                             <label for="designCrmNumber">CRM#</label>
                             <input type="text" id="designCrmNumber" placeholder="Nhập CRM#">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo</label>
+                            <label id="operator_show_design"></label>
+                        </div>
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <label id="content_show_design"></label>
+                        </div>
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_design" href="#" target="_blank"></a>
                         </div>
 
                         <div class="form-row">
@@ -512,6 +533,16 @@
                         </div>
 
                         <div class="form-row">
+                            <label>Người tạo</label>
+                            <label id="operator_show_quotation"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_quotation" href="#" target="_blank"></a>
+                        </div>
+
+                        <div class="form-row">
                             <label for="quotationTotalPrice">Giá trị đơn hàng + VAT</label>
                             <input type="text" id="quotationTotalPrice" placeholder="Nhập giá trị đơn hàng + VAT" oninput="validateInput(this)">
                         </div>
@@ -557,6 +588,16 @@
                         <div class="form-row">
                             <label for="orderQuotationNumber">QUOTATION#</label>
                             <input type="text" id="orderQuotationNumber" placeholder="Nhập QUOTATION#">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo</label>
+                            <label id="operator_show_order"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_order" href="#" target="_blank"></a>
                         </div>
                         
                         <div class="form-row">
@@ -614,6 +655,16 @@
                             <label>Mã đơn hàng</label>
                             <label id="mfgCustomerName"></label>
                         </div>
+
+                        <div class="form-row">
+                            <label>Người tạo</label>
+                            <label id="operator_show_mfg"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_mfg" href="#" target="_blank"></a>
+                        </div>
             
                         <div class="form-row">
                             <label for="mfgContent">Nội dung</label>
@@ -669,7 +720,22 @@
                         </div>
 
                         <div class="form-row">
-                            <label for="deliveryDate">Ngày giao hàng</label>
+                            <label>Người tạo</label>
+                            <label id="operator_show_delivery"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <label id="content_show_delivery"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_delivery" href="#" target="_blank"></a>
+                        </div>
+
+                        <div class="form-row">
+                            <label for="deliveryDate">Ngày thanh toán</label>
                             <input type="date" id="deliveryDate">
                         </div>
             
@@ -720,6 +786,21 @@
                         <div class="form-row">
                             <label>Mã đơn hàng</label>
                             <label id="paymentCustomerName"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo</label>
+                            <label id="operator_show_payment"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <label id="content_show_payment"></label>
+                        </div>
+
+                        <div class="form-row">
+                            <label>File đính kèm</label>
+                            <a id="link_show_payment" href="#" target="_blank"></a>
                         </div>
             
                         <div class="form-row">
