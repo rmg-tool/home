@@ -2312,6 +2312,126 @@ function showSearchResults_crm(displayList, fullData) {
 
 document.getElementById("customer_crm").addEventListener("input", debounce(handleMaterialTypeCrm, 400));
 
+async function crm_to_design() {
+    const wh = document.getElementById("wh_crm").value
+    const customer = document.getElementById("customer_crm").value
+    const content = document.getElementById("content_crm").value
+
+    if (wh === "") {
+        alert("Bạn chưa chọn mã chi nhanh")
+        return
+    }
+
+    if (customer === "") {
+        alert("Bạn chưa nhập tên khách hàng")
+        document.getElementById("customer_crm").focus()
+        return
+    }
+
+    if (content === "") {
+        alert("Bạn chưa nhập nội dung")
+        document.getElementById("content_crm").focus()
+        return
+    }
+
+    document.getElementById("loadingIndicator").style.display = "block";
+    document.getElementById("button_crm").disabled = true;
+
+    // Kiểm tra cột đầu tiên
+    const existsInFirstColumn = customer_data.some(row => row[0] === customer);
+
+    if (existsInFirstColumn) {
+        console.log('Customer exists in the first column');
+    } else {
+        console.log('Customer does not exist in the first column');
+        alert("Sai tên Khách hàng")
+        document.getElementById("loadingIndicator").style.display = "none";
+        document.getElementById("button_crm").disabled = false;
+        return
+    }
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+
+    const array = [1, 2, 3]; // Thay đổi nội dung mảng theo nhu cầu
+    await load_crm()
+
+    // Lọc các giá trị có ngày là hôm nay
+    const todayData = filterTodayData(crm_data);
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_crm = String(length).padStart(3, '0');
+
+    const crm_id = "CRM"+"-"+wh+"-"+customer_id+"-"+datetime_id+"-"+stt_crm
+    console.log(crm_id)
+    try {
+        let crm_table = new FormData();
+        crm_table.append("wh", wh);
+        crm_table.append("operator_name", sessionStorage.getItem("fullname"));
+        crm_table.append("operator_id", sessionStorage.getItem("username"));
+        crm_table.append("customer", customer);
+        crm_table.append("customer_id", customer_id);
+        crm_table.append("crm_id", crm_id);
+        crm_table.append("content", content);
+        
+        fetch('https://script.google.com/macros/s/AKfycbxiadEptjY-QD5UVNUll7sCg7zt7FcrisleVS607ruXZ2YwrK_LmHAcE633KYAz4eQzyA/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: crm_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+
+    reset_crm()
+    
+    try {
+        let design_table_approved = new FormData();
+
+        design_table_approved.append("operator", sessionStorage.getItem("fullname"))
+        design_table_approved.append("username", sessionStorage.getItem("username"))
+        design_table_approved.append("approver", sessionStorage.getItem("approver"))
+
+        design_table_approved.append("dept","")
+        design_table_approved.append("crm_id", crm_id)
+        design_table_approved.append("total_hour", "")
+        design_table_approved.append("product_name", "")
+
+        design_table_approved.append("bom_id", "")
+        design_table_approved.append("total_price", "")
+
+        design_table_approved.append("status", "BOM ĐÃ DUYỆT")
+
+        design_table_approved.append("link", "")
+        design_table_approved.append("design_id", "")
+
+        document.getElementById("loadingIndicator").style.display = "block";
+        await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: design_table_approved
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+    info("Báo giá thành công")
+    document.getElementById("loadingIndicator").style.display = "none";
+    document.getElementById("button_crm").disabled = false;
+}
+
 ////* Survey */
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -2360,6 +2480,9 @@ function reset_survey() {
     document.getElementById("fileData").value = ""
     document.getElementById("mimeType").value = ""
     document.getElementById("fileName").value = ""
+
+    document.getElementById("operator_show_survey").textContent = ""
+    document.getElementById("content_show_survey").textContent = ""
 
     document.getElementById("surveyCrmNumber").focus()    
 
@@ -2622,6 +2745,12 @@ async function get_survey_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("surveyCrmNumber").value = row[0]
+                    crm_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = crm_data.find(item => item[7] === row[0])
+                    const content = findCrm[8]
+                    const operator = findCrm[4]
+                    document.getElementById("operator_show_survey").textContent = operator
+                    document.getElementById("content_show_survey").textContent = content
                 });
             }
             tr.appendChild(td);
@@ -2634,6 +2763,16 @@ async function get_survey_need_to_process() {
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
     document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function get_content_and_operator(array_data, crm_id) {
+    array_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+    findCrm = array_data.find(item => item[7] === crm_id)
+    const content = findCrm[8]
+    const operator = findCrm[4]
+
+    console.log(content, operator)
+
 }
 
 // Hàm đóng modal
@@ -2656,6 +2795,10 @@ function reset_design() {
     document.getElementById("fileData2").value = ""
     document.getElementById("mimeType2").value = ""
     document.getElementById("fileName2").value = ""
+
+    document.getElementById("operator_show_design").textContent = ""
+    document.getElementById("content_show_design").textContent = ""
+    document.getElementById("link_show_design").textContent = ""
 
     document.getElementById("designCrmNumber").focus()  
 }
@@ -2965,8 +3108,6 @@ async function get_design_need_to_process() {
         }
     });
 
-    console.log(latestSurveyData)
-
     // Bước 5: Loại bỏ các crm_id khỏi `latestRejects` nếu `survey_data` có thời gian lớn hơn
     const reprocess = Object.values(latestRejects).filter(row => {
         const crm_id = row[6];
@@ -3035,6 +3176,25 @@ async function get_design_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("designCrmNumber").value = row[0]
+                    survey_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = survey_data.find(item => item[6] === row[0])
+                    console.table(findCrm)
+                    const content = findCrm[8]
+                    const operator = findCrm[2]
+                    const link = findCrm[10]
+                    document.getElementById("operator_show_design").textContent = operator
+                    document.getElementById("content_show_design").textContent = content
+
+                    const linkElement = document.getElementById("link_show_design");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -3087,6 +3247,25 @@ async function get_design_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("designCrmNumber").value = row[0]
+                    survey_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = survey_data.find(item => item[6] === row[0])
+                    console.table(findCrm)
+                    const content = findCrm[8]
+                    const operator = findCrm[2]
+                    const link = findCrm[10]
+                    document.getElementById("operator_show_design").textContent = operator
+                    document.getElementById("content_show_design").textContent = content
+
+                    const linkElement = document.getElementById("link_show_design");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr2.appendChild(td);
@@ -3330,6 +3509,9 @@ function reset_quotation() {
     document.getElementById("fileData3").value = ""
     document.getElementById("mimeType3").value = ""
     document.getElementById("fileName3").value = ""
+
+    document.getElementById("operator_show_quotation").textContent = ""
+    document.getElementById("link_show_quotation").textContent = ""
 
     document.getElementById("quotationCrmNumber").focus()  
 }
@@ -3673,6 +3855,23 @@ async function get_quotation_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("quotationCrmNumber").value = row[0]
+                    design_approval_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = design_approval_data.find(item => item[6] === row[0])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const link = findCrm[12]
+                    document.getElementById("operator_show_quotation").textContent = operator
+                    const linkElement = document.getElementById("link_show_quotation");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -3724,6 +3923,24 @@ async function get_quotation_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("quotationCrmNumber").value = row[0]
+                    design_approval_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = design_approval_data.find(item => item[6] === row[0])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const link = findCrm[12]
+                    document.getElementById("operator_show_quotation").textContent = operator
+                    const linkElement = document.getElementById("link_show_quotation");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    // Cập nhật nội dung hiển thị của hyperlink
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -3966,6 +4183,9 @@ function reset_order() {
     document.getElementById("mimeType4").value = ""
     document.getElementById("fileName4").value = ""
 
+    document.getElementById("operator_show_order").textContent = ""
+    document.getElementById("link_show_order").textContent = ""
+
     document.getElementById("orderQuotationNumber").focus()  
 }
 
@@ -4185,6 +4405,24 @@ async function get_order_need_to_process() {
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
                     document.getElementById("orderQuotationNumber").value = row[0]
+                    quotation_approval_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = quotation_approval_data.find(item => item[5] === row[0])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const link = findCrm[11]
+                    document.getElementById("operator_show_order").textContent = operator
+                    const linkElement = document.getElementById("link_show_order");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    // Cập nhật nội dung hiển thị của hyperlink
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -4214,6 +4452,8 @@ function reset_mfg() {
     document.getElementById("mimeType5").value = ""
     document.getElementById("fileName5").value = ""
 
+    document.getElementById("operator_show_mfg").textContent = ""
+    document.getElementById("link_show_mfg").textContent = ""
     document.getElementById("mfgCrm").focus()  
 }
 
@@ -4440,6 +4680,25 @@ async function get_mfg_need_to_process() {
                     document.getElementById("mfgCrm").value = row[4]
                     document.getElementById("mfgCustomerID").textContent = row[0]
                     document.getElementById("mfgCustomerName").textContent = row[1]
+
+                    order_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = order_data.find(item => item[6] === row[4])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const link = findCrm[8]
+                    document.getElementById("operator_show_mfg").textContent = operator
+                    const linkElement = document.getElementById("link_show_mfg");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    // Cập nhật nội dung hiển thị của hyperlink
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -4470,6 +4729,10 @@ function reset_delivery() {
     document.getElementById("fileData6").value = ""
     document.getElementById("mimeType6").value = ""
     document.getElementById("fileName6").value = ""
+
+    document.getElementById("operator_show_delivery").textContent = ""
+    document.getElementById("content_show_delivery").textContent = ""
+    document.getElementById("link_show_delivery").textContent = ""
 
     document.getElementById("deliveryCrm").focus()  
 }
@@ -4624,7 +4887,7 @@ async function submitForm_delivery() {
         console.error('Error:', error);
     }
     reset_delivery()
-    get_mfg_need_to_process()
+    get_delivery_need_to_process()
     info("Gửi yêu cầu thanh toán thành công!")
     document.getElementById("loadingIndicator").style.display = "none";
     document.getElementById('submitButton_delivery').disabled = false;
@@ -4699,6 +4962,27 @@ async function get_delivery_need_to_process() {
                     document.getElementById("deliveryCrm").value = row[3]
                     document.getElementById("deliveryCustomerID").textContent = row[0]
                     document.getElementById("deliveryCustomerName").textContent = row[1]
+
+                    mfg_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = mfg_data.find(item => item[3] === row[3])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const content = findCrm[6]
+                    const link = findCrm[8]
+                    document.getElementById("operator_show_delivery").textContent = operator
+                    document.getElementById("content_show_delivery").textContent = content
+                    const linkElement = document.getElementById("link_show_delivery");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    // Cập nhật nội dung hiển thị của hyperlink
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
@@ -4722,6 +5006,10 @@ function reset_payment() {
     
     document.getElementById("paymentCustomerID").innerText = ""
     document.getElementById("paymentCustomerName").innerText = ""
+
+    document.getElementById("operator_show_payment").textContent = ""
+    document.getElementById("content_show_payment").textContent = ""
+    document.getElementById("link_show_payment").textContent = ""
 
     document.getElementById("paymentCrm").focus()  
 }
@@ -4867,6 +5155,27 @@ async function get_payment_need_to_process() {
                     document.getElementById("paymentCrm").value = row[3]
                     document.getElementById("paymentCustomerID").textContent = row[0]
                     document.getElementById("paymentCustomerName").textContent = row[1]
+
+                    delivery_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
+                    const findCrm = delivery_data.find(item => item[3] === row[3])
+                    console.table(findCrm)
+                    const operator = findCrm[2]
+                    const content = findCrm[6]
+                    const link = findCrm[9]
+                    document.getElementById("operator_show_payment").textContent = operator
+                    document.getElementById("content_show_payment").textContent = content
+                    const linkElement = document.getElementById("link_show_payment");
+
+                    // Đặt thuộc tính href cho hyperlink
+                    linkElement.href = link;
+
+                    // Cập nhật nội dung hiển thị của hyperlink
+                    if (link === "-" || link === "") {
+                        linkElement.textContent = "";
+                    } else {
+                        // Cập nhật nội dung hiển thị của hyperlink
+                        linkElement.textContent = "Xem File đính kèm";
+                    }
                 });
             }
             tr.appendChild(td);
