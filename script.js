@@ -25,6 +25,8 @@ let price_xuat = ''
 let amount_xuat = ''
 let unit_xuat = ''
 
+let active_frame = ""
+
 function alert(text_want_to_alert) {
     const audio = new Audio('material/error.mp3'); // Replace with your sound file path
     audio.play();
@@ -38,7 +40,14 @@ function alert(text_want_to_alert) {
         position: 'top', // Position it as in the example image
         toast: true, // Display as a toast-style alert
         background: 'red',
-        color: 'white'
+        color: 'white',
+        didOpen: () => {
+            // Set z-index to ensure it's on the highest layer
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) {
+                swalContainer.style.zIndex = '999999';
+            }
+        }
     });
 }
 
@@ -56,7 +65,14 @@ function info(text_want_to_alert) {
         position: 'top', // Position it as in the example image
         toast: true, // Display as a toast-style alert
         background: 'green',
-        color: 'white'
+        color: 'white',
+        didOpen: () => {
+            // Set z-index to ensure it's on the highest layer
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) {
+                swalContainer.style.zIndex = '999999';
+            }
+        }
     });
 }
 
@@ -71,7 +87,14 @@ function warning(text_want_to_alert) {
         position: 'top', // Position it as in the example image
         toast: true, // Display as a toast-style alert
         background: 'yellow',
-        color: 'black'
+        color: 'black',
+        didOpen: () => {
+            // Set z-index to ensure it's on the highest layer
+            const swalContainer = document.querySelector('.swal2-container');
+            if (swalContainer) {
+                swalContainer.style.zIndex = '999999';
+            }
+        }
     });
 }
 
@@ -688,6 +711,7 @@ let order_data = []
 let mfg_data = []
 let delivery_data = []
 let payment_data = []
+let cancel_data = []
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -804,6 +828,15 @@ async function load_payment() {
         .then(data => {
             payment_data = data.content;
             console.log("Dữ liệu payment đã tải xong.");
+        });
+}
+
+async function load_cancel() {
+    return fetch('https://script.google.com/macros/s/AKfycbxTLg9rKc-aB1xquQt9gCU6dMY64E6nCleYFMR2x17pDzoO1wnFtmMq_A5EC3KSfMTE/exec')
+        .then(res => res.json())
+        .then(data => {
+            cancel_data = data.content;
+            console.log("Dữ liệu cancel đã tải xong.");
         });
 }
 
@@ -1264,10 +1297,12 @@ function showFrame(id) {
                 });
             } else if (id === 'crm') {
                 activeFrame.classList.add('active');
+                active_frame = id;
                 console.log("Access granted to frame:", id);
             } else if (id === 'survey') {
                 get_survey_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
                 console.log("Access granted to frame:", id);
             } else if (id === 'approve_center') {
                 load_approval_ticket()
@@ -1275,21 +1310,33 @@ function showFrame(id) {
             } else if (id === 'design') {
                 get_design_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else if (id === 'quotation') {
                 get_quotation_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else if (id === 'order') {
                 get_order_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else if (id === 'mfg') {
                 get_mfg_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else if (id === 'delivery') {
                 get_delivery_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else if (id === 'payment') {
                 get_payment_need_to_process()
                 activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
             } else {
                 activeFrame.classList.add('active');
                 console.log("Access granted to frame:", id);
@@ -5104,15 +5151,34 @@ async function get_payment_need_to_process() {
             const foundCustomer = customer_data.find(customer => customer[1] === thirdElement);
             const customerId = foundCustomer ? foundCustomer[0] : null;
             return [...row, thirdElement, customerId];
+        })
+        .sort((a, b) => {
+            // Chuyển đổi cột thứ 7 thành đối tượng Date để so sánh (nếu là ngày giờ)
+            const dateA = new Date(a[7]);
+            const dateB = new Date(b[7]);
+            return dateA - dateB; // Sắp xếp tăng dần
         });
 
+
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
-        row[4],
-        row[5],
-        row[0],
-        row[3] 
-    ]);
+    const tableData = newArray.map(row => {
+        // Chuyển giá trị row[7] thành đối tượng Date
+        const originalDate = new Date(row[7]);
+        
+        // Cộng thêm 7 giờ
+        originalDate.setHours(originalDate.getHours() + 7);
+        
+        // Chuyển đối tượng Date thành chuỗi ISO và lấy 10 ký tự đầu
+        const formattedDate = originalDate.toISOString().substring(0, 10);
+    
+        return [
+            row[4],
+            row[5],
+            formattedDate, // Dữ liệu đã được cộng 7 giờ và định dạng
+            row[0],
+            row[3]
+        ];
+    });
 
     // Tạo bảng
     const tableContainer = document.getElementById("table-container_payment");
@@ -5122,7 +5188,7 @@ async function get_payment_need_to_process() {
     table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
 
     // Tạo tiêu đề bảng
-    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Mã CRM"];
+    const headers = ["Mã hhách hàng", "Mã đơn hàng","Ngày thanh toán", "Ngày tạo", "Mã CRM"];
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     headers.forEach(header => {
@@ -5152,12 +5218,12 @@ async function get_payment_need_to_process() {
                 td.style.color = "blue"; // Thêm màu để dễ nhận biết
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
-                    document.getElementById("paymentCrm").value = row[3]
+                    document.getElementById("paymentCrm").value = row[4]
                     document.getElementById("paymentCustomerID").textContent = row[0]
                     document.getElementById("paymentCustomerName").textContent = row[1]
 
                     delivery_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
-                    const findCrm = delivery_data.find(item => item[3] === row[3])
+                    const findCrm = delivery_data.find(item => item[3] === row[4])
                     console.table(findCrm)
                     const operator = findCrm[2]
                     const content = findCrm[6]
@@ -5188,4 +5254,159 @@ async function get_payment_need_to_process() {
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
     document.getElementById("loadingIndicator").style.display = "none";
+}
+
+///* CANCEL ///
+// Get modal elements
+const modal_cancel = document.getElementById("cancelModal");
+const openModalBtn = document.getElementById("openModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const cancelReason = document.getElementById("cancelReason");
+const otherReasonInputContainer = document.getElementById("otherReasonInput");
+const otherReasonInput = document.getElementById("otherReasonInput");
+const submitBtn = document.getElementById("submitBtn");
+const cancelSurvey = document.getElementById("cancelSurvey")
+const cancelDesign = document.getElementById("cancelDesign")
+const cancelQuotation = document.getElementById("cancelQuotation")
+const cancelOrder = document.getElementById("cancelOrder")
+
+// Open modal
+cancelSurvey.addEventListener("click", () => {
+    modal_cancel.style.display = "block";
+});
+
+cancelDesign.addEventListener("click", () => {
+    modal_cancel.style.display = "block";
+});
+
+cancelQuotation.addEventListener("click", () => {
+    modal_cancel.style.display = "block";
+});
+
+cancelOrder.addEventListener("click", () => {
+    modal_cancel.style.display = "block";
+});
+
+// Close modal
+closeModalBtn.addEventListener("click", () => {
+    modal_cancel.style.display = "none";
+    resetModal()
+});
+
+// Close modal when clicking outside
+window.addEventListener("click", (event) => {
+    if (event.target === modal_cancel) {
+        modal_cancel.style.display = "none";
+    }
+});
+
+// Show/Hide input based on dropdown selection
+cancelReason.addEventListener("change", () => {
+    if (cancelReason.value === "other") {
+        otherReasonInputContainer.style.display = "block"; // Hiển thị ô input
+        otherReasonInput.focus();
+    } else {
+        otherReasonInputContainer.style.display = "none"; // Ẩn ô input
+        otherReasonInput.value = ""; // Xóa nội dung trong ô input
+    }
+});
+
+let crm_no = ""
+let status_cancel = ""
+// Submit button logic
+submitBtn.addEventListener("click", async () => {
+    const selectedReason = cancelReason.value;
+    const otherReason = otherReasonInput.value.trim();
+
+    if (!selectedReason) {
+        alert("Vui lòng chọn lý do hủy!");
+        return;
+    }
+
+    if (selectedReason === "other" && !otherReason) {
+        alert("Vui lòng nhập lý do hủy trong ô Khác!");
+        return;
+    }
+
+    const finalReason = selectedReason === "other" ? otherReason : cancelReason.options[cancelReason.selectedIndex].text;
+    switch (active_frame) {
+        case "survey":
+            crm_no = document.getElementById("surveyCrmNumber").value;
+            if (crm_no === "") {
+                alert("Bạn chưa nhập CRM#")
+                return
+            }
+            status_cancel = "KHẢO SÁT BỊ CANCEL"
+            break
+        case "design":
+            crm_no = document.getElementById("designCrmNumber").value;
+            if (crm_no === "") {
+                alert("Bạn chưa nhập CRM#")
+                return
+            }
+            status_cancel = "THIẾT KẾ BỊ CANCEL"
+            break
+        case "quotation":
+            crm_no = document.getElementById("quotationCrmNumber").value;
+            if (crm_no === "") {
+                alert("Bạn chưa nhập CRM#")
+                return
+            }
+            status_cancel = "BÁO GIÁ BỊ CANCEL"
+            break
+        case "order":
+            crm_no = document.getElementById("orderCrmNumber").value;
+            if (crm_no === "") {
+                alert("Bạn chưa nhập CRM#")
+                return
+            }
+            status_cancel = "ĐƠN HÀNG BỊ CANCEL"
+            break
+        default:
+            alert("Không tìm thấy frame nào đang hiển thị!");
+            return
+    }
+    document.getElementById("loadingIndicator").style.display = "block";
+    submitBtn.disabled = true;
+    try {
+        let cancel_table = new FormData();
+
+        cancel_table.append("operator", sessionStorage.getItem("fullname"));
+        cancel_table.append("crm_id", crm_no);
+        cancel_table.append("reason", finalReason);
+        cancel_table.append("status", status_cancel);
+        
+        await fetch('https://script.google.com/macros/s/AKfycbyeJNzZeOtB27gYlQpxomA5hHqz1zE_VWmJhLiOjP_mzgFBOXQVAsB66YFSjFRVEoaK/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: cancel_table
+        }).then(response => response.text)
+            .then(result => console.log('Đã gửi data thành công'))
+            .catch(error => console.error('Error:', error));
+        }
+    catch (error) {
+        console.error('Error:', error);
+    }
+
+    console.log(`Lý do hủy: ${finalReason}`);
+    console.log(`CRM#: ${crm_no}`);
+    resetModal()
+    modal_cancel.style.display = "none"; // Close the modal
+    document.getElementById("loadingIndicator").style.display = "none";
+    submitBtn.disabled = false;
+
+    reset_survey()
+    reset_design()
+    reset_quotation()
+    reset_order()
+});
+
+function resetModal() {
+    const select = document.getElementById('cancelReason'); // Lấy phần tử dropdown
+    const otherReasonInput = document.getElementById('otherReasonInput'); // Lấy phần tử ô input
+    const otherReasonInputContainer = document.getElementById('otherReasonInput'); // Lấy phần tử container của input
+
+    select.value = ''; // Đặt lại giá trị của dropdown về giá trị mặc định
+    otherReasonInput.value = ''; // Xóa nội dung trong ô input
+    otherReasonInputContainer.style.display = 'none'; // Ẩn ô input "Khác"
 }
