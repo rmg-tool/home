@@ -832,7 +832,7 @@ async function load_payment() {
 }
 
 async function load_cancel() {
-    return fetch('https://script.google.com/macros/s/AKfycbxTLg9rKc-aB1xquQt9gCU6dMY64E6nCleYFMR2x17pDzoO1wnFtmMq_A5EC3KSfMTE/exec')
+    return fetch('https://script.google.com/macros/s/AKfycbzJzPgmnJQ--IeFGjyoeFow4KGu1FQCc9aQFRqjf4KGUaaK6Pbl4RrioQbATbXpmQHL/exec')
         .then(res => res.json())
         .then(data => {
             cancel_data = data.content;
@@ -2427,6 +2427,7 @@ async function crm_to_design() {
         crm_table.append("customer_id", customer_id);
         crm_table.append("crm_id", crm_id);
         crm_table.append("content", content);
+        crm_table.append("remark", "Bypass")
         
         fetch('https://script.google.com/macros/s/AKfycbxiadEptjY-QD5UVNUll7sCg7zt7FcrisleVS607ruXZ2YwrK_LmHAcE633KYAz4eQzyA/exec', {
             method: 'POST',
@@ -2443,30 +2444,30 @@ async function crm_to_design() {
     reset_crm()
     
     try {
-        let design_table_approved = new FormData();
+        let crm_to_quotation_table = new FormData();
 
-        design_table_approved.append("operator", sessionStorage.getItem("fullname"))
-        design_table_approved.append("username", sessionStorage.getItem("username"))
-        design_table_approved.append("approver", sessionStorage.getItem("approver"))
+        crm_to_quotation_table.append("operator", sessionStorage.getItem("fullname"))
+        crm_to_quotation_table.append("username", sessionStorage.getItem("username"))
+        crm_to_quotation_table.append("approver", sessionStorage.getItem("approver"))
 
-        design_table_approved.append("dept","")
-        design_table_approved.append("crm_id", crm_id)
-        design_table_approved.append("total_hour", "")
-        design_table_approved.append("product_name", "")
+        crm_to_quotation_table.append("dept","")
+        crm_to_quotation_table.append("crm_id", crm_id)
+        crm_to_quotation_table.append("total_hour", "")
+        crm_to_quotation_table.append("product_name", "")
 
-        design_table_approved.append("bom_id", "")
-        design_table_approved.append("total_price", "")
+        crm_to_quotation_table.append("bom_id", "")
+        crm_to_quotation_table.append("total_price", "")
 
-        design_table_approved.append("status", "BOM ĐÃ DUYỆT")
+        crm_to_quotation_table.append("status", "BOM ĐÃ DUYỆT")
 
-        design_table_approved.append("link", "")
-        design_table_approved.append("design_id", "")
+        crm_to_quotation_table.append("link", "")
+        crm_to_quotation_table.append("design_id", "")
 
         document.getElementById("loadingIndicator").style.display = "block";
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
             method: 'POST',
             mode: 'no-cors',
-            body: design_table_approved
+            body: crm_to_quotation_table
         }).then(response => response.text)
             .then(result => console.log('Đã gửi data thành công'))
             .catch(error => console.error('Error:', error));
@@ -2743,7 +2744,7 @@ async function get_survey_need_to_process() {
     const crmColumn = new Set(survey_data.map(row => row[6]));
 
     const newArray = crm_data
-        .filter(row => !crmColumn.has(row[7]))
+        .filter(row => !crmColumn.has(row[7]) && row[10] !== "Bypass"); // Lọc ra các giá trị không tồn tại trong mfgColumn
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
     const tableData = newArray.map(row => [
