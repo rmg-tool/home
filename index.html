@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.3012.119</h4>
+                <h4>Version 4.12.715</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -413,7 +413,7 @@
                             <button class="reset-btn" onclick="reset_survey()">Reset</button>
                             <button id="submitButton_survey" class="submit-btn" onclick="submitForm_survey()">Thiết kế</button>
                         </div>
-                        <!-- <button onclick="openModal('reasonModalSurvey')" class="cancel-btn">CANCEL</button> -->
+                        <button id="cancelSurvey" class="cancel-btn">CANCEL</button>
 
                         <!-- Modal for Survey and Design + BOM (input reason) -->
                         <div id="reasonModalSurvey" class="modal">
@@ -493,7 +493,7 @@
                             <button class="reset-btn" onclick="reset_design()">Reset</button>
                             <button id="submitButton_design" class="submit-btn" onclick="submitForm_design()">Báo giá</button>
                         </div>
-                        <!-- <button onclick="openModal('reasonModalDesignBom')" class="cancel-btn">CANCEL</button> -->
+                        <button id="cancelDesign" class="cancel-btn">CANCEL</button>
 
                         <div id="reasonModalDesignBom" class="modal">
                             <div class="modal-content">
@@ -562,6 +562,7 @@
                             <button class="reset-btn" onclick="reset_quotation()">Reset</button>
                             <button id="submitButton_quotation" class="submit-btn" onclick="submitForm_quotation()">Chờ nhận đơn hàng</button>
                         </div>
+                        <button id="cancelQuotation" class="cancel-btn">CANCEL</button>
                     </div>
 
                     <div id="div2" class="right-frame">
@@ -623,6 +624,7 @@
                             <button class="reset-btn" onclick="reset_order()">Reset</button>
                             <button id="submitButton_order" class="submit-btn" onclick="submitForm_order()">MFG / PUR</button>
                         </div>
+                        <button id="cancelOrder" class="cancel-btn">CANCEL</button>
                     </div>
 
                     <div id="div2" class="right-frame">
@@ -759,7 +761,7 @@
                         </div>
                     </div>
 
-                    <div id="div2">
+                    <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
                         <div id="table-container_delivery" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
@@ -815,7 +817,7 @@
                         </div>
                     </div>
 
-                    <div id="div2">
+                    <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
                         <div id="table-container_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
@@ -1089,6 +1091,36 @@
                 
                 <button id="applyFilter3">Apply Filter and Export</button>
                 <button id="closeModal3">Close</button>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="cancelModal" class="modal">
+            <div class="modal-content" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="modal-header">
+                    <strong>Cancel Reason</strong>
+                </div>
+                <div class="modal-body">
+                    <form id="cancelForm">
+                        <select id="cancelReason" style="width: 100%; padding: 5px; margin-top: 10px;">
+                            <option value="">-- Chọn lý do --</option>
+                            <option value="Giá cao">1. Giá cao</option>
+                            <option value="Thời gian giao hàng lâu">2. Thời gian giao hàng lâu</option>
+                            <option value="Khách hàng thay đổi kế hoạch">3. Khách hàng thay đổi kế hoạch</option>
+                            <option value="Khách hàng hủy nhu cầu">4. Khách hàng hủy nhu cầu</option>
+                            <option value="RMG không đáp ứng được yêu cầu leadtime">5. RMG không đáp ứng được yêu cầu leadtime</option>
+                            <option value="RMG không đáp ứng được yêu cầu kỹ thuật">6. RMG không đáp ứng được yêu cầu kỹ thuật</option>
+                            <option value="other">7. Khác</option>
+                        </select>
+                        <div style="margin-top: 10px;">
+                            <input type="text" id="otherReasonInput" placeholder="Nhập lý do hủy" style="display: none;">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="submitBtn" style="background-color: green;">Submit</button>
+                    <button id="closeModalBtn">Close</button>
+                </div>
             </div>
         </div>
 
