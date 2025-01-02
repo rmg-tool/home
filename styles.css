@@ -2575,27 +2575,7 @@ button:hover {
     padding: 5px;
 }
 
-#table-container_delivery {
-    overflow: auto; /* Cuộn ngang và dọc */
-    width: 100%;
-    max-height: 400px; /* Chiều cao tối đa */
-    border: 1px solid #ccc; /* Viền bảng */
-}
-
-#table-container_delivery table {
-    width: 100%; /* Bảng chiếm 100% chiều rộng */
-    border-collapse: collapse; /* Gộp viền */
-    table-layout: auto; /* Tự động điều chỉnh độ rộng */
-}
-
-#table-container_delivery th, td {
-    text-align: left;
-    border: 1px solid #ddd;
-    padding: 8px;
-    white-space: nowrap; /* Không xuống dòng, nếu muốn */
-}
-
-/* DELIVERY */
+/* PAYMENT */
 #payment {
     padding: 25px;
     background-color: #ffffff;
@@ -2750,22 +2730,6 @@ button:hover {
     padding: 5px;
 }
 
-#table-container_payment {
-    overflow: auto; /* Cuộn ngang và dọc */
-    width: 100%;
-    max-height: 400px; /* Chiều cao tối đa */
-    border: 1px solid #ccc; /* Viền bảng */
-}
-
-#table-container_payment table {
-    width: 100%; /* Bảng chiếm 100% chiều rộng */
-    border-collapse: collapse; /* Gộp viền */
-    table-layout: auto; /* Tự động điều chỉnh độ rộng */
-}
-
-#table-container_payment th, td {
-    text-align: left;
-    border: 1px solid #ddd;
-    padding: 8px;
-    white-space: nowrap; /* Không xuống dòng, nếu muốn */
+.swal-highest-zindex {
+    z-index: 99999999999 !important; /* Ensure it is on the highest layer */
 }
