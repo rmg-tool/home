@@ -366,7 +366,7 @@ h2 {
   }
 
 
-  #loadingIndicator {
+#loadingIndicator {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2732,4 +2732,410 @@ button:hover {
 
 .swal-highest-zindex {
     z-index: 99999999999 !important; /* Ensure it is on the highest layer */
+}
+
+/* bom */
+
+#bom_creation {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1200px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#bom_creation .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+
+#bom_creation label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+
+#bom_creation input[type="text"],
+#bom_creation input[type="number"],
+#bom_creation input[type="date"],
+#bom_creation select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#bom_creation input[type="text"]:focus,
+#bom_creation input[type="number"]:focus,
+#bom_creation input[type="date"]:focus,
+#bom_creation select:focus {
+    border-color: #11998e;
+}
+
+#bom_creation select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#bom_creation input[type="number"]::-webkit-inner-spin-button,
+#bom_creation input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#bom_creation .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#bom_creation .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#bom_creation .cancel-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: black;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#button_group_bom_creation {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#bom_creation .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#bom_creation .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+#bom_creationProductName {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#found_bom_creation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+#found_bom_creation input {
+    width: 100%;
+}
+
+#bom_creation #operator_name_bom_creation {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#bom_creation #customer_id_bom_creation {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#table_approve_bom_creation {
+    margin-top: 100px;
+}
+
+#bom_creation #bom_creationContent {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.bom-modal {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+}
+
+.bom-modal.show {
+    display: flex;
+}
+
+.bom-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90%;
+    overflow-y: auto;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.bom-title {
+    margin-top: 0;
+    color: #333;
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    background-color: red;
+    color: white;
+    padding: 10px 0;
+    border-radius: 8px;
+}
+
+.bom-frame {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f0f8ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bom-frame-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 18px;
+    padding: 10px 12px;
+    border-radius: 5px;
+    background-color: #28a745; /* Green for titles */
+}
+
+.bom-row {
+    display: flex;
+    gap: 20px;
+}
+
+.bom-frame .bom-left,
+.bom-frame .bom-right {
+    flex: 1;
+}
+
+.bom-input-group {
+    margin-bottom: 15px;
+}
+
+.bom-input-group label {
+    display: block;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 5px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.bom-input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: all 0.3s;
+}
+
+.bom-input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    background-color: #fff;
+    transition: all 0.3s;
+}
+
+.bom-input-group input:focus {
+    border-color: #007bff;
+    outline: none;
+    background-color: #e9f7fe;
+}
+
+.bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.bom-table th, .bom-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.bom-table th {
+    background-color: #6c757d; /* Gray */
+    color: white;
+    font-weight: bold;
+}
+
+.bom-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+.bom-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.bom-table td input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    background-color: #fff;
+}
+
+.bom-table td input:focus {
+    border-color: #007bff;
+    background-color: #e9f7fe;
+}
+
+.bom-total-row {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: right;
+    padding-top: 10px;
+    color: #333;
+    border-top: 2px solid #ddd;
+    background-color: #f8f9fa;
+    padding: 10px;
+}
+
+.bom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.bom-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.bom-buttons button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.bom-buttons button.bom-clear {
+    background-color: #dc3545; /* Red for clear */
+}
+
+.bom-buttons button.bom-clear:hover {
+    background-color: #bd2130;
+}
+
+.bom-buttons button.bom-save {
+    background-color: #ffc107; /* Yellow for save */
+}
+
+.bom-buttons button.bom-save:hover {
+    background-color: #e0a800;
+}
+
+/* Total Frame */
+.bom-total-frame {
+    background-color: #fff3cd; /* Light Yellow */
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.show-modal-button {
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.show-modal-button:hover {
+    background-color: #0056b3;
+}
+
+.bom-clear {
+    background-color: #dc3545; /* Màu đỏ để thể hiện hành động xóa */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.bom-clear:hover {
+    background-color: #bd2130; /* Màu đỏ đậm hơn khi hover */
+    transform: scale(1.05); /* Hiệu ứng phóng to nhẹ khi hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Đổ bóng khi hover */
+}
+
+.bom-clear:focus {
+    outline: none; /* Loại bỏ đường viền mặc định khi nhấn vào */
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5); /* Tạo viền sáng khi nút được focus */
 }
