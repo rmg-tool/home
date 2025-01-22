@@ -101,10 +101,10 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 4.12.1010</h4>
+                <h4>Version 1.22.121</h4>
 
                 <!-- Thêm hình ảnh -->
-                <img src="material/rmg.jpg" alt="RMG Technologies" style="width:100%;"/>
+                <img src="material/rmg2025.jpg" alt="RMG Technologies" style="width:100%;"/>
             </div>
             
                 
@@ -826,7 +826,273 @@
                     </div>
                 </div>
             </div>
-            <div id="bom_creation" class="frame">BOM Creation Content</div>
+            
+            <div id="bom_creation" class="frame">
+                <h1>BOM Creation</h1>
+                <div id="button_group_bom_creation">
+                    <!-- <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px;" onclick="load_approval_ticket()">Tạo BOM mới</button> -->
+                </div>
+
+                <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px;" onclick="showModal_bom()">Tạo BOM mới</button>
+                <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px; margin-left: 15px;" onclick="showModal_bom_draft()">Load BOM tạm</button>
+
+                <div class="bom-modal" id="bom-draft-modal">
+                    <div class="modal-content">
+                      <h2>Chọn BOM đã tạm lưu</h2>
+                      <div>
+                        <select id="bomDraftDropdown"></select>
+                      </div>
+                    </div>
+                  </div>
+
+                <div class="bom-modal" id="bom-modal">
+                    <div class="bom-modal-content">
+                      <h2 class="bom-title">BOM Creation</h2>
+                
+                      <!-- Frame 1 -->
+                      <div class="bom-frame">
+                        <div class="bom-frame-title">Thông tin chính:</div>
+                        <div class="bom-row">
+                          <div class="bom-left">
+                            <div class="bom-input-group">
+                              <label for="bom-crm">CRM#:</label>
+                              <!-- <input type="text" id="bom-crm" /> -->
+                              <select id="bom-crm"></select>
+                            </div>
+                            <div class="bom-input-group">
+                                <label for="bom-name">Tên BOM:</label>
+                                <input type="text" id="bom-name" />
+                            </div>
+                        </div>
+                          <div class="bom-right">
+                            <div class="bom-input-group">
+                                <label>Khách hàng:</label>
+                                <label style="width: 100%; margin-top: 15px;" id="bom-customerID"></label>
+                                <label style="width: 100%; margin-top: 15px;" id="bom-customerName"></label>
+                                <label style="width: 100%; margin-top: 15px;" id="bom-wh"></label>
+                                <label style="width: 100%; margin-top: 15px;" id="bom-crm-show"></label>
+                        </div>
+
+                            
+                          </div>
+                        </div>
+                      </div>
+                
+                      <!-- Table Frame 2 -->
+                      <div class="bom-frame">
+                        <div class="bom-frame-title">Danh mục vật tư</div>
+                        <button class="show-modal-button" onclick="showAddItemModal()">Thêm vật tư</button>
+                        <div style="overflow-x: auto;"> <!-- Thêm overflow-x để có cuộn ngang -->
+                            <table class="bom-table" id="bom-item-table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Loại vật tư</th>
+                                        <th>Tên vật tư</th>
+                                        <th>Mã vật tư</th>
+                                        <th>Đơn vị</th>
+                                        <th>Số lượng cần</th>
+                                        <th>Số lượng tồn kho hiện có</th>
+                                        <th>Số lượng cần mua thêm</th>
+                                        <th>Giá / Đơn vị (dự kiến)</th>
+                                        <th>Tổng giá</th>
+                                        <th>Hành động</th> <!-- Thêm cột Hành động -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <label class="bom-total-row" id="bom-total-price" style="font-size: 30px; font-weight: bold;">Tổng giá trị: -</label>
+                      </div>
+                
+                      <!-- Add Item Modal -->
+                      <div class="bom-modal" id="add-item-modal">
+
+                        <div id="secondaryModal_bom" class="modal">
+                            <div class="modal-content">
+                                <span class="close-btn" onclick="closeModal()">x</span>
+                                <h3>Chọn vật tư</h3>
+                                <div id="modalOptions_bom"></div>
+                            </div>
+                        </div>
+
+                        <div class="bom-modal-content">
+                          <h2 class="bom-title">Thêm vật tư</h2>
+                          <div class="bom-input-group">
+                            <label for="item-type">Loại vật tư:</label>
+                            <input type="text" id="item-type" />
+                            <div id="dropdown_bom" class="dropdown"></div>
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-name">Tên vật tư:</label>
+                            <input type="text" id="item-name" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-code">Mã vật tư:</label>
+                            <input type="text" id="item-code" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-unit">Đơn vị:</label>
+                            <input type="text" id="item-unit" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-quantity-needed">Số lượng cần:</label>
+                            <input type="number" id="item-quantity-needed" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-stock">Số lượng tồn kho hiện có:</label>
+                            <input type="number" id="item-stock" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-quantity-buy">Số lượng cần mua thêm:</label>
+                            <input type="number" id="item-quantity-buy" />
+                          </div>
+                          <div class="bom-input-group">
+                            <label for="item-price">Giá / Đơn vị (dự kiến):</label>
+                            <input type="number" id="item-price" />
+                          </div>
+                          <div class="bom-buttons">
+                            <button class="bom-save" onclick="addItem()">Thêm vào</button>
+                            <button class="bom-clear" onclick="hideAddItemModal()">Hủy</button>
+                          </div>
+                        </div>
+                      </div>
+                
+                      <!-- Frame 3 -->
+                      <div class="bom-frame">
+                        <div class="bom-frame-title">Danh mục thiết bị</div>
+                        <table class="bom-table" id="table_asset">
+                          <thead>
+                            <tr>
+                              <th>STT</th>
+                              <th>Thiết bị</th>
+                              <th>Đơn vị</th>
+                              <th>Số giờ cần</th>
+                              <th>Giá / Đơn vị</th>
+                              <th>Tổng giá</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>1</td>
+                              <td>MÁY CNC</td>
+                              <td>Giờ</td>
+                              <td><input type="number" /></td>
+                              <td>170,000</td>
+                              <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>MÁY PHAY</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>90,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>MÁY TIỆN</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>90,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>MÁY CẮT</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>90,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>MÁY HÀN</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>120,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>CÁC LOẠI MÁY KHÁC</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>100,000</td>
+                                <td>-</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <label style="font-size: 30px; font-weight: bold;" id="bom-total-price-asset">Tổng giá trị: -</label>
+                      </div>
+                
+                      <!-- Frame 4 -->
+                      <div class="bom-frame">
+                        <div class="bom-frame-title">Nhân công</div>
+                        <table class="bom-table" id="table_labor">
+                          <thead>
+                            <tr>
+                              <th>Nhân công</th>
+                              <th>Đơn vị</th>
+                              <th>Số giờ cần</th>
+                              <th>Giá / Đơn vị</th>
+                              <th>Tổng giá</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Công nhân</td>
+                              <td>Giờ</td>
+                              <td><input type="number" /></td>
+                              <td>45,000</td>
+                              <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>Kỹ thuật viên</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>55,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>Kỹ sư</td>
+                                <td>Giờ</td>
+                                <td><input type="number" /></td>
+                                <td>80,000</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>Chi phí khác</td>
+                                <td>
+                                    <select>
+                                      <option value="Giờ">Giờ</option>
+                                      <option value="Gói">Gói</option>
+                                    </select>
+                                  </td>
+                                <td><input type="number" /></td>
+                                <td>45,000</td>
+                                <td>-</td>
+                              </tr>
+                          </tbody>
+                        </table>
+
+                        <label style="font-size: 30px; font-weight: bold;" id="bom-total-price-labor">Tổng giá trị: -</label>
+
+                      </div>
+                
+                      <!-- Frame 5 -->
+                      <div class="bom-frame">
+                        <label style="font-size: 40px; font-weight: bold;" id="total_bom_price_final">TỔNG GIÁ TRỊ CỦA BOM</label>
+                        <div class="bom-buttons">
+                            <button class="bom-clear" onclick="clearModalContent()">Xóa dữ liệu</button>
+                          <button class="bom-save">Lưu BOM tạm</button>
+                          <button class="bom-complete" onclick="send_bom_create()">Hoàn thành BOM</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
             <div id="approve_center" class="frame">
                 <h1>Approval Center</h1>
                 
