@@ -712,6 +712,8 @@ let mfg_data = []
 let delivery_data = []
 let payment_data = []
 let cancel_data = []
+let bom_data = []
+let bom_draft_data = []
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -840,6 +842,25 @@ async function load_cancel() {
         });
 }
 
+async function load_bom() {
+    return fetch('https://script.google.com/macros/s/AKfycbyYLnc0F_JT3Rtl8_gjBZvOTuzFalEqQduUdshd2-rXc7rC7mjZKVJwGYRL28zk_BWIBQ/exec')
+        .then(res => res.json())
+        .then(data => {
+            bom_data = data.content;
+            console.log("Dữ liệu bom đã tải xong.");
+        });
+}
+
+async function load_bom_draft() {
+    return fetch('https://script.google.com/macros/s/AKfycbzOQOzfkRQBj6IHuU7QNz82cSaYSkzSMkCX8dp8VH1Pte_LxyvV2hY0h01AY3X8-0ke/exec')
+        .then(res => res.json())
+        .then(data => {
+            bom_draft_data = data.content;
+            console.log("Dữ liệu bom đã tải xong.");
+        });
+}
+
+
 async function load_mml() {
     return fetch('https://script.google.com/macros/s/AKfycbxIwRRg9dRNtBp6ekhJq6j-qNLwBKT3Sny0KSLChLZHuXGnRNxSij7n58ztQtZAVSL5LA/exec')
         .then(res => res.json())
@@ -930,7 +951,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 mfg: user[14] === "x",
                 delivery: user[15] === "x",
                 payment:user[16] === "x",
-                approve_center:user[18] === "x"
+                approve_center:user[18] === "x",
+                bom_creation:user[20] === "x"
+
             };
 
             // Ghi log quyền để kiểm tra
@@ -1334,6 +1357,11 @@ function showFrame(id) {
                 console.log("Access granted to frame:", id);
             } else if (id === 'payment') {
                 get_payment_need_to_process()
+                activeFrame.classList.add('active');
+                active_frame = id;
+                console.log("Access granted to frame:", id);
+            } else if (id === 'bom_creation') {
+                // get_design_need_to_process()
                 activeFrame.classList.add('active');
                 active_frame = id;
                 console.log("Access granted to frame:", id);
@@ -2192,12 +2220,6 @@ document.getElementById("customer_crm").addEventListener("keyup", function(event
     }
 });
 
-// Hàm để lọc dữ liệu theo ngày hiện tại
-// function filterTodayData(data) {
-//     const today = new Date().toISOString().slice(0, 10); // Lấy ngày hiện tại (YYYY-MM-DD)
-//     return data.filter(row => row[0] === today); // Giả sử cột đầu tiên là index 0
-// }
-
 function filterTodayData(data) {
     // Lấy ngày giờ hiện tại
     const now = new Date();
@@ -2827,6 +2849,7 @@ function get_content_and_operator(array_data, crm_id) {
 function closeModal() {
     document.getElementById("secondaryModal").style.display = 'none';
     document.getElementById("secondaryModal2").style.display = 'none';
+    document.getElementById("secondaryModal_bom").style.display = 'none';
     document.getElementById("detailModal").style.display = "none";
     document.getElementById("modalBackdrop").style.display = "none";
 }
@@ -3102,7 +3125,11 @@ async function submitForm_design() {
     return false; // Prevent the default form submission
 }
 
+let crmList = [];
+let bomCrmSelect = document.getElementById("bom-crm");
+let bomDraftCrmSelect = document.getElementById("bomDraftDropdown");
 async function get_design_need_to_process() {
+    crmList = []
     document.getElementById("loadingIndicator").style.display = "block";
     await Promise.all([load_survey(), load_design(), load_design_approval()]);
 
@@ -3184,6 +3211,40 @@ async function get_design_need_to_process() {
         row[13], // Cột thứ 5
         row[0], // Cột thứ 1
     ]);
+
+    // Gộp giá trị row[6] từ tableData
+    tableData.forEach(item => {
+        crmList.push(item[0]);
+    });
+      // Gộp tiếp giá trị row[6] từ tableData2
+      tableData2.forEach(item => {
+        crmList.push(item[0]);
+    });
+
+    // 3) Thay vì tạo thẻ select mới, lấy luôn thẻ select hiện có
+    
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Danh sách đang chờ tạo BOM";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    bomCrmSelect.appendChild(emptyOption);
+
+    // Thêm các option vào select
+    crmList.forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      bomCrmSelect.appendChild(option);
+    });
+
+    bomCrmSelect.addEventListener("change", function(event) {
+        const selectedValue = event.target.value;
+        console.log("Người dùng đã chọn: ", selectedValue);
+        bom_selected(selectedValue)
+      });
 
     // Tạo bảng
     const tableContainer = document.getElementById("table-container_design");
@@ -5410,4 +5471,956 @@ function resetModal() {
     select.value = ''; // Đặt lại giá trị của dropdown về giá trị mặc định
     otherReasonInput.value = ''; // Xóa nội dung trong ô input
     otherReasonInputContainer.style.display = 'none'; // Ẩn ô input "Khác"
+}
+
+
+//* BOM Creation ///
+
+async function showModal_bom() {
+    document.getElementById('bom-modal').classList.add('show');
+    await Promise.all([get_crm_need_to_create_bom(), load_onhand(), load_mml()]);
+}
+
+function hideModal_bom() {
+    document.getElementById('bom-modal').classList.remove('show');
+    bomCrmSelect.innerHTML = "";
+    clearModalContent()
+}
+
+async function showModal_bom_draft() {
+    document.getElementById('bom-draft-modal').classList.add('show');
+    await Promise.all([get_crm_need_to_load_bom_draft()]);
+}
+
+function hideModal_bom_draft() {
+    document.getElementById('bom-draft-modal').classList.remove('show');
+    bomDraftCrmSelect.innerHTML = "";
+    clearModalContent()
+}
+
+// Close modal on outside click
+document.getElementById('bom-draft-modal').addEventListener('click', function(event) {
+    if (event.target.id === 'bom-draft-modal') {
+        hideModal_bom_draft();
+    }
+});
+
+function showAddItemModal() {
+    const wh_value = document.getElementById("bom-wh").textContent
+    const bom_name = document.getElementById("bom-name").value
+
+        if (wh_value === "") {
+            alert("Bạn chưa chọn mục cần tạo BOM")
+
+            return
+        }
+
+        if (bom_name === "") {
+            alert("Bạn chưa nhập tên BOM")
+            document.getElementById("bom-name").focus()
+
+            return
+        }
+        
+    document.getElementById('add-item-modal').classList.add('show');
+}
+
+function hideAddItemModal() {
+    document.getElementById('add-item-modal').classList.remove('show');
+}
+
+function addItem() {
+    const table = document.getElementById('bom-item-table').getElementsByTagName('tbody')[0];
+    const rowCount = table.rows.length + 1;
+
+    const itemType = document.getElementById('item-type').value;
+    const itemName = document.getElementById('item-name').value;
+    const itemCode = document.getElementById('item-code').value;
+    const itemUnit = document.getElementById('item-unit').value;
+    const itemQuantityNeeded = document.getElementById('item-quantity-needed').value;
+    const itemStock = document.getElementById('item-stock').value;
+    const itemQuantityBuy = document.getElementById('item-quantity-buy').value;
+    const itemPrice = document.getElementById('item-price').value;
+
+    const totalPrice = (itemPrice * itemQuantityNeeded) || 0;
+
+    const row = table.insertRow();
+
+    row.innerHTML = `
+        <td>${rowCount}</td>
+        <td>${itemType}</td>
+        <td>${itemName}</td>
+        <td>${itemCode}</td>
+        <td>${itemUnit}</td>
+        <td>${itemQuantityNeeded}</td>
+        <td>${itemStock}</td>
+        <td>${itemQuantityBuy}</td>
+        <td>${itemPrice}</td>
+        <td>${totalPrice}</td>
+        <td><button class="bom-clear" onclick="deleteRow(this)">Xóa</button></td> <!-- Thêm nút Xóa -->
+    `;
+
+    // Clear input fields
+    document.getElementById('item-type').value = '';
+    document.getElementById('item-name').value = '';
+    document.getElementById('item-code').value = '';
+    document.getElementById('item-unit').value = '';
+    document.getElementById('item-quantity-needed').value = '';
+    document.getElementById('item-stock').value = '';
+    document.getElementById('item-quantity-buy').value = '';
+    document.getElementById('item-price').value = '';
+
+    // Hide the modal
+    hideAddItemModal();
+    updateBOMPrice()
+}
+
+function deleteRow(button) {
+    const row = button.parentElement.parentElement;
+    row.parentElement.removeChild(row);
+
+    // Cập nhật lại số thứ tự (STT) trong bảng
+    const tableRows = document.getElementById('bom-item-table').getElementsByTagName('tbody')[0].rows;
+    for (let i = 0; i < tableRows.length; i++) {
+        tableRows[i].cells[0].innerText = i + 1; // Cập nhật lại STT
+    }
+    updateBOMPrice()
+}
+
+// Close modal on outside click
+document.getElementById('bom-modal').addEventListener('click', function(event) {
+    if (event.target.id === 'bom-modal') {
+        hideModal_bom();
+    }
+});
+
+document.getElementById('add-item-modal').addEventListener('click', function(event) {
+    if (event.target.id === 'add-item-modal') {
+        hideAddItemModal();
+    }
+});
+
+function clearModalContent() {
+    // Clear all input fields
+    const inputs = document.querySelectorAll('#bom-modal input');
+    inputs.forEach(input => input.value = '');
+
+    const inputs_draft = document.querySelectorAll('#bom-draft-modal input');
+    inputs_draft.forEach(input => input.value = '');
+
+    // Clear all rows in the item table
+    const tableBody = document.querySelector('#bom-item-table tbody');
+    tableBody.innerHTML = '';
+
+    // Reset "Tổng giá trị"
+    const totalRow = document.querySelector('.bom-total-row');
+    totalRow.textContent = 'Tổng giá trị: -';
+
+    // Optionally reset other sections if needed (e.g., other tables, labels, etc.)
+    updateBOMPrice()
+    
+    document.getElementById("bom-customerID").textContent = ""
+    document.getElementById("bom-customerName").textContent = ""
+    document.getElementById("bom-wh").textContent = ""
+    document.getElementById("bom-crm-show").textContent = ""
+}
+
+function clearModalContentBomDraft() {
+    // Clear all input fields
+    const inputs = document.querySelectorAll('#bom-draft-modal input');
+    inputs.forEach(input => input.value = '');
+
+    // Clear all rows in the item table
+    const tableBody = document.querySelector('#bom-item-table tbody');
+    tableBody.innerHTML = '';
+
+    // Reset "Tổng giá trị"
+    const totalRow = document.querySelector('.bom-total-row');
+    totalRow.textContent = 'Tổng giá trị: -';
+
+    // Optionally reset other sections if needed (e.g., other tables, labels, etc.)
+    updateBOMPrice()
+    
+    document.getElementById("bom-customerID").textContent = ""
+    document.getElementById("bom-customerName").textContent = ""
+    document.getElementById("bom-wh").textContent = ""
+}
+
+
+
+function bom_selected(crm) {
+    // ví dụ tôi có đoạn đoạn text sau: CRM-QN-UAC-25/01/10-008 hay giúp tôi split và lấy phần tử số 3
+    const splitData = crm.split("-");
+    const thirdElement = splitData[2];
+    const secondElement = splitData[1];
+    const foundCustomer = customer_data.find(customer => customer[1] === thirdElement);
+    const customerId = foundCustomer ? foundCustomer[1] : null;
+    const customerName = foundCustomer ? foundCustomer[0] : null;
+    document.getElementById("bom-customerID").textContent = customerId
+    document.getElementById("bom-customerName").textContent = customerName
+    document.getElementById("bom-wh").textContent = secondElement
+    document.getElementById("bom-crm-show").textContent = crm
+    document.getElementById("bom-name").focus()
+}
+
+function hideDropdown_bom() {
+    const dropdown = document.getElementById("dropdown_bom");
+    dropdown.style.display = 'none';
+}
+
+// Gán sự kiện input với debounce để giảm số lần tìm kiếm
+document.getElementById("item-type").addEventListener("input", debounce(handleMaterialTypeInput_bom, 400));
+
+function handleMaterialTypeInput_bom(event) {
+    const wh_value = document.getElementById("bom-wh").textContent
+        if (wh_value === "") {
+            alert("Vui lòng chọn mã chi nhánh trước")
+            modalOptions.innerHTML = ''
+            closeModal()
+
+            document.getElementById("item-type").value = ""
+            return
+        }
+    const searchTerm = removeAccents(event.target.value).toUpperCase(); // Chuyển đổi thành uppercase không dấu
+    const results = mml_data.filter(item => removeAccents(item[0]).toUpperCase().includes(searchTerm))// && item[0] === wh_value); // Tìm kiếm không dấu
+    // Hiển thị kết quả tìm kiếm từ cột mml_data[1]
+    if (results.length > 0) {
+        showSearchResults_bom(results.map(item2 => item2[0]), results); // Truyền danh sách tên vật tư và dữ liệu gốc
+    } else {
+        hideDropdown_bom(); // Ẩn dropdown nếu không có kết quả
+        console.log("Không tìm thấy kết quả.");
+
+    }
+}
+
+function showSearchResults_bom(displayList, fullData) {
+    clear_label_xuat()
+    const dropdown = document.getElementById("dropdown_bom");
+    dropdown.innerHTML = ''; // Xóa nội dung cũ
+
+    // Hiển thị dropdown
+    dropdown.style.display = 'block';
+
+    // Sử dụng Set để giữ lại các giá trị duy nhất
+    const uniqueItems = [...new Set(displayList)];
+
+    // Tạo các mục dropdown từ danh sách uniqueItems
+    uniqueItems.forEach((item, index) => {
+        const dropdownItem = document.createElement("div");
+        dropdownItem.classList.add("dropdown-item");
+        dropdownItem.textContent = item;
+
+        // Lấy chỉ số của phần tử đầu tiên trong fullData tương ứng với item
+        const originalIndex = fullData.findIndex(dataItem => dataItem[0] === item);
+        console.log(originalIndex)
+        
+        // Xử lý sự kiện khi người dùng chọn một mục từ dropdown
+        dropdownItem.addEventListener("click", () => {
+            document.getElementById("item-type").value = item; // Gán lựa chọn vào ô nhập liệu
+            dropdown.style.display = 'none'; // Ẩn dropdown sau khi chọn
+            
+            // Gọi hàm để xử lý lựa chọn đầu tiên và tìm danh sách thứ hai
+            showSecondaryOptions_bom(fullData[originalIndex]);
+        });
+
+        dropdown.appendChild(dropdownItem);
+    });
+}
+
+function showSecondaryOptions_bom(selectedItem) {
+    console.log(selectedItem)
+    const wh_value = document.getElementById("bom-wh").textContent
+    // Filter based on selected item and availability
+    const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]);
+    const modal = document.getElementById("secondaryModal_bom");
+    const modalOptions = document.getElementById("modalOptions_bom");
+    modalOptions.innerHTML = ''; // Clear old content
+
+    // Use a Set to keep track of unique options
+    const uniqueOptions = new Set();
+
+    filteredResults.forEach(option => {
+        const optionKey = `${option[1]} | ${option[2]}`; // Create a unique key based on ID and description
+
+        if (!uniqueOptions.has(optionKey)) {
+            uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
+
+            const optionDiv = document.createElement("div");
+            optionDiv.classList.add("modal-option");
+
+            // Set the text content using the unique ID and description
+            optionDiv.textContent = optionKey;
+
+            optionDiv.addEventListener("click", () => {
+                handleModalSelection_bom2(option); // Call function when user selects an option
+                modal.style.display = 'none';
+            });
+
+            modalOptions.appendChild(optionDiv);
+        }
+    });
+
+    // Display the modal
+    modal.style.display = 'flex';
+}
+
+let bom_sku_name = ""
+let bom_sku_id = ""
+let bom_unit = ""
+let bom_price = ""
+
+function handleModalSelection_bom2(selectedOption) {
+    const wh_value = document.getElementById("bom-wh").textContent;
+    document.getElementById("item-quantity-needed").focus();
+    console.log("Người dùng đã chọn:", selectedOption);
+
+    bom_sku_name = selectedOption[1];
+    bom_sku_id = selectedOption[2];
+    bom_unit = selectedOption[3];
+    bom_price = selectedOption[4];
+
+    document.getElementById("sku_name_xuat").textContent = sku_name_xuat;
+    document.getElementById("sku_id_xuat").textContent = sku_id_xuat;
+    closeModal();
+
+    // Gán giá trị vào các ô nhập liệu
+    document.getElementById("item-name").value = bom_sku_name;
+    document.getElementById("item-code").value = bom_sku_id;
+    document.getElementById("item-unit").value = bom_unit;
+    document.getElementById("item-price").value = bom_price;
+
+    const found_onhand = onhand_data.filter(
+        row => row[0] === wh_value && row[2] === bom_sku_id && row[10] >= 0
+    );
+    
+    if (found_onhand.length > 0) {
+        // Tính tổng cột [10] của các hàng trong found_onhand
+        const totalStock = found_onhand.reduce((sum, row) => sum + row[10], 0);
+        document.getElementById("item-stock").value = totalStock;
+    } else {
+        document.getElementById("item-stock").value = 0;
+    }
+    
+}
+
+async function get_crm_need_to_create_bom() {
+    crmList = []
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_survey(), load_design(), load_design_approval(),load_bom(),load_bom_draft()]);
+
+
+    // Lấy giá trị từ cột thứ 4 của mfg_data
+    const crmColumn = new Set(design_data.map(row => row[6]));
+
+    const newArray = survey_data
+        .filter(row => !crmColumn.has(row[6]))
+    ////////////
+    // Bước 1: Xác định các crm_id có trạng thái "approve"
+    const approvedCrmIds = new Set();
+
+    design_approval_data.forEach(row => {
+        if (row[11] === "BOM ĐÃ DUYỆT") { // Kiểm tra status
+            approvedCrmIds.add(row[6]); // Lưu crm_id có trạng thái approve
+        }
+    });
+
+    // Bước 2: Lọc design_approval_data, chỉ giữ các dòng có status "reject" và không thuộc crm_id đã được approve
+    const filteredRejects = design_approval_data.filter(
+        row => row[11] === "BOM REJECTED" && !approvedCrmIds.has(row[6])
+    );
+
+    // Bước 3: Chỉ giữ lại dòng có thời gian mới nhất cho mỗi crm_id
+    const latestRejects = {};
+
+    filteredRejects.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestRejects[crm_id] ||
+            new Date(`${latestRejects[crm_id][0]}T${latestRejects[crm_id][1]}`) < dateTime
+        ) {
+            latestRejects[crm_id] = row;
+        }
+    });
+
+    // Bước 4: Lọc trước `survey_data` để chỉ giữ thời gian mới nhất cho mỗi `crm_id`
+    const latestSurveyData = {};
+    design_data.forEach(row => {
+        const crm_id = row[6];
+        const dateTime = new Date(`${row[0]}T${row[1]}`); // Kết hợp date và time
+
+        if (
+            !latestSurveyData[crm_id] ||
+            new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`) < dateTime
+        ) {
+            latestSurveyData[crm_id] = row;
+        }
+    });
+
+    // Bước 5: Loại bỏ các crm_id khỏi `latestRejects` nếu `survey_data` có thời gian lớn hơn
+    const reprocess = Object.values(latestRejects).filter(row => {
+        const crm_id = row[6];
+        const designDateTime = new Date(`${row[0]}T${row[1]}`); // Thời gian của dòng `latestReject`
+
+        if (latestSurveyData[crm_id]) {
+            const surveyDateTime = new Date(`${latestSurveyData[crm_id][0]}T${latestSurveyData[crm_id][1]}`);
+            return surveyDateTime <= designDateTime; // Loại bỏ nếu surveyDateTime lớn hơn
+        }
+
+        // Giữ lại nếu không có dòng nào trong survey_data khớp crm_id
+        return true;
+    });
+
+    const tableData = newArray.map(row => [
+        row[6], // Cột thứ 10
+        row[5], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    const tableData2 = reprocess.map(row => [
+        row[6], // Cột thứ 10
+        row[13], // Cột thứ 5
+        row[0], // Cột thứ 1
+    ]);
+
+    // Gộp giá trị row[6] từ tableData
+    tableData.forEach(item => {
+        crmList.push(item[0]);
+    });
+      // Gộp tiếp giá trị row[6] từ tableData2
+      tableData2.forEach(item => {
+        crmList.push(item[0]);
+    });
+
+    //lọc crm list
+    // Lấy cột thứ 2 từ array2D
+    const coiumn_crm = bom_data.map(row => row[1]);
+    const coiumn_crm2 = bom_draft_data.map(row => row[11]);
+
+    // Loại bỏ các item trong crmList có xuất hiện ở cột thứ 2 của array2D
+    crmList = crmList.filter(item => !coiumn_crm.includes(item));    
+    crmList = crmList.filter(item => !coiumn_crm2.includes(item));  
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Danh sách đang chờ tạo BOM";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    bomCrmSelect.appendChild(emptyOption);
+
+    // Thêm các option vào select
+    crmList.forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      bomCrmSelect.appendChild(option);
+    });
+
+    bomCrmSelect.addEventListener("change", function(event) {
+        const selectedValue = event.target.value;
+        console.log("Người dùng đã chọn: ", selectedValue);
+        bom_selected(selectedValue)
+      });
+
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+
+async function get_crm_need_to_load_bom_draft() {
+    crmList = []
+    document.getElementById("loadingIndicator").style.display = "block";
+    await Promise.all([load_bom(),load_bom_draft()]);
+
+    // Gộp giá trị row[6] từ tableData
+    bom_draft_data.forEach(item => {
+        crmList.push(item[11]);
+    });
+
+    //lọc crm list
+    // Lấy cột thứ 2 từ array2D
+    const coiumn_crm = bom_data.map(row => row[1]);
+
+    // Loại bỏ các item trong crmList có xuất hiện ở cột thứ 2 của array2D
+    crmList = crmList.filter(item => !coiumn_crm.includes(item));    
+    crmList = [...new Set(crmList)];
+
+    // Thêm option trống ở đầu danh sách
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Danh sách đang chờ tạo BOM";
+    emptyOption.disabled = true; // Không cho phép chọn lại option trống
+    emptyOption.selected = true; // Đặt làm option mặc định được chọn
+    bomDraftCrmSelect.appendChild(emptyOption);
+
+    // Thêm các option vào select
+    crmList.forEach(value => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      bomDraftCrmSelect.appendChild(option);
+    });
+
+    bomDraftCrmSelect.addEventListener("change", function(event) {
+        const selectedValue = event.target.value;
+        console.log("Người dùng đã chọn: ", selectedValue);
+        updateBOMDraft(selectedValue)
+      });
+
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+async function showModal_bom_load() {
+    document.getElementById('bom-modal').classList.add('show');
+}
+
+async function updateBOMDraft(selectedValue) {
+    const found_draft = bom_draft_data.filter(u => u[11] === selectedValue);
+    console.table(found_draft)
+    showModal_bom_load()
+    document.getElementById("loadingIndicator").style.display = "block";
+    warning("Đang cập nhật lại tồn kho và giá trị BOM Draft, vui lòng chờ trong giây lát...");
+    await Promise.all([load_onhand(), load_mml()]);
+
+    document.getElementById('bom-crm-show').textContent = selectedValue;
+    bom_selected(selectedValue)
+
+    const bom_name = found_draft[0][12]
+    document.getElementById("bom-name").value = bom_name
+
+    // Lặp qua từng dòng của found_draft
+    found_draft.forEach(row => {
+        // Lấy giá trị từ cột thứ 5 của dòng hiện tại
+        const matchValue = row[4];
+        const matchValue2 = row[15];
+    
+        // Lọc dữ liệu từ onhand_data với điều kiện cột thứ 3 = matchValue
+        const filteredOnhand = onhand_data.filter(onhandRow => onhandRow[2] === matchValue && onhandRow[0] === matchValue2);
+    
+        // Tính tổng cột thứ 11 của kết quả lọc
+        const sumColumn11 = filteredOnhand.reduce((sum, onhandRow) => sum + onhandRow[10], 0);
+    
+        // Gán tổng vào một cột mới trong dòng hiện tại của found_draft
+        row.push(sumColumn11); // Hoặc row[12] = sumColumn11 nếu bạn muốn chỉ định một cột cụ thể
+    });
+    
+    // Kết quả là found_draft sẽ có một cột mới chứa tổng cột thứ 11 của onhand_data
+    console.log(found_draft);
+
+    load_item_draft(found_draft)
+
+    // const table = document.getElementById('bom-item-table').getElementsByTagName('tbody')[0];
+    // table.innerHTML = ''; // Xóa nội dung cũ
+
+
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function load_item_draft(found_draft) {
+    // Lấy bảng và tbody
+    const tableBody = document.querySelector("#bom-item-table tbody");
+
+    // Lặp qua các hàng trong found_draft
+    found_draft.forEach((row, index) => {
+    // Tính toán các giá trị cần thiết
+    const stt = index + 1;
+    const loaiVatTu = row[2];
+    const tenVatTu = row[3];
+    const maVatTu = row[4];
+    const donVi = row[5];
+    const soLuongCan = row[6];
+    const soLuongTonKho = row[17];
+    const soLuongCanMuaThem = Math.max(0, soLuongCan - soLuongTonKho);
+    const giaDuKien = row[9];
+    const tongGia = soLuongCan * giaDuKien;
+
+    // Định dạng số với dấu phân cách hàng nghìn (chỉ hiển thị phần nguyên)
+    const formattedGiaDuKien = giaDuKien.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    const formattedTongGia = tongGia.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+    // Tạo một hàng mới trong bảng
+    const tr = document.createElement("tr");
+
+    // Tạo các ô dữ liệu (cột)
+    tr.innerHTML = `
+        <td>${stt}</td>
+        <td>${loaiVatTu}</td>
+        <td>${tenVatTu}</td>
+        <td>${maVatTu}</td>
+        <td>${donVi}</td>
+        <td>${soLuongCan}</td>
+        <td>${soLuongTonKho}</td>
+        <td>${soLuongCanMuaThem}</td>
+        <td>${formattedGiaDuKien}</td>
+        <td>${formattedTongGia}</td>
+        <td>
+            <button class="btn-delete bom-clear" onclick="deleteRow(this)">Xóa</button>
+        </td>
+    `;
+
+    // Thêm hàng vào tbody của bảng
+    tableBody.appendChild(tr);
+    });
+
+    // // Thêm sự kiện xóa cho các nút
+    // tableBody.addEventListener("click", function (event) {
+    // if (event.target.classList.contains("btn-delete")) {
+    //     const rowIndex = event.target.dataset.index;
+    //     found_draft.splice(rowIndex, 1); // Xóa dòng trong found_draft
+    //     event.target.closest("tr").remove(); // Xóa dòng trong bảng
+    // }
+    // });
+    
+    updateBOMPrice()
+
+}
+
+// Lắng nghe sự kiện 'input' trên trường item-quantity-needed
+document.getElementById("item-quantity-needed").addEventListener("input", function () {
+    const itemStock = parseFloat(document.getElementById("item-stock").value) || 0; // Giá trị từ item-stock
+    const quantityNeeded = parseFloat(this.value) || 0; // Giá trị từ item-quantity-needed
+    
+    // Tính giá trị của item-quantity-buy
+    const quantityToBuy = Math.max(quantityNeeded - itemStock, 0); // Nếu < 0 thì = 0
+    
+    // Cập nhật giá trị vào trường item-quantity-buy
+    document.getElementById("item-quantity-buy").value = quantityToBuy;
+});
+
+function calculateTotalPrice() {
+    const table = document.getElementById("bom-item-table"); // Lấy bảng
+    const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Lấy tất cả các hàng trong tbody
+    let totalPrice = 0;
+
+    // Duyệt qua từng hàng trong bảng
+    for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName("td"); // Lấy tất cả các ô trong hàng
+        const priceCell = cells[9]; // Cột thứ 10 (Tổng giá) - chỉ số bắt đầu từ 0
+        if (priceCell) {
+            const price = parseFloat(priceCell.textContent.replace(/,/g, '')) || 0; // Xóa dấu phẩy trước khi chuyển sang số
+            totalPrice += price; // Cộng dồn giá trị
+        }
+    }
+
+    // Cập nhật tổng giá trị vào bom-total-price với dấu phân cách
+    document.getElementById("bom-total-price").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+}
+
+// Hàm tính tổng giá trị cho từng dòng và toàn bảng
+function calculateAssetPrice() {
+    const table = document.getElementById("table_asset"); // Lấy bảng theo ID
+    const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+    let totalPrice = 0; // Biến lưu tổng giá trị toàn bảng
+
+    rows.forEach(row => {
+        const input = row.querySelector("input[type='number']"); // Lấy ô input
+        const pricePerUnitCell = row.cells[4]; // Cột Giá / Đơn vị
+        const totalCell = row.cells[5]; // Cột Tổng giá
+
+        const quantity = parseFloat(input.value) || 0; // Số giờ cần (nếu rỗng thì là 0)
+        const pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, '')) || 0;  // Giá / Đơn vị
+        
+        // Tính Tổng giá cho dòng hiện tại
+        const total = quantity * pricePerUnit;
+
+        // Hiển thị giá trị tính toán vào cột Tổng giá
+        totalCell.textContent = total.toLocaleString('en-US'); // Hiển thị có dấu phẩy phân cách
+
+        // Cộng dồn giá trị vào tổng giá trị toàn bảng
+        totalPrice += total;
+    });
+
+    // Cập nhật tổng giá trị vào phần tử bom-total-price-asset
+    document.getElementById("bom-total-price-asset").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+}
+
+
+
+// Hàm tính tổng giá trị cho từng dòng và toàn bảng
+function calculateLaborPrice() {
+    const table = document.getElementById("table_labor"); // Lấy bảng theo ID
+    const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+    let totalPrice = 0; // Biến lưu tổng giá trị toàn bảng
+
+    rows.forEach(row => {
+        const input = row.querySelector("input[type='number']"); // Lấy ô input
+        const pricePerUnitCell = row.cells[3]; // Cột Giá / Đơn vị
+        const totalCell = row.cells[4]; // Cột Tổng giá
+
+        const quantity = parseFloat(input.value) || 0; // Số giờ cần (nếu rỗng thì là 0)
+        const pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, '')) || 0; // Giá / Đơn vị (xóa dấu phẩy)
+        
+        // Tính Tổng giá cho dòng hiện tại
+        const total = quantity * pricePerUnit;
+
+        // Hiển thị giá trị tính toán vào cột Tổng giá
+        totalCell.textContent = total.toLocaleString('en-US'); // Hiển thị có dấu phẩy phân cách
+
+        // Cộng dồn giá trị vào tổng giá trị toàn bảng
+        totalPrice += total;
+    });
+
+    // Cập nhật tổng giá trị vào phần tử bom-total-price-labor
+    document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+}
+
+// Hàm tính tổng giá trị của BOM
+function calculateTotalBOMPrice() {
+    // Lấy tổng giá trị từ các bảng
+    const bomTotalText = document.getElementById("bom-total-price").textContent;
+    const assetTotalText = document.getElementById("bom-total-price-asset").textContent;
+    const laborTotalText = document.getElementById("bom-total-price-labor").textContent;
+
+    // Chuyển đổi giá trị thành số, loại bỏ phần chữ và dấu phẩy
+    const assetTotal = parseFloat(assetTotalText.replace(/[^0-9.-]+/g, '')) || 0;
+    const laborTotal = parseFloat(laborTotalText.replace(/[^0-9.-]+/g, '')) || 0;
+    const bomTotal = parseFloat(bomTotalText.replace(/[^0-9.-]+/g, '')) || 0;
+
+    // Tính tổng BOM
+    const totalBOMPrice = assetTotal + laborTotal + bomTotal;
+
+    // Hiển thị tổng BOM
+    document.getElementById("total_bom_price_final").textContent = `TỔNG GIÁ TRỊ CỦA BOM: ${totalBOMPrice.toLocaleString('en-US')} VNĐ`;
+}
+
+// Gọi hàm này sau khi tính toán xong các bảng con
+function updateBOMPrice() {
+    calculateTotalPrice(); // Cập nhật tổng giá trị cho bảng bom-item
+    calculateAssetPrice(); // Cập nhật tổng giá trị cho table_asset
+    calculateLaborPrice(); // Cập nhật tổng giá trị cho table_labor
+    calculateTotalBOMPrice(); // Tính tổng giá trị của BOM
+}
+
+// Gắn sự kiện cho các ô input của bảng asset
+document.querySelectorAll("#table_asset input[type='number']").forEach(input => {
+    input.addEventListener("input", updateBOMPrice);
+});
+
+// Gắn sự kiện cho các ô input của bảng labor
+document.querySelectorAll("#table_labor input[type='number']").forEach(input => {
+    input.addEventListener("input", updateBOMPrice);
+});
+// Hàm chuyển bảng thành mảng, thêm bom-crm, bom-name, bom-customerID, bom-customerName, bom-wh
+function get_asset_labor_table(tableId, crmSelectId) {
+    const table = document.getElementById(tableId); // Lấy bảng theo ID
+    const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+    const crmValue = document.getElementById("bom-crm-show").textContent; // Lấy <select id="bom-crm">
+    // const crmValue = crmSelect.options[crmSelect.selectedIndex].textContent.trim(); // Lấy giá trị của option được chọn trong bom-crm
+
+    // Lấy các giá trị từ các phần tử khác
+    const bomName = document.getElementById("bom-name").value.trim();
+    const customerID = document.getElementById("bom-customerID").textContent.trim();
+    const customerName = document.getElementById("bom-customerName").textContent.trim();
+    const wh = document.getElementById("bom-wh").textContent.trim();
+
+    const dataArray = []; // Mảng lưu trữ dữ liệu
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td, th"); // Lấy tất cả ô trong hàng
+        const rowData = []; // Mảng lưu trữ dữ liệu của hàng hiện tại
+
+        cells.forEach(cell => {
+            // Kiểm tra nếu bảng là table_labor và ô có <select>
+            if (tableId === "table_labor") {
+                const select = cell.querySelector("select");
+                if (select) {
+                    // Lấy giá trị của tùy chọn được chọn
+                    rowData.push(select.options[select.selectedIndex].textContent.trim());
+                } else {
+                    // Nếu ô có input, lấy giá trị của input, nếu không, lấy textContent
+                    const input = cell.querySelector("input[type='number']");
+                    rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
+                }
+            } else {
+                // Xử lý bình thường cho table_asset
+                const input = cell.querySelector("input[type='number']");
+                rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
+            }
+        });
+
+        // Thêm giá trị từ các phần tử bổ sung vào cuối hàng
+        rowData.push(crmValue, bomName, customerID, customerName, wh);
+
+        dataArray.push(rowData); // Thêm hàng vào mảng
+    });
+
+    return dataArray; // Trả về mảng dữ liệu
+}
+
+// // Chuyển đổi cả hai bảng thành mảng với các giá trị bổ sung
+// const assetTableArray = tableToArrayWithAdditionalData("table_asset", "bom-crm"); // Table Asset
+// const laborTableArray = tableToArrayWithAdditionalData("table_labor", "bom-crm"); // Table Labor
+
+// Hàm chuyển đổi bảng bom-item-table thành mảng, thêm các giá trị từ các phần tử khác
+function get_bom_item() {
+    const table = document.getElementById("bom-item-table"); // Lấy bảng theo ID
+    const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+
+    // Lấy giá trị từ các phần tử bổ sung
+    const crmSelect = document.getElementById("bom-crm");
+    const crmValue = document.getElementById("bom-crm-show").textContent; // Lấy giá trị của bom-crm
+
+    const bomName = document.getElementById("bom-name").value.trim();
+    const customerID = document.getElementById("bom-customerID").textContent.trim();
+    const customerName = document.getElementById("bom-customerName").textContent.trim();
+    const wh = document.getElementById("bom-wh").textContent.trim();
+
+    const dataArray = []; // Mảng lưu trữ dữ liệu
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td"); // Lấy tất cả các ô trong hàng
+        const rowData = []; // Mảng lưu dữ liệu của hàng hiện tại
+
+        cells.forEach((cell, index) => {
+            // Loại bỏ cột cuối cùng (Hành động)
+            if (index !== cells.length - 1) {
+                const input = cell.querySelector("input"); // Kiểm tra nếu ô có input
+                rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim()); // Lấy giá trị từ input hoặc textContent
+            }
+        });
+
+        // Thêm giá trị từ các phần tử bổ sung vào cuối hàng
+        rowData.push(crmValue, bomName, customerID, customerName, wh);
+
+        dataArray.push(rowData); // Thêm hàng vào mảng
+    });
+
+    return dataArray; // Trả về mảng dữ liệu
+}
+
+// Example arrays
+async function send_bom_create() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    const wh = document.getElementById("bom-wh").textContent;
+    const operator = sessionStorage.getItem("fullname");
+    const customer_id = document.getElementById("bom-customerID").textContent;
+
+    await Promise.all([load_bom()]);
+    const todayData = filterTodayData(bom_data);
+    
+    // Lấy số lượng dữ liệu
+    const length = todayData.length + 1;
+
+    // Chuyển length thành chuỗi với định dạng 3 chữ số
+    const stt_bom = String(length).padStart(3, '0');
+
+    const now = new Date();
+
+    const year = String(now.getFullYear()).slice(-2); // Lấy 2 chữ số cuối của năm
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Lấy tháng, thêm số 0 nếu cần
+    const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
+
+    const datetime_id = `${year}/${month}/${day}`;
+
+    const bom_id = "BOM"+"-"+wh+"-"+customer_id+"-"+datetime_id+"-"+stt_bom
+
+    const assetArray = get_asset_labor_table("table_asset", "bom-crm"); // Table Asset
+    const laborArray = get_asset_labor_table("table_labor", "bom-crm"); // Table Labor
+    const bomItemArray = get_bom_item(); // BOM Item Table
+
+    // push bom_id vào bomItemArray
+    bomItemArray.forEach(item => item.unshift(bom_id));
+    // push bom_id vào assetArray
+    assetArray.forEach(item => item.unshift(bom_id));
+    // push bom_id vào laborArray
+    laborArray.forEach(item => item.unshift(bom_id));
+
+    // push operator vào bomItemArray
+    bomItemArray.forEach(item => item.push(operator));
+    // push operator vào assetArray
+    assetArray.forEach(item => item.push(operator));
+    // push operator vào laborArray
+    laborArray.forEach(item => item.push(operator));
+    
+    // Google Apps Script web app URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbzTkIqK3gP5NjXHW2XdNE1scD1qk31DJ-qrXTWhyambJ0K7OO79ZtbqJbPpmqnUsrJGxg/exec"; // Replace YOUR_SCRIPT_ID
+    
+    // Function to send data to Google Sheets
+    async function sendDataToGoogleSheets() {
+        try {
+            // Hiển thị loading indicator
+            document.getElementById("loadingIndicator").style.display = "block";
+    
+            const response = await fetch(scriptUrl, {
+                method: "POST",
+                mode: "no-cors", // Lưu ý: no-cors có thể không cho phép đọc response
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    bomItemData: bomItemArray,
+                    assetData: assetArray,
+                    laborData: laborArray,
+                }),
+            });
+    
+            // Với no-cors, bạn không thể truy cập response hoặc result
+            // Nếu không dùng no-cors:
+            const result = await response.text();
+            console.log("Đã gửi data thành công:", result);
+            document.getElementById("loadingIndicator").style.display = "none";
+            info("Đã tạo BOM thành công")
+            clearModalContent();
+            hideModal_bom();
+            hideModal_bom_draft()
+            
+    
+        } catch (error) {
+            console.error("Error:", error);
+        } 
+    }
+    // Call the function to send data
+    sendDataToGoogleSheets();
+    
+}
+async function send_bom_draft() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    const wh = document.getElementById("bom-wh").textContent;
+    const operator = sessionStorage.getItem("fullname");
+    const customer_id = document.getElementById("bom-customerID").textContent;
+
+    const bomItemArray = get_bom_item(); // BOM Item Table
+
+    // push operator vào bomItemArray
+    bomItemArray.forEach(item => item.push(operator));
+    
+    // Google Apps Script web app URL
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbx2519XIo9d_caklnZaqFRkF62kjNy8uWRu49oUWGdYXWRPftaFwbYf9pJFUllq9Xxc/exec"; // Replace YOUR_SCRIPT_ID
+    
+    // Function to send data to Google Sheets
+    async function sendDataToGoogleSheets() {
+        try {
+            // Hiển thị loading indicator
+            document.getElementById("loadingIndicator").style.display = "block";
+    
+            const response = await fetch(scriptUrl, {
+                method: "POST",
+                mode: "no-cors", // Lưu ý: no-cors có thể không cho phép đọc response
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    bomItemData: bomItemArray
+                }),
+            });
+    
+            // Với no-cors, bạn không thể truy cập response hoặc result
+            // Nếu không dùng no-cors:
+            const result = await response.text();
+            console.log("Đã gửi data thành công:", result);
+            document.getElementById("loadingIndicator").style.display = "none";
+            info("Đã lưu BOM tạm thành công")
+            clearModalContent();
+            hideModal_bom();
+            hideModal_bom_draft()
+            
+    
+        } catch (error) {
+            console.error("Error:", error);
+        } 
+    }
+    // Call the function to send data
+    sendDataToGoogleSheets();
+    
 }
