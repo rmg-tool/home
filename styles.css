@@ -3139,3 +3139,44 @@ button:hover {
     outline: none; /* Loại bỏ đường viền mặc định khi nhấn vào */
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.5); /* Tạo viền sáng khi nút được focus */
 }
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+  }
+  
+  .scorecard {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .card {
+    border: 2px solid red;
+    width: 120px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: white;
+  }
+  
+  .card p {
+    margin: 0;
+    font-size: 14px;
+    color: gray;
+  }
+  
+  .card h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: black;
+  }
+  
