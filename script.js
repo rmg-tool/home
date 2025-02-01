@@ -1922,7 +1922,6 @@ async function show_onhand() {
         { title: "Đơn giá", formatter: (cell) => cell.getData()[12] },
         { title: "Thành tiền", formatter: (cell) => cell.getData()[13] },
         { title: "Đơn vị", formatter: (cell) => cell.getData()[14] },
-        { title: "Concat", formatter: (cell) => cell.getData()[15] }
     ];
 
 
@@ -2188,9 +2187,8 @@ async function show_nhap() {
         { title: 'Mã vật tư', formatter: (cell) => cell.getData()[9] },
         { title: 'Ngày hết hạn', formatter: (cell) => cell.getData()[10] },
         { title: 'Đơn giá', formatter: (cell) => cell.getData()[11] },
-        { title: 'concat', formatter: (cell) => cell.getData()[12] },
-        { title: 'Thành tiền', formatter: (cell) => cell.getData()[13] },
-        { title: 'Đơn vị', formatter: (cell) => cell.getData()[14] }
+        { title: 'Thành tiền', formatter: (cell) => cell.getData()[12] },
+        { title: 'Đơn vị', formatter: (cell) => cell.getData()[13] }
     ];
 
     const table = new Tabulator("#nhapTable", {
