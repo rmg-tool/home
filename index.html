@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 1.23.11</h4>
+                <h4>Version 2.1.121</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg2025.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -600,6 +600,16 @@
                             <label>File đính kèm</label>
                             <a id="link_show_order" href="#" target="_blank"></a>
                         </div>
+
+                        <div class="form-row">
+                            <label>Nội dung CRM</label>
+                            <label id="crm_content_order"></label>
+                        </div>
+
+                        <!-- <div class="form-row">
+                            <label>Nội dung QUOTATION</label>
+                            <label id="quotation_content_order"></label>
+                        </div> -->
                         
                         <div class="form-row">
                             <label for="orderOrderID">CUSTOMER ORDER #</label>
@@ -829,6 +839,19 @@
             
             <div id="bom_creation" class="frame">
                 <h1>BOM Creation</h1>
+
+                <div class="scorecard">
+                    <div class="card" id="doneCard">
+                      <p>BOM mới</p>
+                      <h1 id="doneValue">0</h1>
+                    </div>
+                    <div class="card" id="pendingCard">
+                      <p>BOM tạm</p>
+                      <h1 id="pendingValue">0</h1>
+                    </div>
+                </div>
+                <p style="display: none;" id="getBomLoading">Đang lấy dữ liệu ...</p>
+                  
                 <div id="button_group_bom_creation">
                     <!-- <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px;" onclick="load_approval_ticket()">Tạo BOM mới</button> -->
                 </div>
@@ -925,6 +948,10 @@
                             <div id="dropdown_bom" class="dropdown"></div>
                           </div>
                           <div class="bom-input-group">
+                            <label style="background-color: lightgreen; padding: 5px;" for="item-quantity-needed">Số lượng cần:</label>
+                            <input type="number" id="item-quantity-needed" />
+                          </div>
+                          <div class="bom-input-group">
                             <label for="item-name">Tên vật tư:</label>
                             <input type="text" id="item-name" />
                           </div>
@@ -936,10 +963,7 @@
                             <label for="item-unit">Đơn vị:</label>
                             <input type="text" id="item-unit" />
                           </div>
-                          <div class="bom-input-group">
-                            <label for="item-quantity-needed">Số lượng cần:</label>
-                            <input type="number" id="item-quantity-needed" />
-                          </div>
+                          
                           <div class="bom-input-group">
                             <label for="item-stock">Số lượng tồn kho hiện có:</label>
                             <input type="number" id="item-stock" />
@@ -1085,7 +1109,8 @@
                       <div class="bom-frame">
                         <label style="font-size: 40px; font-weight: bold;" id="total_bom_price_final">TỔNG GIÁ TRỊ CỦA BOM</label>
                         <div class="bom-buttons">
-                            <button class="bom-clear" onclick="clearModalContent()">Xóa dữ liệu</button>
+                          <button style="background-color: black;" class="bom-close" onclick="hideModal_bom()">Đóng BOM</button>
+                          <button class="bom-clear" onclick="clearModalContent()">Xóa dữ liệu</button>
                           <button class="bom-save" onclick="send_bom_draft()">Lưu BOM tạm</button>
                           <button class="bom-complete" onclick="send_bom_create()">Hoàn thành BOM</button>
                         </div>
