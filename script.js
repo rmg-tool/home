@@ -6342,7 +6342,7 @@ async function send_bom_create() {
     laborArray.forEach(item => item.push(operator));
     
     // Google Apps Script web app URL
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbzTkIqK3gP5NjXHW2XdNE1scD1qk31DJ-qrXTWhyambJ0K7OO79ZtbqJbPpmqnUsrJGxg/exec"; // Replace YOUR_SCRIPT_ID
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxFEye3OnLnCWJa19Ngs0iS3IsQm6vb769EZYu9uaVqjkB6ub_YwrN27hDL086F5vgD/exec"; // Replace YOUR_SCRIPT_ID
     
     // Function to send data to Google Sheets
     async function sendDataToGoogleSheets() {
