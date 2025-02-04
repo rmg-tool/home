@@ -3180,3 +3180,33 @@ body {
     color: black;
   }
   
+  #bom_link_frame {
+    border: 2px solid #333; /* Viền đậm màu xám đậm */
+    border-radius: 10px; /* Bo góc nhẹ */
+    padding: 20px; /* Khoảng cách bên trong */
+}
+
+  .bom_link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px; /* Giới hạn độ rộng nếu cần */
+    margin-bottom: 5px; /* Giảm khoảng cách giữa các hàng */
+}
+
+.bom_link label:first-child {
+    font-weight: bold; /* Làm đậm nhãn bên trái */
+    flex-basis: 120px; /* Giảm độ rộng của nhãn bên trái */
+    margin-bottom: 10px;
+}
+
+.bom_link label:last-child {
+    flex-grow: 1; /* Cho phép nhãn bên phải mở rộng */
+    text-align: left; /* Để gần nhau hơn, không căn phải */
+    padding-left: 50px; /* Tạo khoảng cách nhỏ */
+    margin-bottom: 10px;
+}
+
+#bom_link_pdf {
+    margin-left: 50px;
+}
