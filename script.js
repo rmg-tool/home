@@ -714,6 +714,7 @@ let payment_data = []
 let cancel_data = []
 let bom_data = []
 let bom_draft_data = []
+let bom_link_data = []
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -857,6 +858,15 @@ async function load_bom_draft() {
         .then(data => {
             bom_draft_data = data.content;
             console.log("Dữ liệu bom draft đã tải xong.");
+        });
+}
+
+async function load_bom_link() {
+    return fetch('https://script.google.com/macros/s/AKfycbzj_XC0HrdRg6rEGT_aT0rq7z0-M5zyoBXcf9tLMxmVm2CoobAGD1PNpStFTKmmPK8HKg/exec')
+        .then(res => res.json())
+        .then(data => {
+            bom_link_data = data.content;
+            console.log("Dữ liệu bom link đã tải xong.");
         });
 }
 
@@ -6453,3 +6463,62 @@ async function get_bom_scorecard() {
     document.getElementById("getBomLoading").style.display = "none";
 }
 
+async function get_bom_link() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    const bom_input = document.getElementById("input_bom_to_export").value
+
+    if (bom_input === "") {
+        alert("Vui lòng nhập BOM")
+        document.getElementById("loadingIndicator").style.display = "none";
+        clear_bom_link_table()
+        return;
+    }
+
+    await load_bom_link();
+
+    const findBomLink = bom_link_data.find(row => row[2] === bom_input);
+
+    if (findBomLink) {
+        info("Done")
+        console.log(findBomLink)
+
+        document.getElementById("bom_create_date").textContent = findBomLink[0];
+        document.getElementById("crm_id_link").textContent = findBomLink[1];
+        document.getElementById("bom_id_link").textContent = findBomLink[2];
+        document.getElementById("bom_name_link").textContent = findBomLink[3];
+        document.getElementById("bom_customer").textContent = findBomLink[4];
+        document.getElementById("bom_wh").textContent = findBomLink[5];
+        document.getElementById("bom_operator").textContent = findBomLink[6];
+        var linkElement = document.getElementById("bom_link_pdf");
+
+        // Kiểm tra nếu findBomLink[7] có giá trị hợp lệ
+        if (findBomLink[7]) {
+            linkElement.textContent = "Xem PDF"; // Hiển thị chữ "Xem PDF"
+            linkElement.href = findBomLink[7]; // Gán đường link
+            linkElement.target = "_blank"; // Mở trong tab mới
+        } else {
+            linkElement.textContent = "Không có PDF"; // Trường hợp không có link
+            linkElement.href = "#"; // Không điều hướng
+        }
+
+
+    } else {
+        warning("Không tìm thấy BOM")
+        clear_bom_link_table()
+    }
+    document.getElementById("input_bom_to_export").value = "";
+    document.getElementById("loadingIndicator").style.display = "none";
+
+
+}
+
+function clear_bom_link_table() {
+    document.getElementById("bom_create_date").textContent = "";
+    document.getElementById("crm_id_link").textContent = "";
+    document.getElementById("bom_id_link").textContent = "";
+    document.getElementById("bom_name_link").textContent = "";
+    document.getElementById("bom_customer").textContent = "";
+    document.getElementById("bom_wh").textContent = "";
+    document.getElementById("bom_operator").textContent = "";
+    document.getElementById("bom_link_pdf").textContent = "";
+}
