@@ -58,19 +58,27 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <ul>
-                <h2 id="welcome-message">Welcome, Admin!</h2>
-                <li onclick="showFrame('home')">Home</li>
-                <li>
-                    Inventory Management
-                    <ul class="submenu">
+                <h2 id="welcome-message"></h2>
+                <li onclick="showFrame('home')"><i class="fas fa-home icon"></i> Home</li>
+                <li onclick="toggleSubmenu(event, 'inv_list', this)">
+
+                        <i class="fa-solid fa-network-wired"></i>   
+                        Inventory
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+   
+                    <ul class="submenu" id="inv_list">
                         <li onclick="showFrame('import')">Nhập</li>
                         <li onclick="showFrame('export')">Xuất</li>
                         <li onclick="showFrame('mml')">MML</li>
                     </ul>
                 </li>
-                <li>
-                    OPS Management
-                    <ul class="submenu">
+                <li onclick="toggleSubmenu(event, 'ops_list', this)">
+
+                        <i class="fa-solid fa-arrow-up-wide-short"></i>
+                        OPS Management
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+        
+                    <ul class="submenu" id="ops_list">
                         <li onclick="showFrame('crm')">CRM</li>
                         <li onclick="showFrame('survey')">KHẢO SÁT</li>
                         <li onclick="showFrame('design')">DESIGN + BOM</li>
@@ -80,18 +88,23 @@
                         <li onclick="showFrame('delivery')">DELIVERY</li>
                         <li onclick="showFrame('payment')">PAYMENT</li>
                     </ul>
+                    
                 </li>
-                <li onclick="showFrame('bom_creation')">BOM Creation</li>
-                <li onclick="showFrame('approve_center')">Approval Center</li>
-                <li>
+                <li onclick="showFrame('bom_creation')"> <i class="fa-brands fa-ubuntu"></i> BOM Creation</li>
+                <li onclick="showFrame('approve_center')"> <i class="fa-solid fa-check"></i> Approval Center</li>
+                <li onclick="toggleSubmenu(event, 'export_list', this)">
+    
+                    <i class="fa-solid fa-download"></i>
                     Export Data
-                    <ul class="submenu">
+                    <i class="fa-solid fa-chevron-down arrow"></i>
+
+                    <ul class="submenu" id="export_list">
                         <li onclick="showFrame('onhand')">Onhand</li>
                         <li onclick="showFrame('transaction_nhap')">Nhập</li>
                         <li onclick="showFrame('transaction_xuat')">Xuất</li>
                     </ul>
                 </li>
-                <li><button id="logout-btn" class="logout-btn">LOGOUT</button></li>
+                <li><button id="logout-btn" class="logout-btn"> <i class="fa-solid fa-right-from-bracket"></i> LOGOUT</button></li>
             </ul>
         </aside>
 
@@ -101,7 +114,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 2.5.102</h4>
+                <h4>Version 2.5.211</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg2025.jpg" alt="RMG Technologies" style="width:100%;"/>
