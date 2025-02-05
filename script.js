@@ -715,6 +715,7 @@ let cancel_data = []
 let bom_data = []
 let bom_draft_data = []
 let bom_link_data = []
+let bom_link_filter_data = []
 
 async function load_user() {
     return fetch('https://script.google.com/macros/s/AKfycbzwWx6hpZ-C5zcjFDeTjJv77nlWZ2tLlHqtg1SUZS37dOoF5c_ua8ITxzHsX-d5zIhH/exec')
@@ -866,6 +867,8 @@ async function load_bom_link() {
         .then(res => res.json())
         .then(data => {
             bom_link_data = data.content;
+            bom_link_filter_data = data.content;
+            bom_link_filter_data.shift()
             console.log("Dữ liệu bom link đã tải xong.");
         });
 }
@@ -1271,7 +1274,7 @@ function load_data_nhap_without_loading() {
 }
 
 
-function showFrame(id) {
+async function showFrame(id) {
     const permissions = JSON.parse(sessionStorage.getItem("permissions")) || {};
 
     // Log to check access permissions
@@ -1371,7 +1374,7 @@ function showFrame(id) {
                 active_frame = id;
                 console.log("Access granted to frame:", id);
             } else if (id === 'bom_creation') {
-                get_bom_scorecard()
+                await Promise.all([get_bom_scorecard(), displayTableData()])
                 activeFrame.classList.add('active');
                 active_frame = id;
                 console.log("Access granted to frame:", id);
@@ -6156,19 +6159,55 @@ function calculateAssetPrice() {
 
 
 // Hàm tính tổng giá trị cho từng dòng và toàn bảng
+// function calculateLaborPrice() {
+//     const table = document.getElementById("table_labor"); // Lấy bảng theo ID
+//     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+//     let totalPrice = 0; // Biến lưu tổng giá trị toàn bảng
+
+//     rows.forEach(row => {
+//         const input = row.querySelector("input[type='number']"); // Lấy ô input
+//         const pricePerUnitCell = row.cells[3]; // Cột Giá / Đơn vị
+//         const totalCell = row.cells[4]; // Cột Tổng giá
+
+//         const quantity = parseFloat(input.value) || 0; // Số giờ cần (nếu rỗng thì là 0)
+//         const pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, '')) || 0; // Giá / Đơn vị (xóa dấu phẩy)
+        
+//         // Tính Tổng giá cho dòng hiện tại
+//         const total = quantity * pricePerUnit;
+
+//         // Hiển thị giá trị tính toán vào cột Tổng giá
+//         totalCell.textContent = total.toLocaleString('en-US'); // Hiển thị có dấu phẩy phân cách
+
+//         // Cộng dồn giá trị vào tổng giá trị toàn bảng
+//         totalPrice += total;
+//     });
+
+//     // Cập nhật tổng giá trị vào phần tử bom-total-price-labor
+//     document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+// }
+
 function calculateLaborPrice() {
     const table = document.getElementById("table_labor"); // Lấy bảng theo ID
     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
     let totalPrice = 0; // Biến lưu tổng giá trị toàn bảng
 
     rows.forEach(row => {
-        const input = row.querySelector("input[type='number']"); // Lấy ô input
+        const input = row.querySelector("input[type='number']"); // Lấy ô input số giờ cần
         const pricePerUnitCell = row.cells[3]; // Cột Giá / Đơn vị
         const totalCell = row.cells[4]; // Cột Tổng giá
 
         const quantity = parseFloat(input.value) || 0; // Số giờ cần (nếu rỗng thì là 0)
-        const pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, '')) || 0; // Giá / Đơn vị (xóa dấu phẩy)
-        
+
+        let pricePerUnit = 0; // Giá mỗi đơn vị
+
+        // Kiểm tra nếu cột Giá / Đơn vị là input thì lấy value, ngược lại lấy textContent
+        const priceInput = pricePerUnitCell.querySelector("input[type='text']");
+        if (priceInput) {
+            pricePerUnit = parseFloat(priceInput.value.replace(/,/g, "")) || 0; // Lấy giá trị nhập vào và loại bỏ dấu phẩy
+        } else {
+            pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, "")) || 0;
+        }
+
         // Tính Tổng giá cho dòng hiện tại
         const total = quantity * pricePerUnit;
 
@@ -6182,6 +6221,7 @@ function calculateLaborPrice() {
     // Cập nhật tổng giá trị vào phần tử bom-total-price-labor
     document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
 }
+
 
 // Hàm tính tổng giá trị của BOM
 function calculateTotalBOMPrice() {
@@ -6220,11 +6260,56 @@ document.querySelectorAll("#table_labor input[type='number']").forEach(input => 
     input.addEventListener("input", updateBOMPrice);
 });
 // Hàm chuyển bảng thành mảng, thêm bom-crm, bom-name, bom-customerID, bom-customerName, bom-wh
+// function get_asset_labor_table(tableId, crmSelectId) {
+//     const table = document.getElementById(tableId); // Lấy bảng theo ID
+//     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
+//     const crmValue = document.getElementById("bom-crm-show").textContent; // Lấy <select id="bom-crm">
+//     // const crmValue = crmSelect.options[crmSelect.selectedIndex].textContent.trim(); // Lấy giá trị của option được chọn trong bom-crm
+
+//     // Lấy các giá trị từ các phần tử khác
+//     const bomName = document.getElementById("bom-name").value.trim();
+//     const customerID = document.getElementById("bom-customerID").textContent.trim();
+//     const customerName = document.getElementById("bom-customerName").textContent.trim();
+//     const wh = document.getElementById("bom-wh").textContent.trim();
+
+//     const dataArray = []; // Mảng lưu trữ dữ liệu
+
+//     rows.forEach(row => {
+//         const cells = row.querySelectorAll("td, th"); // Lấy tất cả ô trong hàng
+//         const rowData = []; // Mảng lưu trữ dữ liệu của hàng hiện tại
+
+//         cells.forEach(cell => {
+//             // Kiểm tra nếu bảng là table_labor và ô có <select>
+//             if (tableId === "table_labor") {
+//                 const select = cell.querySelector("select");
+//                 if (select) {
+//                     // Lấy giá trị của tùy chọn được chọn
+//                     rowData.push(select.options[select.selectedIndex].textContent.trim());
+//                 } else {
+//                     // Nếu ô có input, lấy giá trị của input, nếu không, lấy textContent
+//                     const input = cell.querySelector("input[type='number']");
+//                     rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
+//                 }
+//             } else {
+//                 // Xử lý bình thường cho table_asset
+//                 const input = cell.querySelector("input[type='number']");
+//                 rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
+//             }
+//         });
+
+//         // Thêm giá trị từ các phần tử bổ sung vào cuối hàng
+//         rowData.push(crmValue, bomName, customerID, customerName, wh);
+
+//         dataArray.push(rowData); // Thêm hàng vào mảng
+//     });
+
+//     return dataArray; // Trả về mảng dữ liệu
+// }
+
 function get_asset_labor_table(tableId, crmSelectId) {
     const table = document.getElementById(tableId); // Lấy bảng theo ID
     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
-    const crmValue = document.getElementById("bom-crm-show").textContent; // Lấy <select id="bom-crm">
-    // const crmValue = crmSelect.options[crmSelect.selectedIndex].textContent.trim(); // Lấy giá trị của option được chọn trong bom-crm
+    const crmValue = document.getElementById("bom-crm-show").textContent.trim(); // Lấy giá trị CRM
 
     // Lấy các giá trị từ các phần tử khác
     const bomName = document.getElementById("bom-name").value.trim();
@@ -6239,16 +6324,24 @@ function get_asset_labor_table(tableId, crmSelectId) {
         const rowData = []; // Mảng lưu trữ dữ liệu của hàng hiện tại
 
         cells.forEach(cell => {
-            // Kiểm tra nếu bảng là table_labor và ô có <select>
+            // Nếu bảng là table_labor và ô có <select>
             if (tableId === "table_labor") {
                 const select = cell.querySelector("select");
                 if (select) {
                     // Lấy giá trị của tùy chọn được chọn
                     rowData.push(select.options[select.selectedIndex].textContent.trim());
                 } else {
-                    // Nếu ô có input, lấy giá trị của input, nếu không, lấy textContent
-                    const input = cell.querySelector("input[type='number']");
-                    rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
+                    // Nếu ô có input type="number", lấy giá trị
+                    let inputNumber = cell.querySelector("input[type='number']");
+                    let inputText = cell.querySelector("input[type='text']");
+
+                    if (inputNumber) {
+                        rowData.push(parseFloat(inputNumber.value) || 0);
+                    } else if (inputText) {
+                        rowData.push(inputText.value.replace(/,/g, "").trim()); // Lấy input text, loại bỏ dấu phẩy nếu có
+                    } else {
+                        rowData.push(cell.textContent.trim());
+                    }
                 }
             } else {
                 // Xử lý bình thường cho table_asset
@@ -6265,6 +6358,7 @@ function get_asset_labor_table(tableId, crmSelectId) {
 
     return dataArray; // Trả về mảng dữ liệu
 }
+
 
 // // Chuyển đổi cả hai bảng thành mảng với các giá trị bổ sung
 // const assetTableArray = tableToArrayWithAdditionalData("table_asset", "bom-crm"); // Table Asset
@@ -6522,3 +6616,139 @@ function clear_bom_link_table() {
     document.getElementById("bom_operator").textContent = "";
     document.getElementById("bom_link_pdf").textContent = "";
 }
+
+const input_others_cost = document.getElementById("others_cost");
+
+input_others_cost.addEventListener("input", function () {
+    let value = input_others_cost.value.replace(/,/g, ""); // Loại bỏ dấu phẩy cũ trước khi xử lý
+
+    if (!isNaN(value) && value !== "") {
+        input_others_cost.value = Number(value).toLocaleString("en-US"); // Thêm dấu phẩy phân cách nghìn
+    } else {
+        input_others_cost.value = ""; // Nếu giá trị không hợp lệ, xóa nội dung
+    }
+});
+
+input_others_cost.addEventListener("blur", function () {
+    if (input_others_cost.value === "") {
+        input_others_cost.value = "0"; // Nếu ô trống khi mất focus, đặt về 0
+    }
+});
+
+
+const input_hr_other = document.getElementById("others_hours");
+
+input_hr_other.addEventListener("input", function () {
+    let value_other_cost = document.getElementById("others_cost").value
+    if (value_other_cost === "" || value_other_cost === "0" || value_other_cost === 0) {
+        alert("Vui lòng đơn giá trước")
+        input_others_cost.focus();
+        input_hr_other.value = ""
+        return;
+    }
+});
+
+
+const tableBody = document.querySelector("#bomLinkTable tbody");
+const filterDate = document.getElementById("filter-date");
+const filterBranch = document.getElementById("filter-branch");
+const filterOperator = document.getElementById("filter-operator");
+
+// 🛠️ Lấy danh sách operator duy nhất
+function populateOperatorFilter() {
+    const operators = [...new Set(bom_link_filter_data.map(row => row[6]))]; // Cột Operator
+    filterOperator.innerHTML = `<option value="">Tất cả</option>` + operators.map(op => `<option value="${op}">${op}</option>`).join("");
+}
+
+// 🛠️ Hiển thị dữ liệu trong bảng
+async function displayTableData() {
+    clear_filter()
+    document.getElementById("loadingIndicator").style.display = "block";
+    await load_bom_link();
+    const data = bom_link_filter_data
+    populateOperatorFilter();
+    tableBody.innerHTML = "";
+
+    data.forEach(rowData => {
+        const row = document.createElement("tr");
+
+        rowData.forEach((cellData, index) => {
+            const cell = document.createElement("td");
+
+            if (index === 7) { // Nếu là cột Link, tạo thẻ <a>
+                const link = document.createElement("a");
+                link.href = cellData;
+                link.target = "_blank";
+                link.textContent = "Xem tài liệu"; // Hiển thị chữ thay vì link dài
+                cell.appendChild(link);
+            } else {
+                cell.textContent = cellData;
+            }
+
+            row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+        document.getElementById("loadingIndicator").style.display = "none";
+    });
+}
+
+// 🛠️ Lọc dữ liệu dựa trên điều kiện
+function filterTable() {
+    const dateValue = filterDate.value;
+    const branchValue = filterBranch.value;
+    const operatorValue = filterOperator.value;
+
+    const filteredData = bom_link_filter_data.filter(row => {
+        const matchDate = dateValue ? row[0] === dateValue : true;
+        const matchBranch = branchValue ? row[5] === branchValue : true;
+        const matchOperator = operatorValue ? row[6] === operatorValue : true;
+
+        return matchDate && matchBranch && matchOperator;
+    });
+    console.log(filteredData)
+    tableBody.innerHTML = "";
+
+    filteredData.forEach(rowData => {
+        const row = document.createElement("tr");
+
+        rowData.forEach((cellData, index) => {
+            const cell = document.createElement("td");
+
+            if (index === 7) { // Nếu là cột Link, tạo thẻ <a>
+                const link = document.createElement("a");
+                link.href = cellData;
+                link.target = "_blank";
+                link.textContent = "Xem tài liệu"; // Hiển thị chữ thay vì link dài
+                cell.appendChild(link);
+            } else {
+                cell.textContent = cellData;
+            }
+
+            row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+    });
+}
+
+// 🛠️ Gán sự kiện lắng nghe thay đổi
+filterDate.addEventListener("input", filterTable);
+filterBranch.addEventListener("change", filterTable);
+filterOperator.addEventListener("change", filterTable);
+
+// 🛠️ Khởi tạo dữ liệu
+
+// displayTableData(); // Hiển thị dữ liệu ban đầu
+
+
+function clear_filter() {
+    // Reset các giá trị của bộ lọc
+    filterDate.value = "";
+    filterBranch.value = "";
+    filterOperator.value = "";
+
+    // Hiển thị lại toàn bộ dữ liệu bảng
+    // displayTableData(bom_link_data);
+    filterTable()
+};
