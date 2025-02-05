@@ -992,7 +992,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
         displayWelcomeFrame();
         if (welcomeMessage) {
-            welcomeMessage.textContent = "Welcome, " + username;
+            welcomeMessage.textContent = username;
         }
     
         // Gọi hàm khởi tạo combobox sau khi hoàn tất đăng nhập
@@ -1014,7 +1014,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (isLoggedIn === "true" && expirationTime && Date.now() < parseInt(expirationTime)) {
             displayWelcomeFrame();
             if (welcomeMessage) {
-                welcomeMessage.textContent = "Welcome, " + (username || "User");
+                welcomeMessage.textContent = (username || "User");
             }
         } else {
             logout();
@@ -1048,164 +1048,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Hàm hiển thị frame theo id, chỉ cho phép truy cập nếu có quyền
     
 });
-
-// document.addEventListener("DOMContentLoaded", async () => {
-//     await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
-
-//     const loginForm = document.getElementById("login-form");
-//     const usernameInput = document.getElementById("username");
-//     const passwordInput = document.getElementById("password");
-//     const loginFrame = document.getElementById("login-frame");
-//     const welcomeFrame = document.getElementById("welcome-frame");
-//     const welcomeMessage = document.getElementById("welcome-message");
-//     const logoutButton = document.getElementById("logout-btn");
-
-//     const EXPIRATION_TIME = 3 * 24 * 60 * 60 * 1000; // 3 ngày
-//     // const EXPIRATION_TIME = 1 * 60 * 1000; // 1 phút
-
-//     checkLoginStatus();
-//     // const isLoggedIn = sessionStorage.getItem("isLoggedIn");
-//     // const expirationTime = sessionStorage.getItem("expirationTime");
-//     // const username = sessionStorage.getItem("username");
-
-//     // // Kiểm tra nếu đã đăng nhập và còn hiệu lực
-//     // if (isLoggedIn === "true" && expirationTime && Date.now() < parseInt(expirationTime)) {
-//     //     displayWelcomeFrame(); // Hiển thị khung chào mừng
-//     //     if (welcomeMessage) {
-//     //         welcomeMessage.textContent = "Welcome, " + (username || "User");
-//     //     }
-
-//     //     // Gọi các hàm cần thiết sau khi hiển thị khung chào mừng
-//     //     create_wh_nhap();
-//     //     create_wh_xuat();
-//     //     create_wh_xuat_export();
-//     //     create_wh_nhap_export();
-//     //     create_wh_onhand_export();
-//     //     create_wh_crm();
-//     // } else {
-//     //     // Nếu chưa đăng nhập hoặc hết hạn, thực hiện bước tải dữ liệu
-//     //     await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
-
-//     //     // Hiển thị khung đăng nhập
-//     //     displayLoginFrame();
-//     // }
-
-//     loginForm.addEventListener("submit", async (e) => {
-//         e.preventDefault();
-//         document.getElementById("loadingIndicator").style.display = "block";
-//         await load_user()
-        
-
-//         const username = usernameInput.value;
-//         const password = passwordInput.value;
-
-//         // Tìm user trong user_data dựa trên tên đăng nhập và mật khẩu
-//         const user = user_data.find(u => u[2] === username && u[3] === password);
-
-//         if (user) {
-//             const fullname = user[0];
-//             const wh = user[1]
-//             const approver = user[17]
-//             const dept = user[19]
-//             // Xác định quyền của user dựa trên các cột 4, 5, 6, 7 trong user_data
-//             const permissions = {
-//                 import: user[4] === "x",
-//                 export: user[5] === "x",
-//                 onhand: user[6] === "x",
-//                 transaction_nhap: user[6] === "x",
-//                 transaction_xuat: user[6] === "x",
-//                 mml: user[7] === "x",
-//                 crm: user[9] === "x",
-//                 survey: user[10] === "x",
-//                 design: user[11] === "x",
-//                 quotation: user[12] === "x",
-//                 order: user[13] === "x", 
-//                 mfg: user[14] === "x",
-//                 delivery: user[15] === "x",
-//                 payment:user[16] === "x",
-//                 approve_center:user[18] === "x"
-//             };
-
-//             // Ghi log quyền để kiểm tra
-//             console.log("Quyền truy cập của người dùng:", permissions);
-
-//             // Lưu quyền và thông tin người dùng vào sessionStorage
-//             sessionStorage.setItem("permissions", JSON.stringify(permissions));
-//             sessionStorage.setItem("username", username);
-//             sessionStorage.setItem("fullname", fullname);
-//             sessionStorage.setItem("wh", wh);
-//             sessionStorage.setItem("approver", approver);
-//             sessionStorage.setItem("dept", dept);
-//             loginSuccess(username);
-//         } else {
-//             alert("Sai tên đăng nhập hoặc mật khẩu!");
-//         }
-//     });
-
-//     function loginSuccess(username) {
-//         const expirationTime = Date.now() + EXPIRATION_TIME;
-//         sessionStorage.setItem("isLoggedIn", "true");
-//         sessionStorage.setItem("expirationTime", expirationTime.toString());
-    
-//         displayWelcomeFrame();
-//         if (welcomeMessage) {
-//             welcomeMessage.textContent = "Welcome, " + username;
-//         }
-    
-//         // Gọi hàm khởi tạo combobox sau khi hoàn tất đăng nhập
-//         create_wh_nhap();
-//         create_wh_xuat()
-//         create_wh_xuat_export()
-//         create_wh_nhap_export()
-//         create_wh_onhand_export()
-//         create_wh_crm()
-//         document.getElementById("loadingIndicator").style.display = "none";
-    
-//     }
-    
-
-//     function checkLoginStatus() {
-//         const isLoggedIn = sessionStorage.getItem("isLoggedIn");
-//         const expirationTime = sessionStorage.getItem("expirationTime");
-//         const username = sessionStorage.getItem("username");
-        
-//         if (isLoggedIn === "true" && expirationTime && Date.now() < parseInt(expirationTime)) {
-//             displayWelcomeFrame();
-//             if (welcomeMessage) {
-//                 welcomeMessage.textContent = "Welcome, " + (username || "User");
-//             }
-//         } else {
-//             logout();
-//         }
-//     }
-
-//     function logout() {
-//         sessionStorage.clear(); // Xóa tất cả dữ liệu sessionStorage
-
-//         displayLoginFrame();
-//         // alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-
-//         usernameInput.value = "";
-//         passwordInput.value = "";
-//     }
-
-//     function displayLoginFrame() {
-//         loginFrame.style.display = "flex";
-//         welcomeFrame.style.display = "none";
-//     }
-
-//     function displayWelcomeFrame() {
-//         loginFrame.style.display = "none";
-//         welcomeFrame.style.display = "flex";
-//     }
-
-//     if (logoutButton) {
-//         logoutButton.addEventListener("click", logout);
-//     }
-
-//     // Hàm hiển thị frame theo id, chỉ cho phép truy cập nếu có quyền
-    
-// });
 
 
 async function load_data_nhap() {
@@ -6259,52 +6101,6 @@ document.querySelectorAll("#table_asset input[type='number']").forEach(input => 
 document.querySelectorAll("#table_labor input[type='number']").forEach(input => {
     input.addEventListener("input", updateBOMPrice);
 });
-// Hàm chuyển bảng thành mảng, thêm bom-crm, bom-name, bom-customerID, bom-customerName, bom-wh
-// function get_asset_labor_table(tableId, crmSelectId) {
-//     const table = document.getElementById(tableId); // Lấy bảng theo ID
-//     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
-//     const crmValue = document.getElementById("bom-crm-show").textContent; // Lấy <select id="bom-crm">
-//     // const crmValue = crmSelect.options[crmSelect.selectedIndex].textContent.trim(); // Lấy giá trị của option được chọn trong bom-crm
-
-//     // Lấy các giá trị từ các phần tử khác
-//     const bomName = document.getElementById("bom-name").value.trim();
-//     const customerID = document.getElementById("bom-customerID").textContent.trim();
-//     const customerName = document.getElementById("bom-customerName").textContent.trim();
-//     const wh = document.getElementById("bom-wh").textContent.trim();
-
-//     const dataArray = []; // Mảng lưu trữ dữ liệu
-
-//     rows.forEach(row => {
-//         const cells = row.querySelectorAll("td, th"); // Lấy tất cả ô trong hàng
-//         const rowData = []; // Mảng lưu trữ dữ liệu của hàng hiện tại
-
-//         cells.forEach(cell => {
-//             // Kiểm tra nếu bảng là table_labor và ô có <select>
-//             if (tableId === "table_labor") {
-//                 const select = cell.querySelector("select");
-//                 if (select) {
-//                     // Lấy giá trị của tùy chọn được chọn
-//                     rowData.push(select.options[select.selectedIndex].textContent.trim());
-//                 } else {
-//                     // Nếu ô có input, lấy giá trị của input, nếu không, lấy textContent
-//                     const input = cell.querySelector("input[type='number']");
-//                     rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
-//                 }
-//             } else {
-//                 // Xử lý bình thường cho table_asset
-//                 const input = cell.querySelector("input[type='number']");
-//                 rowData.push(input ? parseFloat(input.value) || 0 : cell.textContent.trim());
-//             }
-//         });
-
-//         // Thêm giá trị từ các phần tử bổ sung vào cuối hàng
-//         rowData.push(crmValue, bomName, customerID, customerName, wh);
-
-//         dataArray.push(rowData); // Thêm hàng vào mảng
-//     });
-
-//     return dataArray; // Trả về mảng dữ liệu
-// }
 
 function get_asset_labor_table(tableId, crmSelectId) {
     const table = document.getElementById(tableId); // Lấy bảng theo ID
@@ -6358,11 +6154,6 @@ function get_asset_labor_table(tableId, crmSelectId) {
 
     return dataArray; // Trả về mảng dữ liệu
 }
-
-
-// // Chuyển đổi cả hai bảng thành mảng với các giá trị bổ sung
-// const assetTableArray = tableToArrayWithAdditionalData("table_asset", "bom-crm"); // Table Asset
-// const laborTableArray = tableToArrayWithAdditionalData("table_labor", "bom-crm"); // Table Labor
 
 // Hàm chuyển đổi bảng bom-item-table thành mảng, thêm các giá trị từ các phần tử khác
 function get_bom_item() {
@@ -6538,14 +6329,6 @@ async function send_bom_draft() {
     get_bom_scorecard();
     
 }
-
-// Dữ liệu mẫu
-// const doneList = []; // List for 'Done'
-// const pendingList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // List for 'Pending'
-
-// // Cập nhật giá trị scorecard
-// document.getElementById('doneValue').textContent = doneList.length;
-// document.getElementById('pendingValue').textContent = pendingList.length;
 
 async function get_bom_scorecard() {
     document.getElementById("getBomLoading").style.display = "block";
@@ -6752,3 +6535,17 @@ function clear_filter() {
     // displayTableData(bom_link_data);
     filterTable()
 };
+
+function toggleSubmenu(event, submenuId, element) {
+    event.preventDefault();
+    const submenu = document.getElementById(submenuId);
+    const arrow = element.querySelector('.arrow');
+
+    if (submenu.style.display === 'block') {
+      submenu.style.display = 'none';
+      arrow.classList.replace('fa-chevron-up', 'fa-chevron-down');
+    } else {
+      submenu.style.display = 'block';
+      arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
+    }
+}
