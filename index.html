@@ -101,7 +101,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 2.4.327</h4>
+                <h4>Version 2.5.102</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg2025.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -854,51 +854,94 @@
 
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 25px;" onclick="showModal_bom()">Tạo BOM mới</button>
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px; margin-left: 15px;" onclick="showModal_bom_draft()">Load BOM tạm</button>
-                <p>________________________________________________________________________________________________</p>
-                <input style="width: 600px;" type="text" id="input_bom_to_export"  placeholder="Nhập BOM#"/>
-                <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 20px; background-color: green; margin-left: 15px;" onclick="get_bom_link()">Get Link</button>
+                <div style="display: none;">
+                    <p>________________________________________________________________________________________________</p>
+                    <input style="width: 600px;" type="text" id="input_bom_to_export"  placeholder="Nhập BOM#"/>
+                    <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 20px; background-color: green; margin-left: 15px;" onclick="get_bom_link()">Get Link</button>
 
-                <div style="margin-top: 40px;" id="bom_link_frame">
-                    <div class="bom_link">
-                        <label>Ngày tạo:</label>
-                        <label id="bom_create_date"></label>
-                    </div>
+                    <div style="margin-top: 40px;" id="bom_link_frame">
+                        <div class="bom_link">
+                            <label>Ngày tạo:</label>
+                            <label id="bom_create_date"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>CRM#:</label>
-                        <label id="crm_id_link"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>CRM#:</label>
+                            <label id="crm_id_link"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>BOM#:</label>
-                        <label id="bom_id_link"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>BOM#:</label>
+                            <label id="bom_id_link"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>Tên BOM:</label>
-                        <label id="bom_name_link"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>Tên BOM:</label>
+                            <label id="bom_name_link"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>Khách hàng:</label>
-                        <label id="bom_customer"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>Khách hàng:</label>
+                            <label id="bom_customer"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>Chi nhánh:</label>
-                        <label id="bom_wh"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>Chi nhánh:</label>
+                            <label id="bom_wh"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>Người tạo:</label>
-                        <label id="bom_operator"></label>
-                    </div>
+                        <div class="bom_link">
+                            <label>Người tạo:</label>
+                            <label id="bom_operator"></label>
+                        </div>
 
-                    <div class="bom_link">
-                        <label>Link PDF:</label>
-                        <a id="bom_link_pdf" href="#" target="_blank"></a>
+                        <div class="bom_link">
+                            <label>Link PDF:</label>
+                            <a id="bom_link_pdf" href="#" target="_blank"></a>
+                        </div>
                     </div>
                 </div>
+
+                <h2 style="margin-top: 20px; margin-bottom: 10px;">Lọc BOM đã tạo</h2>
+                <!-- Bộ lọc -->
+                <div class="filter-container">
+                    <label style="margin-right: 20px;">Ngày nhập: <input type="date" id="filter-date"></label>
+                    <label>Chi nhánh:
+                        <select id="filter-branch" style="margin-right: 20px;">
+                            <option value="">Tất cả</option>
+                            <option value="HCM">HCM</option>
+                            <option value="QN">QN</option>
+                            <option value="BN">SG</option>
+                            <option value="SG">BN</option>
+                        </select>
+                    </label>
+                    <label>Operator:
+                        <select id="filter-operator" style="margin-right: 20px;">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </label>
+                </div>
+
+                <button id="clear-bom-link-filter" onclick="clear_filter()">Clear Filter</button>
+                <button onclick="displayTableData()">Refresh</button>
+
+                <!-- fd -->
+
+                <table id="bomLinkTable">
+                    <thead>
+                        <tr>
+                            <th>Ngày nhập</th>
+                            <th>CRM#</th>
+                            <th>BOM#</th>
+                            <th>BOM Name</th>
+                            <th>Khách hàng</th>
+                            <th>Chi nhánh</th>
+                            <th>Operator</th>
+                            <th>Link</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
 
                 <div class="bom-modal" id="bom-draft-modal">
                     <div class="modal-content">
@@ -992,6 +1035,12 @@
                             <label style="background-color: lightgreen; padding: 5px;" for="item-quantity-needed">Số lượng cần:</label>
                             <input type="number" id="item-quantity-needed" />
                           </div>
+
+                          <div class="bom-buttons">
+                            <button class="bom-save" onclick="addItem()">Thêm vào</button>
+                            <button class="bom-clear" onclick="hideAddItemModal()">Hủy</button>
+                          </div>
+
                           <div class="bom-input-group">
                             <label for="item-name">Tên vật tư:</label>
                             <input type="text" id="item-name" />
@@ -1017,10 +1066,7 @@
                             <label for="item-price">Giá / Đơn vị (dự kiến):</label>
                             <input type="number" id="item-price" />
                           </div>
-                          <div class="bom-buttons">
-                            <button class="bom-save" onclick="addItem()">Thêm vào</button>
-                            <button class="bom-clear" onclick="hideAddItemModal()">Hủy</button>
-                          </div>
+                          
                         </div>
                       </div>
                 
@@ -1135,8 +1181,8 @@
                                       <option value="Gói">Gói</option>
                                     </select>
                                   </td>
-                                <td><input type="number" /></td>
-                                <td>45,000</td>
+                                <td><input type="number" id="others_hours" /></td>
+                                <td><input type="text" id="others_cost" /></td>
                                 <td>-</td>
                               </tr>
                           </tbody>
