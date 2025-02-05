@@ -5873,7 +5873,6 @@ async function updateBOMDraft(selectedValue) {
     
         // Tính tổng cột thứ 11 của kết quả lọc
         const sumColumn11 = filteredOnhand.reduce((sum, onhandRow) => sum + onhandRow[10], 0);
-    
         // Gán tổng vào một cột mới trong dòng hiện tại của found_draft
         row.push(sumColumn11); // Hoặc row[12] = sumColumn11 nếu bạn muốn chỉ định một cột cụ thể
     });
@@ -5901,7 +5900,7 @@ function load_item_draft(found_draft) {
     const maVatTu = row[4];
     const donVi = row[5];
     const soLuongCan = row[6];
-    const soLuongTonKho = row[17];
+    const soLuongTonKho = row[18];
     const soLuongCanMuaThem = Math.max(0, soLuongCan - soLuongTonKho);
     const giaDuKien = row[9];
     const tongGia = soLuongCan * giaDuKien;
