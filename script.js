@@ -6486,6 +6486,12 @@ async function displayTableData() {
     clear_filter()
     document.getElementById("loadingIndicator").style.display = "block";
     await load_bom_link();
+
+    if (bom_link_filter_data.length === 0) {
+        document.getElementById("loadingIndicator").style.display = "none";
+        return;
+    }
+
     const data = bom_link_filter_data
     populateOperatorFilter();
     tableBody.innerHTML = "";
