@@ -5839,18 +5839,18 @@ async function get_crm_need_to_load_bom_draft() {
 
     // Nếu cần, có thể gỡ bỏ hoặc đảm bảo chỉ thêm event listener một lần
     bomDraftCrmSelect.removeEventListener("change", bomDraftCrmSelect._changeHandler);
-    // bomDraftCrmSelect._changeHandler = function(event) {
-    //     const selectedValue = event.target.value;
-    //     console.log("Người dùng đã chọn: ", selectedValue);
-    //     updateBOMDraft(selectedValue);
-    // };
-
     bomDraftCrmSelect._changeHandler = function(event) {
         const selectedValue = event.target.value;
-        const a1 = selectedValue.split('|')[0].trim(); // Lấy giá trị trước dấu '|'
-        console.log("Người dùng đã chọn: ", a1);
-        updateBOMDraft(a1); // Gọi hàm với giá trị a
+        console.log("Người dùng đã chọn: ", selectedValue);
+        updateBOMDraft(selectedValue);
     };
+
+    // bomDraftCrmSelect._changeHandler = function(event) {
+    //     const selectedValue = event.target.value;
+    //     const a1 = selectedValue.split('|')[0].trim(); // Lấy giá trị trước dấu '|'
+    //     console.log("Người dùng đã chọn: ", a1);
+    //     updateBOMDraft(a1); // Gọi hàm với giá trị a
+    // };
     
     bomDraftCrmSelect.addEventListener("change", bomDraftCrmSelect._changeHandler);
 
@@ -5875,9 +5875,12 @@ function parseDateTime(row) {
     return new Date(year, month - 1, day, hour, minute, second);
   }
 
-async function updateBOMDraft(selectedValue) {
+async function updateBOMDraft(value) {
+    const selectedValue = value.split('|')[0].trim(); // Lấy giá trị trước dấu '|'
+    const operator = value.split('|')[1].trim(); // Lấy giá trị trước dấu '|'
+
     hideModal_bom_draft();
-    const found_draft2 = bom_draft_data.filter(u => u[11] === selectedValue);
+    const found_draft2 = bom_draft_data.filter(u => u[11] === selectedValue && u[16] === operator);
     // Bước 1: Tìm datetime mới nhất trong data
     const maxDateTime = found_draft2.reduce((max, row) => {
         const currentDateTime = parseDateTime(row);
