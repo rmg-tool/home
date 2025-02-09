@@ -1216,9 +1216,9 @@ async function showFrame(id) {
                 active_frame = id;
                 console.log("Access granted to frame:", id);
             } else if (id === 'bom_creation') {
-                await Promise.all([get_bom_scorecard(), displayTableData()])
                 activeFrame.classList.add('active');
                 active_frame = id;
+                await Promise.all([get_bom_scorecard(), displayTableData()])
                 console.log("Access granted to frame:", id);
             } else {
                 activeFrame.classList.add('active');
@@ -5575,20 +5575,42 @@ function showSearchResults_bom(displayList, fullData) {
     });
 }
 
+function updateArrayWithSum(array1, array2) {
+    const wh = document.getElementById("bom-wh").textContent
+    // Duyệt qua từng dòng của array1
+    array1.forEach(row1 => {
+        let key = row1[2]; // Cột thứ 2 của array1 (index 1)
+        
+        // Lọc các dòng trong array2 có cột thứ 2 khớp với key
+        let filteredRows = array2.filter(row2 => row2[2] === key && row2[0] === wh);
+        
+        // Tính tổng của cột thứ 10 (index 9) trong array2
+        let total = filteredRows.reduce((sum, row) => sum + (row[10] || 0), 0);
+        
+        // Gán tổng vào array1, ví dụ: cột thứ 10 (index 9) của array1
+        row1[10] = total;
+    });
+
+    return array1;
+}
+
 function showSecondaryOptions_bom(selectedItem) {
     console.log(selectedItem)
     const wh_value = document.getElementById("bom-wh").textContent
     // Filter based on selected item and availability
-    const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]);
+    const filteredResults2 = mml_data.filter(item => item[0] === selectedItem[0]);
+    const filteredResults = updateArrayWithSum(filteredResults2, onhand_data);
     const modal = document.getElementById("secondaryModal_bom");
     const modalOptions = document.getElementById("modalOptions_bom");
     modalOptions.innerHTML = ''; // Clear old content
+
+    console.log(filteredResults)
 
     // Use a Set to keep track of unique options
     const uniqueOptions = new Set();
 
     filteredResults.forEach(option => {
-        const optionKey = `${option[1]} | ${option[2]}`; // Create a unique key based on ID and description
+        const optionKey = `${option[1]} | ${option[2]} | Tồn: ${option[10]}`; // Create a unique key based on ID and description
 
         if (!uniqueOptions.has(optionKey)) {
             uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
@@ -5785,13 +5807,19 @@ async function get_crm_need_to_load_bom_draft() {
 
     // Tiếp tục xử lý dữ liệu...
     bom_draft_data.forEach(item => {
-        crmList.push(item[11]);
+        crmList.push(item[11] + " | " + item[16]);
     });
 
     // Lọc crmList
     const coiumn_crm = bom_data.map(row => row[1]);
-    crmList = crmList.filter(item => !coiumn_crm.includes(item));
+    // crmList = crmList.filter(item => !coiumn_crm.includes(item));
+    crmList = crmList.filter(item => {
+        let a = item.split('|')[0].trim(); // Lấy giá trị a trước dấu |
+        return !coiumn_crm.includes(a); // Lọc bỏ nếu a có trong coiumn_crm
+    });
     crmList = [...new Set(crmList)];
+
+    console.log(crmList);
 
     // Thêm option trống ở đầu danh sách
     const emptyOption = document.createElement("option");
@@ -5811,11 +5839,19 @@ async function get_crm_need_to_load_bom_draft() {
 
     // Nếu cần, có thể gỡ bỏ hoặc đảm bảo chỉ thêm event listener một lần
     bomDraftCrmSelect.removeEventListener("change", bomDraftCrmSelect._changeHandler);
+    // bomDraftCrmSelect._changeHandler = function(event) {
+    //     const selectedValue = event.target.value;
+    //     console.log("Người dùng đã chọn: ", selectedValue);
+    //     updateBOMDraft(selectedValue);
+    // };
+
     bomDraftCrmSelect._changeHandler = function(event) {
         const selectedValue = event.target.value;
-        console.log("Người dùng đã chọn: ", selectedValue);
-        updateBOMDraft(selectedValue);
+        const a1 = selectedValue.split('|')[0].trim(); // Lấy giá trị trước dấu '|'
+        console.log("Người dùng đã chọn: ", a1);
+        updateBOMDraft(a1); // Gọi hàm với giá trị a
     };
+    
     bomDraftCrmSelect.addEventListener("change", bomDraftCrmSelect._changeHandler);
 
     document.getElementById("loadingIndicator").style.display = "none";
