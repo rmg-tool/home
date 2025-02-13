@@ -74,7 +74,7 @@
                 </li>
                 <li onclick="toggleSubmenu(event, 'ops_list', this)">
 
-                        <i class="fa-solid fa-arrow-up-wide-short"></i>
+                    <i class="fa-solid fa-gears"></i>
                         OPS Management
                         <i class="fa-solid fa-chevron-down arrow"></i>
         
@@ -90,7 +90,25 @@
                     </ul>
                     
                 </li>
-                <li onclick="showFrame('bom_creation')"> <i class="fa-brands fa-ubuntu"></i> BOM Creation</li>
+
+                <li onclick="toggleSubmenu(event, 'pur_list', this)">
+
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    PUR Management
+                    <i class="fa-solid fa-chevron-down arrow"></i>
+        
+                    <ul class="submenu" id="pur_list">
+                        <li onclick="showFrame('pur_pr')">Purchasing Request</li>
+                        <li onclick="showFrame('pur_po')">Purchase Order</li>
+                        <li onclick="showFrame('pur_po_release')">PO Release</li>
+                        <li onclick="showFrame('pur_pre_payment')">Pre-Payment</li>
+                        <li onclick="showFrame('pur_po_receiving')">PO Receiving</li>
+                        <li onclick="showFrame('pur_final_payment')">Final Payment</li>
+                    </ul>
+                    
+                </li>
+
+                <li onclick="showFrame('bom_creation')"> <i class="fa-solid fa-code-pull-request"></i> BOM Creation</li>
                 <li onclick="showFrame('approve_center')"> <i class="fa-solid fa-check"></i> Approval Center</li>
                 <li onclick="toggleSubmenu(event, 'export_list', this)">
     
@@ -867,7 +885,7 @@
 
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 25px;" onclick="showModal_bom()">Tạo BOM mới</button>
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px; margin-left: 15px;" onclick="showModal_bom_draft()">Load BOM tạm</button>
-                <div style="display: none;">
+                <!-- <div style="display: none;">
                     <p>________________________________________________________________________________________________</p>
                     <input style="width: 600px;" type="text" id="input_bom_to_export"  placeholder="Nhập BOM#"/>
                     <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 20px; background-color: green; margin-left: 15px;" onclick="get_bom_link()">Get Link</button>
@@ -913,7 +931,7 @@
                             <a id="bom_link_pdf" href="#" target="_blank"></a>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <h2 style="margin-top: 20px; margin-bottom: 10px;">Lọc BOM đã tạo</h2>
                 <!-- Bộ lọc -->
@@ -1417,6 +1435,44 @@
                     </div>
                 </div>
             </div>
+            <!-- ######################## -->
+            <!-- PURCHASE MGMT> -->
+            <div id="pur_pr" class="frame">
+                <h1>Purchase Request</h1>
+
+                <div class="bom-modal" id="pr-modal">
+                    <div class="bom-modal-content">
+                        <h2 class="bom-title">PURCHASING REQUEST</h2>
+
+                        <div class="pr_frame_1">
+                            <div class="form-row">
+                                <label for="warehouse">Chọn chi nhánh</label>
+                                <select id="warehouse_pr">
+                                    <!-- Options sẽ được thêm qua JavaScript -->
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="pr_dept">Bộ phận</label>
+                                <input type="text" id="pr_dept" placeholder="Nhập bộ phận">
+                            </div>
+
+                            <div class="form-row">
+                                <label for="purpose_pr">Chọn chi nhánh</label>
+                                <select id="purpose_pr">
+                                    <!-- Options sẽ được thêm qua JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="show-modal-button" onclick="showAddItemModal()">Thêm vật tư</button>
+
+                    </div>
+                </div>
+
+                <button style="padding: 10px 30px; font-size: 20px; font-weight: bold; margin-top: 20px; " onclick="showModal_pr()">Create New PR</button>
+            </div>
+             <!-- ########################### -->
             <div id="transaction_xuat" class="frame">
                 <h1>Transaction Xuất</h1>
                 <button id="export_xuat" class="refresh-btn">Export</button>
