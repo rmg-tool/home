@@ -965,7 +965,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 delivery: user[15] === "x",
                 payment:user[16] === "x",
                 approve_center:user[18] === "x",
-                bom_creation:user[20] === "x"
+                bom_creation:user[20] === "x",
+                pur_pr:user[21] === "x",
+                pur_po:user[22] === "x",
+                pur_po_release:user[23] === "x",
+                pur_pre_payment:user[24] === "x",
+                pur_po_receiving:user[25] === "x",
+                pur_final_payment:user[26] === "x"
 
             };
 
@@ -6506,9 +6512,15 @@ async function displayTableData() {
                 const link = document.createElement("a");
                 link.href = cellData;
                 link.target = "_blank";
-                link.textContent = "Xem tài liệu"; // Hiển thị chữ thay vì link dài
+                link.textContent = "Xem PDF"; // Hiển thị chữ thay vì link dài
                 cell.appendChild(link);
-            } else {
+            } else if (index === 8) { // Nếu là cột Link, tạo thẻ <a>
+                const link = document.createElement("a");
+                link.href = cellData;
+                link.target = "_blank";
+                link.textContent = "Xem Folder"; // Hiển thị chữ thay vì link dài
+                cell.appendChild(link);
+             } else {
                 cell.textContent = cellData;
             }
 
@@ -6592,4 +6604,15 @@ function toggleSubmenu(event, submenuId, element) {
       submenu.style.display = 'block';
       arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
     }
+}
+
+//* PURCHASE //
+
+async function showModal_pr() {
+    document.getElementById('pr-modal').classList.add('show');
+    // await Promise.all([get_crm_need_to_create_bom(), load_onhand(), load_mml()]);
+}
+
+function hideModal_pr() {
+    document.getElementById('pr-modal').classList.remove('show');
 }
