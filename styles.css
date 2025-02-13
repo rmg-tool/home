@@ -3252,3 +3252,117 @@ body {
 #others_cost {
     text-align: center;
 }
+
+
+/* PURCHASE MGMT */
+
+#pur_pr {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 100%; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_pr .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+#pur_pr label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+#pur_pr #sku_name_nhap,#sku_id_nhap {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_pr #sku_id_nhap {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_pr input[type="text"],
+#pur_pr input[type="number"],
+#pur_pr input[type="date"],
+#pur_pr select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_pr input[type="text"]:focus,
+#pur_pr input[type="number"]:focus,
+#pur_pr input[type="date"]:focus,
+#pur_pr select:focus {
+    border-color: #11998e;
+}
+
+#pur_pr select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_pr input[type="number"]::-webkit-inner-spin-button,
+#pur_pr input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_pr .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_pr .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#button_group_nhap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_pr .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_pr .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+.pr_frame_1 {
+    width: 600px;
+}
