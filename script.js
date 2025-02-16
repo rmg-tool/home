@@ -6311,6 +6311,8 @@ async function send_bom_create() {
             clearModalContent();
             hideModal_bom();
             hideModal_bom_draft()
+            get_bom_scorecard();
+            displayTableData()
             
     
         } catch (error) {
@@ -6319,7 +6321,7 @@ async function send_bom_create() {
     }
     // Call the function to send data
     sendDataToGoogleSheets();
-    get_bom_scorecard();
+    
     
 }
 async function send_bom_draft() {
