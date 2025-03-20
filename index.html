@@ -110,6 +110,20 @@
 
                 <li onclick="showFrame('bom_creation')"> <i class="fa-solid fa-code-pull-request"></i> BOM Creation</li>
                 <li onclick="showFrame('approve_center')"> <i class="fa-solid fa-check"></i> Approval Center</li>
+                <!-- <li onclick="toggleSubmenu(event, 'approval_list', this)">
+
+                    <i class="fa-solid fa-check"></i>
+                        Approval Center
+                        <i class="fa-solid fa-chevron-down arrow"></i>
+        
+                    <ul class="submenu" id="approval_list">
+                        <li onclick="showFrame('crm')">BOM</li>
+                        <li onclick="showFrame('survey')">QUOTATION</li>
+                        <li onclick="showFrame('design')">PR</li>
+                        <li onclick="showFrame('quotation')">PO</li>
+                    </ul>
+                    
+                </li> -->
                 <li onclick="toggleSubmenu(event, 'export_list', this)">
     
                     <i class="fa-solid fa-download"></i>
@@ -132,7 +146,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.2.17.557</h4>
+                <h4>Version 3.20.12.4</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -885,53 +899,6 @@
 
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 25px;" onclick="showModal_bom()">Tạo BOM mới</button>
                 <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px; margin-left: 15px;" onclick="showModal_bom_draft()">Load BOM tạm</button>
-                <!-- <div style="display: none;">
-                    <p>________________________________________________________________________________________________</p>
-                    <input style="width: 600px;" type="text" id="input_bom_to_export"  placeholder="Nhập BOM#"/>
-                    <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 20px; background-color: green; margin-left: 15px;" onclick="get_bom_link()">Get Link</button>
-
-                    <div style="margin-top: 40px;" id="bom_link_frame">
-                        <div class="bom_link">
-                            <label>Ngày tạo:</label>
-                            <label id="bom_create_date"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>CRM#:</label>
-                            <label id="crm_id_link"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>BOM#:</label>
-                            <label id="bom_id_link"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>Tên BOM:</label>
-                            <label id="bom_name_link"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>Khách hàng:</label>
-                            <label id="bom_customer"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>Chi nhánh:</label>
-                            <label id="bom_wh"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>Người tạo:</label>
-                            <label id="bom_operator"></label>
-                        </div>
-
-                        <div class="bom_link">
-                            <label>Link PDF:</label>
-                            <a id="bom_link_pdf" href="#" target="_blank"></a>
-                        </div>
-                    </div>
-                </div> -->
 
                 <h2 style="margin-top: 20px; margin-bottom: 10px;">Lọc BOM đã tạo</h2>
                 <!-- Bộ lọc -->
@@ -1410,6 +1377,108 @@
                 
                 <div id="modalBackdrop3" style="display: none;" onclick="closeModal3()"></div>
                 
+                <!-- PR Approve -->
+                <table id="dataTable_pr" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PR#</th>
+                            <th>Requestor</th>
+                            <th>Approver</th>
+                            <th>Department</th>
+                            <th>Warehouse</th>
+                            <th>Purpose</th>
+                            <th class="hidden">Spreadsheet_id</th> <!-- Cột bị ẩn -->
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+                
+                <div id="modal_pr" class="modal_pr">
+                    <div class="modal-content_pr">
+                        <span class="close_pr" onclick="closeModal_pr()">&times;</span>
+                        <h2>Chi tiết PR</h2>
+                        <div id="scroll_content"">
+                            <div id="modalContent_pr">Đang tải...</div>
+                        </div>
+
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button class="action-btn approve-btn-pr">Approve</button>
+                            <button class="action-btn reject-btn-pr">Reject</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PO Approve -->
+                <table id="dataTable_po" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PO#</th>
+                            <th>PR#</th>
+                            <th>Vendor</th>
+                            <th>PO Creator</th>
+                            <th>PR Creator</th>
+                            <th>PO Approver</th>
+                            <th class="hidden">PDF</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Files</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Status</th>
+                            <th>Tổng giá trị</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+
+                <div id="modal_po" class="modal_pr2" style="display: none;">
+                    <div class="modal-content_pr2">
+                        <span class="close_pr" onclick="closeModal_po()">&times;</span>
+                        <h2>Chi tiết PO</h2>
+                        <div id="scroll_content">
+                            <label>Date</label>
+                            <label id="po_date"></label><br>
+                            <label>Time</label>
+                            <label id="po_time"></label><br>
+                            <label>PO#</label>
+                            <label id="po_number"></label><br>
+                            <label>PR#</label>
+                            <label id="po_pr"></label><br>
+                            <label>Vendor</label>
+                            <label id="po_vendor"></label><br>
+                            <label>PO Creator</label>
+                            <label id="po_creator"></label><br>
+                            <label>PR Creator</label>
+                            <label id="po_pr_creator"></label><br>
+                            <label>PO Approver</label>
+                            <label id="po_approver"></label><br>
+                            <label>Tổng giá trị PO</label>
+                            <label id="po_total"></label><br>
+                
+                            <button id="po_pdf_view">Xem PDF</button>
+                            <button id="po_fils_view">Xem Files Upload</button>
+                        </div>
+                
+                        <!-- Lý do Reject (Ẩn ban đầu) -->
+                        <div id="reject_reason_section" style="display: none; margin-top: 15px;">
+                            <label for="reject_reason">Lý do Reject:</label>
+                            <textarea id="reject_reason" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                        </div>
+                
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button id="po_approve">Approve</button>
+                            <button id="po_reject">Reject</button>
+                        </div>
+                    </div>
+                </div>
+                
+                
                 
             </div>
             <div id="onhand" class="frame">
@@ -1460,21 +1529,744 @@
                             </div>
 
                             <div class="form-row">
-                                <label for="purpose_pr">Chọn chi nhánh</label>
+                                <label for="purpose_pr">Mục đích mua hàng</label>
                                 <select id="purpose_pr">
-                                    <!-- Options sẽ được thêm qua JavaScript -->
+                                    <option value="">-- Chọn mục đích --</option>
+                                    <option value="Thương mại">Thương mại</option>
+                                    <option value="Sản xuất">Sản xuất</option>
+                                    <option value="Dùng cho xưởng">Dùng cho xưởng</option>
+                                    <option value="Uyên Long">Uyên Long</option>
+                                    <option value="Stock kho TM/SX">Stock kho TM/SX</option>
+                                    <option value="Dịch vụ">Dịch vụ</option>
                                 </select>
                             </div>
                         </div>
 
-                        <button class="show-modal-button" onclick="showAddItemModal()">Thêm vật tư</button>
+                        <div class="pr_frame_2">
+                            <button class="show-modal-button" onclick="openModal_pr_add_item()">Thêm vật tư</button>
+                            <div style="overflow-x: auto;"> <!-- Thêm overflow-x để có cuộn ngang -->
+                                <table class="bom-table" id="pr-item-table">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Loại vật tư</th>
+                                            <th>Tên vật tư</th>
+                                            <th>Mã vật tư</th>
+                                            <th>Thông số kỹ thuật</th>
+                                            <th>Đơn vị</th>
+                                            <th>Tên khách hàng</th>
+                                            <th>Số PO của khách hàng</th>
+                                            <th>Ngày cần có vật tư</th>
+                                            <th>Đơn giá / đơn vị dự kiến (VND)</th>
+                                            <th>Số lượng cần</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Danh sách File</th>
+                                            <th>File Data</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                            <div id="pr_modal_add_item" class="modal">
+
+                                <div class="second_modal">
+                                    <div id="secondaryModal_pr_type" class="modal">
+                                        <div class="modal-content" style="width: 100%;">
+                                            <span class="close-btn" onclick="closeModal()">x</span>
+                                            <h3>Chọn vật tư</h3>
+                                            <div id="modalOptions_pr_type"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bom-modal-content">
+                                    <h2 class="bom-title">Nhập Thông Tin Vật Tư</h2>
+                                    <div class="bom-input-group">
+                                        <label>Loại vật tư:</label>
+                                        <input type="text" id="pr-type">
+                                        <div id="dropdown_pr_type" class="dropdown"></div>
+                                    </div>
+                                    <div class="bom-input-group"><label>Thông số kỹ thuật:</label> <input type="text" id="pr_specs"></div>
+                                    
+                                    <div class="bom-input-group">
+                                        <label>Tên khách hàng:</label>
+                                        <input type="text" id="pr-vendor">
+                                        <div id="dropdown_pr_vendor" class="dropdown"></div>
+                                    </div>
+                                    <div class="bom-input-group"><label>Số PO của khách hàng:</label> <input type="text" id="pr_po"></div>
+                                    <div class="bom-input-group"><label>Ngày cần có vật tư:</label> <input type="date" id="pr_date"></div>
+                                    <div class="bom-input-group"><label>Đơn giá / đơn vị dự kiến (VND):</label> <input type="number" id="pr_price"></div>
+                                    <div class="bom-input-group"><label>Số lượng cần:</label> <input type="number" id="pr_quantity"></div>
+
+                                    <div style="text-align: center; margin-top: 30px;">
+                                        <input type="file" name="file" id="fileUpload_pr" onchange="LoadFile_pr(event)" required multiple><br><br>
+                        
+                                        <input type="hidden" id="fileData_pr" name="fileData_pr">
+                                        <input type="hidden" id="mimeType_pr" name="mimeType_pr">
+                                        <input type="hidden" id="fileName_pr" name="fileName_pr">
+                                    </div>
+                                    <label style="margin-bottom: 20px;">Lưu ý: Đính kèm tối đa 3 files và mỗi file không quá 10MB</label><br>
+
+                                    <div class="bom-buttons">
+                                        <button class="btn btn-confirm" onclick="addItem_pr()">Xác nhận</button>
+                                        <button class="btn btn-close" onclick="closeModal_pr_add_item()">Đóng</button>
+                                    </div>
+
+                                    <div class="bom-input-group"><label>Tên vật tư:</label> <input type="text" id="pr_name"></div>
+                                    <div class="bom-input-group"><label>Mã vật tư:</label> <input type="text" id="pr_code"></div>
+                                    <div class="bom-input-group"><label>Đơn vị:</label> <input type="text" id="pr_unit"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bom-buttons">
+                            <button style="background-color: black;" class="bom-close" onclick="hideModal_pr()">Đóng</button>
+                            <button class="bom-complete" onclick="send_pr()">Gửi yêu cầu duyệt mua hàng</button>
+                        </div>
 
                     </div>
+
                 </div>
 
                 <button style="padding: 10px 30px; font-size: 20px; font-weight: bold; margin-top: 20px; " onclick="showModal_pr()">Create New PR</button>
             </div>
              <!-- ########################### -->
+
+             <!-- Purchase Order> -->
+            <div id="pur_po" class="frame">
+                <h1>Purchase Order</h1>
+
+                <table id="poTable" border="1">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PR#</th>
+                            <th>Requestor</th>
+                            <th>Approver</th>
+                            <th>Department</th>
+                            <th>Warehouse</th>
+                            <th>Purpose</th>
+                            <th>Spreadsheet ID</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được chèn vào đây -->
+                    </tbody>
+                </table>
+
+                <!-- Modal when click into PR# -->
+                <div class="bom-modal" id="po-modal">
+                    <div class="bom-modal-content">
+                        <h2 class="bom-title">PURCHASING ORDER</h2>
+                        <div class="bom-frame-title">
+                            Thông tin PR
+                        </div>
+                        <div class="pr_frame_1">
+                            <div class="form-row">
+                                <label>PR#</label>
+                                <label id="po_po_label" style="width: 500px; margin-left: 35px;"></label>  
+                            </div>
+
+                            <div class="form-row">
+                                <label>Chi nhánh</label>
+                                <label id="po_wh_label"></label>  
+                            </div>
+
+                            <div class="form-row">
+                                <label>Ngày giao hàng dự kiến</label>
+                                <input type="date" id="po_expect_delivery_date">
+                            </div>
+
+                            <div class="form-row">
+                                <label>Ngày thanh toán</label>
+                                <input type="date" id="po_payment_date">
+                            </div>
+
+                            <div class="form-row">
+                                <label>Người tạo PR</label>
+                                <label id="po_pr_operator_label" style="width: 500px; margin-left: 35px;"></label>  
+                            </div>
+
+                            <div class="form-row">
+                                <label>Sheet ID</label>
+                                <label id="po_sheet_id_label" style="width: 500px; margin-left: 35px;"></label>  
+                            </div>
+                        </div>
+
+                        <div class="bom-frame-title">
+                            Supplier
+                        </div>
+                        <div class="pr_frame_2">
+                            <div class="bom-input-group">
+                                <label>Company</label>
+                                <input id="po_company_input" type="text">
+                                <div id="dropdown_po_vendor" class="dropdown"></div>
+                            </div>
+                            <div class="bom-row">
+                                <div class="bom-left">
+                                    <div class="form-row">
+                                        <label>Address</label>
+                                        <input id="po_address_input" type="text">
+                                    </div>
+                                
+                                    <div class="form-row">
+                                        <label>Tax Code</label>
+                                        <input id="po_tax_input" type="text">
+                                    </div>
+                                
+                                    <div class="form-row">
+                                        <label>Bank Address</label>
+                                        <input id="po_bank_add_input" type="text">
+                                    </div>
+                                </div>
+                                <div class="bom-right">
+                                    <div class="form-row">
+                                        <label>Bank Account</label>
+                                        <input id="po_bank_acc_input" type="text">
+                                    </div>
+                                
+                                    <div class="form-row">
+                                        <label>Bank Name</label>
+                                        <input id="po_bank_name_input" type="text">
+                                    </div>
+                                
+                                    <div class="form-row">
+                                        <label>Swift Code</label>
+                                        <input id="po_swift_input" type="text">
+                                    </div>
+                                </div>  
+                            </div>
+                        </div>
+
+                        <div class="bom-frame-title">
+                            Chi tiết vật tư
+                        </div>
+                        <div class="pr_frame_3">
+                            <div style="overflow: auto;">
+                                <table id="po_materialTable" class="bom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Loại vật tư</th>
+                                            <th>Tên vật tư</th>
+                                            <th>Tên vật tư (tiếng việt)</th>
+                                            <th>Mã vật tư</th>
+                                            <th>Đơn vị</th>
+                                            <th>Số PO của khách hàng</th>
+                                            <th>Số tiền từ PR</th>
+                                            <th>SL cần từ PR</th>
+                                            <th>SL cần mua</th>
+                                            <th>Đơn giá</th>
+                                            <th>Thành tiền</th>
+                                            <th>% Thuế GTGT</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dữ liệu sẽ được chèn vào đây -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <label style="font-size: 30px; font-weight: bold;" id="po_total_price">Tổng giá trị: -</label>
+                        </div>
+
+                        <div class="bom-frame-title">
+                            Thông tin giao hàng
+                        </div>
+                        <div class="pr_frame_4">
+                            <div class="form-row">
+                                <label>Delivery Address</label>
+                                <input id="po_delivery_address_input" type="text" value="RMG TECHNOLOGIES VIETNAM CO., LTD">
+                            </div>
+                        </div>
+                        <div class="bom-row">
+                            <div class="bom-left">
+                                <div class="form-row">
+                                    <label>Delivery To</label>
+                                    <input id="po_delivery_to_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Attts</label>
+                                    <input id="po_atts_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Phone Number</label>
+                                    <input id="po_phone_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Ship via</label>
+                                    <input id="po_ship_via_input" type="text">
+                                </div>
+                            </div>
+
+                            <div class="bom-right">
+                                <div class="form-row">
+                                    <label>Delivery Terms</label>
+                                    <input id="po_delivery_terms_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Payment Terms</label>
+                                    <input id="po_payment_terms_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Lead time</label>
+                                    <input id="po_lead_time_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Warranty</label>
+                                    <input id="po_warranty_input" type="text">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Shipping Value</label>
+                            <input id="po_ship_value_input" type="text">
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_po" onchange="LoadFile_po(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_po" name="fileData_po">
+                            <input type="hidden" id="mimeType_po" name="mimeType_po">
+                            <input type="hidden" id="fileName_po" name="fileName_po">
+                        </div>
+                            
+                        <div class="bom-buttons">
+                            <button class="bom-complete" onclick="sendPO()">Gửi yêu cầu duyệt PO</button>
+                            <button class="bom-close" onclick="hideModal_po()">Đóng</button>
+                        </div>
+                    </div>  
+
+                </div>
+            </div>
+
+            <!-- ########################### -->
+
+            <!-- PO RELEASE> -->
+            <div id="pur_po_release" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PO RELEASE</h1>
+
+                        <div class="form-row">
+                            <label>PR#</label>
+                            <input id="pr_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>PO#</label>
+                            <input id="po_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PO</label>
+                            <input id="po_creator_po_release" type="text">
+                        </div>
+                        
+
+                        <div class="form-row">
+                            <label>Nhà cung cấp</label>
+                            <input id="vendor_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tổng giá trị PO</label>
+                            <input id="total_value_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí cần thanh toán trước</label>
+                            <input id="pre_pay_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí còn lại sẽ thanh toán</label>
+                            <input id="remain_pay_po_release" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày nhận hàng dự kiến</label>
+                            <input id="expect_recv_date_po_release" type="date">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <textarea id="content_po_release"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_po_release" onchange="LoadFile_po_release(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_po_release" name="fileData_po_release">
+                            <input type="hidden" id="mimeType_po_release" name="mimeType_po_release">
+                            <input type="hidden" id="fileName_po_release" name="fileName_po_release">
+                        </div>
+            
+                        <div id="button_group_po_release">
+                            <button id="submitButton_po_release" class="submit-btn">RA ĐƠN HÀNG</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_po_release" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <table id="po_release_table">
+                                <thead>
+                                    <tr>
+                                        <th>PO#</th>
+                                        <th>PR#</th>
+                                        <th>Vendor</th>
+                                        <th>Người tạo PO</th>
+                                        <th>Người tạo PR</th>
+                                        <th>Ngày tạo PO</th>
+                                        <th>Tổng giá trị PO</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+            <!-- ############ -->
+
+            <!-- PO Pre-payment -->
+            <div id="pur_pre_payment" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PO PRE-PAYMENT</h1>
+
+                        <div class="form-row">
+                            <label>PR#</label>
+                            <input id="pr_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>PO#</label>
+                            <input id="po_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PO</label>
+                            <input id="po_creator_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PR</label>
+                            <input id="pr_creator_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tổng giá trị PO</label>
+                            <input id="total_value_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí cần thanh toán trước</label>
+                            <input id="pre_pay_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí còn lại sẽ thanh toán</label>
+                            <input id="remain_pay_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nhà cung cấp</label>
+                            <input id="vendor_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Địa chỉ</label>
+                            <input id="vendor_addr_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số điện thoại</label>
+                            <input id="vendor_phone_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tên ngân hàng</label>
+                            <input id="vendor_bank_name_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số tài khoản</label>
+                            <input id="vendor_bank_acc_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày thanh toán</label>
+                            <input id="payment_date_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày nhận hàng dự kiến</label>
+                            <input id="expect_recv_date_pre_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nội dung PO-RELEASE</label>
+                            <input id="content_release_pre_payment" type="text">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <textarea id="content_pre_payment"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_pre_payment" onchange="LoadFile_pre_payment(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_pre_payment" name="fileData_pre_payment">
+                            <input type="hidden" id="mimeType_pre_payment" name="mimeType_pre_payment">
+                            <input type="hidden" id="fileName_pre_payment" name="fileName_pre_payment">
+                        </div>
+            
+                        <div id="button_group_pre_payment">
+                            <button id="submitButton_pre_payment" class="submit-btn">ĐÃ THANH TOÁN TRƯỚC</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_pre_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <table id="pre_payment_table">
+                                <thead>
+                                    <tr>
+                                        <th>PO#</th>
+                                        <th>PR#</th>
+                                        <th>Vendor</th>
+                                        <th>Tổng giá trị PO</th>
+                                        <th>Thanh toán trước</th>
+                                        <th>Người tạo PO</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+            <!-- ############ -->
+
+            <!-- PO RECEIVING -->
+            <div id="pur_po_receiving" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PO RECEIVING</h1>
+
+                        <div class="form-row">
+                            <label>PR#</label>
+                            <input id="pr_po_receiving" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>PO#</label>
+                            <input id="po_po_receiving" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tổng giá trị PO</label>
+                            <input id="total_value_po_receiving" type="text">
+                        </div>
+                    
+                        <div class="form-row">
+                            <label>Nội dung PO PRE-PAYMENT</label>
+                            <input id="content_pre_pay_po_receiving" type="text">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <textarea id="content_po_receiving"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_po_receiving" onchange="LoadFile_po_receiving(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_po_receiving" name="fileData_po_receiving">
+                            <input type="hidden" id="mimeType_po_receiving" name="mimeType_po_receiving">
+                            <input type="hidden" id="fileName_po_receiving" name="fileName_po_receiving">
+                        </div>
+            
+                        <div id="button_group_po_receiving">
+                            <button id="submitButton_po_receiving" class="submit-btn">ĐÃ NHẬN HÀNG</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_po_receiving" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <table id="po_receiving_table">
+                                <thead>
+                                    <tr>
+                                        <th>PO#</th>
+                                        <th>PR#</th>
+                                        <th>Vendor</th>
+                                        <th>Người tạo PO</th>
+                                        <th>Người tạo PR</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+            <!-- ############ -->
+
+            <!-- PO Final Payment -->
+            <div id="pur_final_payment" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PO PRE-PAYMENT</h1>
+
+                        <div class="form-row">
+                            <label>PR#</label>
+                            <input id="pr_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>PO#</label>
+                            <input id="po_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PO</label>
+                            <input id="po_creator_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PR</label>
+                            <input id="pr_creator_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tổng giá trị PO</label>
+                            <input id="total_value_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí cần thanh toán trước</label>
+                            <input id="pre_pay_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí còn lại sẽ thanh toán</label>
+                            <input id="remain_pay_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nhà cung cấp</label>
+                            <input id="vendor_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Địa chỉ</label>
+                            <input id="vendor_addr_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số điện thoại</label>
+                            <input id="vendor_phone_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tên ngân hàng</label>
+                            <input id="vendor_bank_name_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số tài khoản</label>
+                            <input id="vendor_bank_acc_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày thanh toán</label>
+                            <input id="payment_date_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày nhận hàng dự kiến</label>
+                            <input id="expect_recv_date_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nội dung PO-RECEIVING</label>
+                            <input id="content_release_final_payment" type="text">
+                        </div>
+
+                        <div class="form-row">
+                            <label>Xem Files đính kèm</label>
+                            <div id="files_final_payment"></div> <!-- Chuyển từ button sang div -->
+                        </div>
+                        
+                        
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <textarea id="content_final_payment"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_final_payment" onchange="LoadFile_final_payment(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_final_payment" name="fileData_final_payment">
+                            <input type="hidden" id="mimeType_final_payment" name="mimeType_final_payment">
+                            <input type="hidden" id="fileName_final_payment" name="fileName_final_payment">
+                        </div>
+            
+                        <div id="button_group_final_payment">
+                            <button id="submitButton_final_payment" class="submit-btn">ĐÃ THANH TOÁN TRƯỚC</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_final_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                            <table id="final_payment_table">
+                                <thead>
+                                    <tr>
+                                        <th>PO#</th>
+                                        <th>PR#</th>
+                                        <th>Vendor</th>
+                                        <th>Ngày thanh toán</th>
+                                        <th>Số tiền còn lại</th>
+                                        <th>Người tạo PO</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+            <!-- ############ -->
+
             <div id="transaction_xuat" class="frame">
                 <h1>Transaction Xuất</h1>
                 <button id="export_xuat" class="refresh-btn">Export</button>
