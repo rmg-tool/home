@@ -732,6 +732,17 @@ h1 {
     transition: background-color 0.2s !important;
 }
 
+textarea {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
 .tabulator .tabulator-paginator button:hover {
     background-color: #d1d5db !important;
 }
@@ -3125,6 +3136,14 @@ button:hover {
     background-color: #e0a800;
 }
 
+.bom-buttons button.bom-complete {
+    background-color: darkgreen; /* Yellow for save */
+}
+
+.bom-buttons button.bom-complete:hover {
+    background-color: #3d9c0e;
+}
+
 /* Total Frame */
 .bom-total-frame {
     background-color: #fff3cd; /* Light Yellow */
@@ -3366,3 +3385,986 @@ body {
 .pr_frame_1 {
     width: 600px;
 }
+
+/* .pr_frame_2 {
+    width: 600px;
+} */
+.details {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    display: none;
+}
+
+.modal_pr {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    min-width: 100px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content_pr {
+    background-color: white;
+    margin: 10% auto;
+    max-height: 700px;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+#scroll_content {
+    overflow-x: auto;  /* Cuộn ngang */
+    overflow-y: auto;  /* Cuộn dọc */
+    max-height: 500px;
+}
+
+.close_pr {
+    color: red;
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.selected-row {
+    background-color: #f4f4f4 !important;
+}
+
+
+
+/* PURCHASE PO */
+
+#pur_po {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 100%; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_po .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+#pur_po label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+#pur_po #sku_name_nhap,#sku_id_nhap {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_po #sku_id_nhap {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_po input[type="text"],
+#pur_po input[type="number"],
+#pur_po input[type="date"],
+#pur_po select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_po input[type="text"]:focus,
+#pur_po input[type="number"]:focus,
+#pur_po input[type="date"]:focus,
+#pur_po select:focus {
+    border-color: #11998e;
+}
+
+#pur_po select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_po input[type="number"]::-webkit-inner-spin-button,
+#pur_po input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_po .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_po .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#button_group_nhap {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_po .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_po .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+.details {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+    display: none;
+}
+
+.modal_po {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    min-width: 100px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content_po {
+    background-color: white;
+    margin: 10% auto;
+    max-height: 700px;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+.close_po {
+    color: red;
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.pr_frame_2 {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f0f8ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+#dropdown_po_vendor {
+    width: 100%;
+}
+
+/* Ẩn modal mặc định */
+.modal_pr2 {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền tối mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Nội dung modal */
+.modal-content_pr2 {
+    background-color: white;
+    padding: 20px;
+    width: 50%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+    position: relative;
+}
+
+/* Hiệu ứng mở modal */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Nút đóng modal */
+/* .close_pr {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close_pr:hover {
+    color: red;
+} */
+
+/* Tiêu đề modal */
+.modal-content_pr2 h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+/* Nội dung cuộn nếu quá dài */
+/* #scroll_content {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+} */
+
+/* Kiểu label */
+label {
+    font-weight: bold;
+    display: inline-block;
+    /* width: 120px; */
+    margin-bottom: 5px;
+}
+
+label + label {
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+/* Căn giữa các nút */
+/* .modal-content_pr2 div {
+    text-align: center;
+} */
+
+/* Nút hành động */
+.action-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.approve-btn-pr {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.approve-btn-pr:hover {
+    background-color: #45a049;
+}
+
+.reject-btn-pr {
+    background-color: #f44336;
+    color: white;
+}
+
+.reject-btn-pr:hover {
+    background-color: #d32f2f;
+}
+
+/* Nút xem file */
+#po_pdf_view,
+#po_fils_view {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+#po_pdf_view {
+    background-color: #007bff;
+    color: white;
+}
+
+#po_pdf_view:hover {
+    background-color: #0056b3;
+}
+
+#po_fils_view {
+    background-color: #ff9800;
+    color: white;
+}
+
+#po_fils_view:hover {
+    background-color: #e68900;
+}
+
+/* PO RELEASE */
+
+#pur_po_release {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1500px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_po_release .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+
+#pur_po_release label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+
+#pur_po_release input[type="text"],
+#pur_po_release input[type="number"],
+#pur_po_release input[type="date"],
+#pur_po_release select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_po_release input[type="text"]:focus,
+#pur_po_release input[type="number"]:focus,
+#pur_po_release input[type="date"]:focus,
+#pur_po_release select:focus {
+    border-color: #11998e;
+}
+
+#pur_po_release select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_po_release input[type="number"]::-webkit-inner-spin-button,
+#pur_po_release input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_po_release .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_po_release .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_po_release .cancel-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: black;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#button_group_pur_po_release {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_po_release .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_po_release .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_po_releaseProductName {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#found_pur_po_release {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+#found_pur_po_release input {
+    width: 100%;
+}
+
+#pur_po_release #operator_name_pur_po_release {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_po_release #customer_id_pur_po_release {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#table_approve_pur_po_release {
+    margin-top: 100px;
+}
+
+#pur_po_release #pur_po_releaseContent {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+/* PO PRE-Payment */
+
+#pur_pre_payment {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1500px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_pre_payment .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+
+#pur_pre_payment label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+
+#pur_pre_payment input[type="text"],
+#pur_pre_payment input[type="number"],
+#pur_pre_payment input[type="date"],
+#pur_pre_payment select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_pre_payment input[type="text"]:focus,
+#pur_pre_payment input[type="number"]:focus,
+#pur_pre_payment input[type="date"]:focus,
+#pur_pre_payment select:focus {
+    border-color: #11998e;
+}
+
+#pur_pre_payment select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_pre_payment input[type="number"]::-webkit-inner-spin-button,
+#pur_pre_payment input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_pre_payment .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_pre_payment .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_pre_payment .cancel-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: black;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#button_group_pur_pre_payment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_pre_payment .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_pre_payment .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_pre_paymentProductName {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#found_pur_pre_payment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+#found_pur_pre_payment input {
+    width: 100%;
+}
+
+#pur_pre_payment #operator_name_pur_pre_payment {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_pre_payment #customer_id_pur_pre_payment {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#table_approve_pur_pre_payment {
+    margin-top: 100px;
+}
+
+#pur_pre_payment #pur_pre_paymentContent {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+/* PO RECEIVING */
+
+#pur_po_receiving {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1500px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_po_receiving .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+
+#pur_po_receiving label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+
+#pur_po_receiving input[type="text"],
+#pur_po_receiving input[type="number"],
+#pur_po_receiving input[type="date"],
+#pur_po_receiving select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_po_receiving input[type="text"]:focus,
+#pur_po_receiving input[type="number"]:focus,
+#pur_po_receiving input[type="date"]:focus,
+#pur_po_receiving select:focus {
+    border-color: #11998e;
+}
+
+#pur_po_receiving select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_po_receiving input[type="number"]::-webkit-inner-spin-button,
+#pur_po_receiving input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_po_receiving .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_po_receiving .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_po_receiving .cancel-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: black;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#button_group_pur_po_receiving {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_po_receiving .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_po_receiving .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_po_receivingProductName {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#found_pur_po_receiving {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+#found_pur_po_receiving input {
+    width: 100%;
+}
+
+#pur_po_receiving #operator_name_pur_po_receiving {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_po_receiving #customer_id_pur_po_receiving {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#table_approve_pur_po_receiving {
+    margin-top: 100px;
+}
+
+#pur_po_receiving #pur_po_receivingContent {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+/* PO Final Payment */
+
+
+#pur_final_payment {
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 1500px; /* Tăng chiều rộng của form */
+    margin: 0 auto;
+}
+
+#pur_final_payment .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+}
+
+
+#pur_final_payment label {
+    font-size: 18px; /* Tăng kích thước font của label */
+    color: #333;
+    font-weight: bold;
+    width: 180px; /* Đặt kích thước rộng hơn cho label */
+}
+
+
+#pur_final_payment input[type="text"],
+#pur_final_payment input[type="number"],
+#pur_final_payment input[type="date"],
+#pur_final_payment select {
+    flex: 1;
+    padding: 15px; /* Tăng padding cho input */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 18px; /* Tăng kích thước font của input */
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#pur_final_payment input[type="text"]:focus,
+#pur_final_payment input[type="number"]:focus,
+#pur_final_payment input[type="date"]:focus,
+#pur_final_payment select:focus {
+    border-color: #11998e;
+}
+
+#pur_final_payment select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #f9f9f9;
+}
+
+#pur_final_payment input[type="number"]::-webkit-inner-spin-button,
+#pur_final_payment input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#pur_final_payment .submit-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: #11998e;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_final_payment .reset-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: red;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#pur_final_payment .cancel-btn {
+    width: 100%;
+    padding: 15px; /* Tăng padding cho button */
+    background-color: black;
+    color: #ffffff;
+    font-size: 20px; /* Tăng kích thước font của button */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#button_group_pur_final_payment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Tăng khoảng cách giữa các dòng */
+    gap: 5px;
+}
+
+#pur_final_payment .submit-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_final_payment .reset-btn:hover {
+    background-color: #0b8263;
+}
+
+#pur_final_paymentProductName {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#found_pur_final_payment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+
+#found_pur_final_payment input {
+    width: 100%;
+}
+
+#pur_final_payment #operator_name_pur_final_payment {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#pur_final_payment #customer_id_pur_final_payment {
+    width: 500px;
+    margin-left: 60px;
+}
+
+#table_approve_pur_final_payment {
+    margin-top: 100px;
+}
+
+#pur_final_payment #pur_final_paymentContent {
+    width: 60%;
+    height: 100px;
+    font-size: 16px;
+    padding: 5px;
+}
+
