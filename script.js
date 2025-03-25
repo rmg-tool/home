@@ -6926,7 +6926,7 @@ document.getElementById("pr-vendor").addEventListener("input", debounce(handleMa
 
 function handleMaterialTypeInput_pr_vendor(event) {
     const searchTerm = removeAccents(event.target.value).toUpperCase(); // Chuyển đổi thành uppercase không dấu
-    const results = vendor_data.filter(item => removeAccents(item[0]).toUpperCase().includes(searchTerm))// && item[0] === wh_value); // Tìm kiếm không dấu
+    const results = customer_data.filter(item => removeAccents(item[0]).toUpperCase().includes(searchTerm))// && item[0] === wh_value); // Tìm kiếm không dấu
     // Hiển thị kết quả tìm kiếm từ cột vendor_data[1]
     if (results.length > 0) {
         showSearchResults_pr_vendor(results.map(item2 => item2[0]), results); // Truyền danh sách tên vật tư và dữ liệu gốc
@@ -7650,21 +7650,37 @@ async function click_pr_to_po(row) {
 
                     // Format số khi nhập liệu
                     if ([9, 10].includes(index)) {
+                        // Xử lý khi người dùng đang gõ
                         input.addEventListener("input", function () {
-                            let value = input.value.replace(/[^0-9]/g, ""); // Chỉ giữ số
-                            if (value) {
-                                input.value = parseInt(value, 10).toLocaleString();
+                            let raw = input.value.replace(/[^0-9.]/g, "");
+                            let parts = raw.split(".");
+                    
+                            if (parts.length > 2) {
+                                raw = parts[0] + "." + parts.slice(1).join("");
                             }
+                    
+                            input.value = raw; // Không định dạng tại đây
                             updateCalculatedFields(newRow);
                         });
-                    }
+                    
+                        // Định dạng khi người dùng rời ô input
+                        input.addEventListener("blur", function () {
+                            let number = parseFloat(input.value.replace(/,/g, ""));
+                            if (!isNaN(number)) {
+                                input.value = number.toLocaleString("en-US", {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2
+                                });
+                            }
+                        });
+                    }                    
 
                     newCell.appendChild(input);
                 } else if (index === 12) {
                     // Tạo dropdown cho % Thuế GTGT
                     let select = document.createElement("select");
                     select.style.width = "150px";
-                    ["8%", "10%"].forEach(optionValue => {
+                    ["0%","8%", "10%"].forEach(optionValue => {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
@@ -7718,19 +7734,28 @@ function updateCalculatedFields(row) {
     let thueSelect = row.children[12].querySelector("select"); // % Thuế GTGT
     let tongTienCell = row.children[13];  // Tổng tiền
 
-    let slCanMua = parseInt(slCanMuaInput?.value.replace(/,/g, ""), 10) || 0;
-    let donGia = parseInt(donGiaInput?.value.replace(/,/g, ""), 10) || 0;
-    let phanTramThue = parseInt(thueSelect?.value, 10) || 0;
+    // Chuyển đổi về số thập phân
+    let slCanMua = parseFloat(slCanMuaInput?.value.replace(/,/g, "")) || 0;
+    let donGia = parseFloat(donGiaInput?.value.replace(/,/g, "")) || 0;
+    let phanTramThue = parseFloat(thueSelect?.value) || 0;
 
     // Tính toán Thành tiền
     let thanhTien = slCanMua * donGia;
-    thanhTienCell.textContent = thanhTien.toLocaleString();
+    thanhTienCell.textContent = thanhTien.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
     // Tính toán Tổng tiền
     let tongTien = thanhTien + (thanhTien * phanTramThue / 100);
-    tongTienCell.textContent = tongTien.toLocaleString();
-    calculateTotalPricePO()
+    tongTienCell.textContent = tongTien.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    calculateTotalPricePO();
 }
+
 // Search Company
 
 // Gán sự kiện input với debounce để giảm số lần tìm kiếm
