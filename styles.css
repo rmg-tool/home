@@ -4368,3 +4368,14 @@ label + label {
     padding: 5px;
 }
 
+#po_delivery_to_input {
+    /* margin-left: 100px; */
+    width: 90%;
+}
+
+input[disabled],
+button[disabled],
+select[disabled],
+textarea[disabled] {
+  cursor: not-allowed;
+}
