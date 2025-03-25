@@ -146,7 +146,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.20.12.4</h4>
+                <h4>Version 3.25.12.4</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -1711,33 +1711,33 @@
                                 <div class="bom-left">
                                     <div class="form-row">
                                         <label>Address</label>
-                                        <input id="po_address_input" type="text">
+                                        <input id="po_address_input" type="text" disabled>
                                     </div>
                                 
                                     <div class="form-row">
                                         <label>Tax Code</label>
-                                        <input id="po_tax_input" type="text">
+                                        <input id="po_tax_input" type="text" disabled>
                                     </div>
                                 
                                     <div class="form-row">
                                         <label>Bank Address</label>
-                                        <input id="po_bank_add_input" type="text">
+                                        <input id="po_bank_add_input" type="text" disabled>
                                     </div>
                                 </div>
                                 <div class="bom-right">
                                     <div class="form-row">
                                         <label>Bank Account</label>
-                                        <input id="po_bank_acc_input" type="text">
+                                        <input id="po_bank_acc_input" type="text" disabled>
                                     </div>
                                 
                                     <div class="form-row">
                                         <label>Bank Name</label>
-                                        <input id="po_bank_name_input" type="text">
+                                        <input id="po_bank_name_input" type="text" disabled>
                                     </div>
                                 
                                     <div class="form-row">
                                         <label>Swift Code</label>
-                                        <input id="po_swift_input" type="text">
+                                        <input id="po_swift_input" type="text" disabled>
                                     </div>
                                 </div>  
                             </div>
@@ -1773,7 +1773,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <label style="font-size: 30px; font-weight: bold;" id="po_total_price">Tổng giá trị: -</label>
+                            <label style="font-size: 30px; font-weight: bold; width: 100%;" id="po_total_price">Tổng giá trị: -</label>
                         </div>
 
                         <div class="bom-frame-title">
@@ -1785,13 +1785,34 @@
                                 <input id="po_delivery_address_input" type="text" value="RMG TECHNOLOGIES VIETNAM CO., LTD">
                             </div>
                         </div>
-                        <div class="bom-row">
-                            <div class="bom-left">
-                                <div class="form-row">
-                                    <label>Delivery To</label>
-                                    <input id="po_delivery_to_input" type="text">
-                                </div>
 
+                        <div class="form-row">
+                            <label>Delivery To</label>
+                            <!-- <input id="po_delivery_to_input" type="text"> -->
+                            <select id="po_delivery_to_input">
+                                <option value="267A Nguyễn Xiển, phường Trường Thạnh, Tp. Thủ Đức, Tp.HCM, Việt Nam">
+                                  267A Nguyễn Xiển, phường Trường Thạnh, Tp. Thủ Đức, Tp.HCM, Việt Nam
+                                </option>
+                                <option value="Lô E18, Đường số 10, Cụm Công nghiệp Hải Sơn Đức Hòa Đông, Xã Đức Hòa Đông, Huyện Đức Hòa, Tỉnh Long An, Việt Nam">
+                                  Lô E18, Đường số 10, Cụm Công nghiệp Hải Sơn Đức Hòa Đông, Xã Đức Hòa Đông, Huyện Đức Hòa, Tỉnh Long An, Việt Nam
+                                </option>
+                                <option value="Đường số 2, KCN Quảng Phú, P.Quảng Phú, TP. Quảng Ngãi, Quang Ngãi, Việt Nam">
+                                  Đường số 2, KCN Quảng Phú, P.Quảng Phú, TP. Quảng Ngãi, Quang Ngãi, Việt Nam
+                                </option>
+                                <option value="Đường TS 5, khu công nghiệp Tiên Sơn, Phường Tân Hồng, Thành phố Từ Sơn, Bắc Ninh, Việt Nam">
+                                  Đường TS 5, khu công nghiệp Tiên Sơn, Phường Tân Hồng, Thành phố Từ Sơn, Bắc Ninh, Việt Nam
+                                </option>
+                                <option value="159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam">
+                                  159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam
+                                </option>
+                              </select>
+                              
+                        </div>
+
+                        <div class="bom-row">
+                            
+                            <div class="bom-left">
+                                
                                 <div class="form-row">
                                     <label>Attts</label>
                                     <input id="po_atts_input" type="text">
@@ -1805,6 +1826,11 @@
                                 <div class="form-row">
                                     <label>Ship via</label>
                                     <input id="po_ship_via_input" type="text">
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Shipping Value</label>
+                                    <input id="po_ship_value_input" type="text">
                                 </div>
                             </div>
 
@@ -1828,13 +1854,12 @@
                                     <label>Warranty</label>
                                     <input id="po_warranty_input" type="text">
                                 </div>
+
+                                
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <label>Shipping Value</label>
-                            <input id="po_ship_value_input" type="text">
-                        </div>
+                       
 
                         <div style="text-align: center; margin-top: 30px;">
                             <input type="file" name="file" id="fileUpload_po" onchange="LoadFile_po(event)" required multiple><br><br>
