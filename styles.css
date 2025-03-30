@@ -4379,3 +4379,36 @@ select[disabled],
 textarea[disabled] {
   cursor: not-allowed;
 }
+
+.bom-modal-content input[type="text"],
+.bom-modal-content input[type="number"],
+.bom-modal-content input[type="date"]{
+  border: 2px solid #2c3e50 !important; /* Viền đậm và tối ngay từ đầu */
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 15px;
+}
+
+.bom-modal-content input:focus {
+  border-color: #e74c3c; /* Màu đỏ nổi bật khi focus */
+  box-shadow: 0 0 6px #e74c3c;
+  outline: none;
+}
+
+.bom-modal-content label{
+    width: 40% !important;
+}
+
+#po_delivery_to_input {
+    border: 2px solid #2c3e50 !important; /* Viền đậm và tối ngay từ đầu */
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
