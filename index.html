@@ -146,7 +146,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.25.12.4</h4>
+                <h4>Version 3.31.1.35</h4>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -1027,7 +1027,7 @@
                         <div class="bom-modal-content">
                           <h2 class="bom-title">Thêm vật tư</h2>
                           <div class="bom-input-group">
-                            <label for="item-type">Loại vật tư:</label>
+                            <label for="item-type">Loại vật tư: (Có gợi ý)</label>
                             <input type="text" id="item-type" />
                             <div id="dropdown_bom" class="dropdown"></div>
                           </div>
@@ -1043,28 +1043,28 @@
 
                           <div class="bom-input-group">
                             <label for="item-name">Tên vật tư:</label>
-                            <input type="text" id="item-name" />
+                            <input type="text" id="item-name" disabled />
                           </div>
                           <div class="bom-input-group">
                             <label for="item-code">Mã vật tư:</label>
-                            <input type="text" id="item-code" />
+                            <input type="text" id="item-code" disabled />
                           </div>
                           <div class="bom-input-group">
                             <label for="item-unit">Đơn vị:</label>
-                            <input type="text" id="item-unit" />
+                            <input type="text" id="item-unit" disabled />
                           </div>
                           
                           <div class="bom-input-group">
                             <label for="item-stock">Số lượng tồn kho hiện có:</label>
-                            <input type="number" id="item-stock" />
+                            <input type="number" id="item-stock" disabled />
                           </div>
                           <div class="bom-input-group">
                             <label for="item-quantity-buy">Số lượng cần mua thêm:</label>
-                            <input type="number" id="item-quantity-buy" />
+                            <input type="number" id="item-quantity-buy" disabled />
                           </div>
                           <div class="bom-input-group">
                             <label for="item-price">Giá / Đơn vị (dự kiến):</label>
-                            <input type="number" id="item-price" />
+                            <input type="number" id="item-price" disabled />
                           </div>
                           
                         </div>
@@ -1525,7 +1525,7 @@
 
                             <div class="form-row">
                                 <label for="pr_dept">Bộ phận</label>
-                                <input type="text" id="pr_dept" placeholder="Nhập bộ phận">
+                                <input type="text" id="pr_dept" placeholder="Nhập bộ phận" disabled>
                             </div>
 
                             <div class="form-row">
@@ -1580,25 +1580,28 @@
                                         </div>
                                     </div>
                                 </div>
-
+                            
                                 <div class="bom-modal-content">
                                     <h2 class="bom-title">Nhập Thông Tin Vật Tư</h2>
                                     <div class="bom-input-group">
-                                        <label>Loại vật tư:</label>
+                                        <label>Loại vật tư: (Có gợi ý)</label>
                                         <input type="text" id="pr-type">
                                         <div id="dropdown_pr_type" class="dropdown"></div>
                                     </div>
-                                    <div class="bom-input-group"><label>Thông số kỹ thuật:</label> <input type="text" id="pr_specs"></div>
+
+                                    <div class="bom-input-group"><label>Thông số kỹ thuật:</label>
+                                        <input type="text" id="pr_specs" placeholder="Nhập thông số kỹ thuật">
+                                    </div>
                                     
                                     <div class="bom-input-group">
-                                        <label>Tên khách hàng:</label>
+                                        <label>Tên khách hàng: (Có gợi ý)</label>
                                         <input type="text" id="pr-vendor">
                                         <div id="dropdown_pr_vendor" class="dropdown"></div>
                                     </div>
-                                    <div class="bom-input-group"><label>Số PO của khách hàng:</label> <input type="text" id="pr_po"></div>
+                                    <div class="bom-input-group"><label>Số PO của khách hàng:</label> <input type="text" id="pr_po" placeholder="Nhập số PO"></div>
                                     <div class="bom-input-group"><label>Ngày cần có vật tư:</label> <input type="date" id="pr_date"></div>
-                                    <div class="bom-input-group"><label>Đơn giá / đơn vị dự kiến (VND):</label> <input type="number" id="pr_price"></div>
-                                    <div class="bom-input-group"><label>Số lượng cần:</label> <input type="number" id="pr_quantity"></div>
+                                    <div class="bom-input-group"><label>Đơn giá / đơn vị dự kiến (VND):</label> <input type="number" id="pr_price" placeholder="Nhập đơn giá"></div>
+                                    <div class="bom-input-group"><label>Số lượng cần:</label> <input type="number" id="pr_quantity" placeholder="Nhập số lượng cần"></div>
 
                                     <div style="text-align: center; margin-top: 30px;">
                                         <input type="file" name="file" id="fileUpload_pr" onchange="LoadFile_pr(event)" required multiple><br><br>
@@ -1614,11 +1617,12 @@
                                         <button class="btn btn-close" onclick="closeModal_pr_add_item()">Đóng</button>
                                     </div>
 
-                                    <div class="bom-input-group"><label>Tên vật tư:</label> <input type="text" id="pr_name"></div>
-                                    <div class="bom-input-group"><label>Mã vật tư:</label> <input type="text" id="pr_code"></div>
-                                    <div class="bom-input-group"><label>Đơn vị:</label> <input type="text" id="pr_unit"></div>
+                                    <div class="bom-input-group"><label>Tên vật tư:</label> <input type="text" id="pr_name" disabled></div>
+                                    <div class="bom-input-group"><label>Mã vật tư:</label> <input type="text" id="pr_code" disabled></div>
+                                    <div class="bom-input-group"><label>Đơn vị:</label> <input type="text" id="pr_unit" disabled></div>
 
                                 </div>
+                                
                             </div>
                         </div>
 
@@ -1757,14 +1761,15 @@
                                             <th>Tên vật tư (tiếng việt)</th>
                                             <th>Mã vật tư</th>
                                             <th>Đơn vị</th>
-                                            <th>Số PO của khách hàng</th>
-                                            <th>Số tiền từ PR</th>
-                                            <th>SL cần từ PR</th>
-                                            <th>SL cần mua</th>
+                                            <th>Đơn vị tiền tệ</th>
+                                            <th>Giá bán</th>
+                                            <th>Xuất xứ hàng hóa</th>
+                                            <th>Số lượng cần mua</th>
                                             <th>Đơn giá</th>
                                             <th>Thành tiền</th>
                                             <th>% Thuế GTGT</th>
                                             <th>Tổng tiền</th>
+                                            <th>Ghi chú</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -1781,13 +1786,14 @@
                         </div>
                         <div class="pr_frame_4">
                             <div class="form-row">
-                                <label>Delivery Address</label>
-                                <input id="po_delivery_address_input" type="text" value="RMG TECHNOLOGIES VIETNAM CO., LTD">
+                                <label style="width: 150px !important;">Delivery Address</label>
+                                <input id="po_delivery_address_input" type="text" value="RMG VIETNAM CO., LTD" readonly>
+
                             </div>
                         </div>
 
                         <div class="form-row">
-                            <label>Delivery To</label>
+                            <label style="width: 150px !important;">Delivery To</label>
                             <!-- <input id="po_delivery_to_input" type="text"> -->
                             <select id="po_delivery_to_input">
                                 <option value="267A Nguyễn Xiển, phường Trường Thạnh, Tp. Thủ Đức, Tp.HCM, Việt Nam">
@@ -1888,28 +1894,28 @@
 
                         <div class="form-row">
                             <label>PR#</label>
-                            <input id="pr_po_release" type="text">
+                            <input id="pr_po_release" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>PO#</label>
-                            <input id="po_po_release" type="text">
+                            <input id="po_po_release" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PO</label>
-                            <input id="po_creator_po_release" type="text">
+                            <input id="po_creator_po_release" type="text" readonly>
                         </div>
                         
 
                         <div class="form-row">
                             <label>Nhà cung cấp</label>
-                            <input id="vendor_po_release" type="text">
+                            <input id="vendor_po_release" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tổng giá trị PO</label>
-                            <input id="total_value_po_release" type="text">
+                            <input id="total_value_po_release" type="text" readonly>
                         </div>
 
                         <div class="form-row">
@@ -1919,7 +1925,7 @@
 
                         <div class="form-row">
                             <label>Chi phí còn lại sẽ thanh toán</label>
-                            <input id="remain_pay_po_release" type="text">
+                            <input id="remain_pay_po_release" type="text" readonly>
                         </div>
 
                         <div class="form-row">
@@ -1979,77 +1985,77 @@
 
                         <div class="form-row">
                             <label>PR#</label>
-                            <input id="pr_pre_payment" type="text">
+                            <input id="pr_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>PO#</label>
-                            <input id="po_pre_payment" type="text">
+                            <input id="po_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PO</label>
-                            <input id="po_creator_pre_payment" type="text">
+                            <input id="po_creator_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PR</label>
-                            <input id="pr_creator_pre_payment" type="text">
+                            <input id="pr_creator_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tổng giá trị PO</label>
-                            <input id="total_value_pre_payment" type="text">
+                            <input id="total_value_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Chi phí cần thanh toán trước</label>
-                            <input id="pre_pay_pre_payment" type="text">
+                            <input id="pre_pay_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Chi phí còn lại sẽ thanh toán</label>
-                            <input id="remain_pay_pre_payment" type="text">
+                            <input id="remain_pay_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Nhà cung cấp</label>
-                            <input id="vendor_pre_payment" type="text">
+                            <input id="vendor_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Địa chỉ</label>
-                            <input id="vendor_addr_pre_payment" type="text">
+                            <input id="vendor_addr_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Số điện thoại</label>
-                            <input id="vendor_phone_pre_payment" type="text">
+                            <input id="vendor_phone_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tên ngân hàng</label>
-                            <input id="vendor_bank_name_pre_payment" type="text">
+                            <input id="vendor_bank_name_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Số tài khoản</label>
-                            <input id="vendor_bank_acc_pre_payment" type="text">
+                            <input id="vendor_bank_acc_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Ngày thanh toán</label>
-                            <input id="payment_date_pre_payment" type="text">
+                            <input id="payment_date_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Ngày nhận hàng dự kiến</label>
-                            <input id="expect_recv_date_pre_payment" type="text">
+                            <input id="expect_recv_date_pre_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Nội dung PO-RELEASE</label>
-                            <input id="content_release_pre_payment" type="text">
+                            <input id="content_release_pre_payment" type="text" readonly>
                         </div>
                         
                         <div class="form-row">
@@ -2103,22 +2109,22 @@
 
                         <div class="form-row">
                             <label>PR#</label>
-                            <input id="pr_po_receiving" type="text">
+                            <input id="pr_po_receiving" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>PO#</label>
-                            <input id="po_po_receiving" type="text">
+                            <input id="po_po_receiving" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tổng giá trị PO</label>
-                            <input id="total_value_po_receiving" type="text">
+                            <input id="total_value_po_receiving" type="text" readonly>
                         </div>
                     
                         <div class="form-row">
                             <label>Nội dung PO PRE-PAYMENT</label>
-                            <input id="content_pre_pay_po_receiving" type="text">
+                            <input id="content_pre_pay_po_receiving" type="text" readonly>
                         </div>
                         
                         <div class="form-row">
@@ -2167,81 +2173,81 @@
             <div id="pur_final_payment" class="frame">
                 <div class="frame2">
                     <div id="div1" class="left-frame">
-                        <h1>PO PRE-PAYMENT</h1>
+                        <h1>PO FINAL PAYMENT</h1>
 
                         <div class="form-row">
                             <label>PR#</label>
-                            <input id="pr_final_payment" type="text">
+                            <input id="pr_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>PO#</label>
-                            <input id="po_final_payment" type="text">
+                            <input id="po_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PO</label>
-                            <input id="po_creator_final_payment" type="text">
+                            <input id="po_creator_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PR</label>
-                            <input id="pr_creator_final_payment" type="text">
+                            <input id="pr_creator_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tổng giá trị PO</label>
-                            <input id="total_value_final_payment" type="text">
+                            <input id="total_value_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Chi phí cần thanh toán trước</label>
-                            <input id="pre_pay_final_payment" type="text">
+                            <input id="pre_pay_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Chi phí còn lại sẽ thanh toán</label>
-                            <input id="remain_pay_final_payment" type="text">
+                            <input id="remain_pay_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Nhà cung cấp</label>
-                            <input id="vendor_final_payment" type="text">
+                            <input id="vendor_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Địa chỉ</label>
-                            <input id="vendor_addr_final_payment" type="text">
+                            <input id="vendor_addr_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Số điện thoại</label>
-                            <input id="vendor_phone_final_payment" type="text">
+                            <input id="vendor_phone_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tên ngân hàng</label>
-                            <input id="vendor_bank_name_final_payment" type="text">
+                            <input id="vendor_bank_name_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Số tài khoản</label>
-                            <input id="vendor_bank_acc_final_payment" type="text">
+                            <input id="vendor_bank_acc_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Ngày thanh toán</label>
-                            <input id="payment_date_final_payment" type="text">
+                            <input id="payment_date_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Ngày nhận hàng dự kiến</label>
-                            <input id="expect_recv_date_final_payment" type="text">
+                            <input id="expect_recv_date_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Nội dung PO-RECEIVING</label>
-                            <input id="content_release_final_payment" type="text">
+                            <input id="content_release_final_payment" type="text" readonly>
                         </div>
 
                         <div class="form-row">
@@ -2264,7 +2270,7 @@
                         </div>
             
                         <div id="button_group_final_payment">
-                            <button id="submitButton_final_payment" class="submit-btn">ĐÃ THANH TOÁN TRƯỚC</button>
+                            <button id="submitButton_final_payment" class="submit-btn">ĐÃ THANH TOÁN</button>
                         </div>
                     </div>
 
