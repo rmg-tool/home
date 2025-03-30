@@ -1090,6 +1090,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const wh = user[1]
             const approver = user[17]
             const dept = user[19]
+            const pr_approver = user[27]
+            const po_approver = user[28]
             // Xác định quyền của user dựa trên các cột 4, 5, 6, 7 trong user_data
             const permissions = {
                 import: user[4] === "x",
@@ -1127,6 +1129,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             sessionStorage.setItem("wh", wh);
             sessionStorage.setItem("approver", approver);
             sessionStorage.setItem("dept", dept);
+            sessionStorage.setItem("pr_approver", pr_approver);
+            sessionStorage.setItem("po_approver", po_approver);
             loginSuccess(username);
         } else {
             alert("Sai tên đăng nhập hoặc mật khẩu!");
@@ -6785,12 +6789,21 @@ async function showModal_pr() {
     document.getElementById("loadingIndicator").style.display = "none";
 }
 
+function clearPrModalContent() {
+    let table = document.getElementById("pr-item-table").getElementsByTagName('tbody')[0];
+    table.innerHTML = ""; // Xóa nội dung của tbody
+
+    document.getElementById("purpose_pr").value = ""; // Xóa nội dung của ô nhập liệu
+}
+
 function hideModal_pr() {
     document.getElementById('pr-modal').classList.remove('show');
+    clearPrModalContent(); // Gọi hàm để xóa nội dung modal
 }
 
 function openModal_pr_add_item() {
     document.getElementById("pr_modal_add_item").style.display = "flex";
+    document.getElementById("pr-type").focus(); // Đặt focus vào ô nhập liệu
 }
 
 function closeModal_pr_add_item() {
@@ -6991,6 +7004,41 @@ function addItem_pr() {
     let quantity = parseFloat(document.getElementById("pr_quantity").value) || 0;
     let total = price * quantity;
 
+    if (type === "") {
+        alert("Vui lòng chọn loại vật tư")
+        document.getElementById("pr-type").focus()
+        return
+    }
+
+    if (customer === "") {
+        alert("Vui lòng chọn nhà cung cấp")
+        document.getElementById("pr-vendor").focus()
+        return
+    }
+
+    if (po === "") {
+        alert("Vui lòng nhập số PO")
+        document.getElementById("pr_po").focus()
+        return
+    }
+
+    if (date === "") {
+        alert("Vui lòng nhập ngày cần hàng")
+        return
+    }
+    
+    if (price === 0) {
+        alert("Vui lòng nhập đơn giá")
+        document.getElementById("pr_price").focus()
+        return
+    }
+
+    if (quantity === 0) {
+        alert("Vui lòng nhập số lượng")
+        document.getElementById("pr_quantity").focus()
+        return
+    }
+
     // Lấy danh sách file
     let fileNames = JSON.parse(document.getElementById('fileName_pr').value || "[]");
     let fileLinks = JSON.parse(document.getElementById('fileData_pr').value || "[]");
@@ -7066,6 +7114,11 @@ function clearItem_pr() {
 
 
 function send_pr() {
+    const pr_purpose = document.getElementById("purpose_pr").value;
+    if (pr_purpose === "") {
+        alert("Vui lòng chọn mục đích mua hàng")
+        return
+    }
     document.getElementById("loadingIndicator").style.display = "block";
     let table = document.getElementById("pr-item-table").getElementsByTagName('tbody')[0];
     let rows = table.getElementsByTagName("tr");
@@ -7097,7 +7150,7 @@ function send_pr() {
             Dept: document.getElementById("pr_dept").value,
             Warehouse: document.getElementById("warehouse_pr").value,
             Purpose: document.getElementById("purpose_pr").value,
-            Approver: sessionStorage.getItem("approver")
+            Approver: sessionStorage.getItem("pr_approver")
         };
 
         data.push(rowData);
@@ -7114,11 +7167,11 @@ function send_pr() {
         body: JSON.stringify(payload)
     })
     .then(() => info("Dữ liệu đã được gửi thành công!"))
-    .catch(error => console.error("Lỗi khi gửi dữ liệu:", error))
+    .catch(console.log("Lỗi khi gửi dữ liệu:"))
     .finally(() => {
         document.getElementById("loadingIndicator").style.display = "none";
         clearItem_pr();
-        table.innerHTML = "";
+        clearPrModalContent();
         hideModal_pr();
     });
 }
@@ -7152,8 +7205,8 @@ function LoadFile_pr(event) {
     var files = event.target.files;
 
     // Giới hạn số lượng tệp
-    if (files.length > 2) {
-    alert('Bạn chỉ được chọn tối đa 2 tệp.');
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
     event.target.value = ''; // Reset input file
     return;
     }
@@ -7372,18 +7425,28 @@ async function showDetails(spreadsheetId, rowData) {
 
         // Hiển thị dữ liệu dưới dạng bảng
         let tableHtml = "<table border='1' style='width: 100%; border-collapse: collapse;'>";
-        
+        console.log(data.content)
+        let totalAmount = 0; // Biến tính tổng tiền
+
         data.content.forEach((row, index) => {
             tableHtml += "<tr>";
 
             row.forEach((cell, cellIndex) => {
                 if (index === 0) {
-                    // Header
                     tableHtml += `<th>${cell}</th>`;
                 } else {
-                    // Kiểm tra nếu cột cuối cùng có dạng link
                     if (cellIndex === row.length - 1 && typeof cell === "string" && cell.startsWith("http")) {
                         tableHtml += `<td><a href="${cell}" target="_blank">Xem File đính kèm</a></td>`;
+                    } else if (cellIndex === 10 || cellIndex === 11) {
+                        const formattedNumber = Number(cell).toLocaleString("vi-VN");
+                        tableHtml += `<td style="text-align: right;">${formattedNumber}</td>`;
+
+                        if (cellIndex === 11) {
+                            totalAmount += Number(cell); // Cộng vào tổng ở cột 11
+                        }
+                    } else if (cellIndex === 8) {
+                        let formattedDate = new Date(cell).toLocaleDateString("vi-VN");
+                        tableHtml += `<td>${formattedDate}</td>`;
                     } else {
                         tableHtml += `<td>${cell}</td>`;
                     }
@@ -7391,7 +7454,17 @@ async function showDetails(spreadsheetId, rowData) {
             });
 
             tableHtml += "</tr>";
+
         });
+
+        // Thêm dòng Tổng tiền sau khi kết thúc bảng
+        if (data.content.length > 1) {
+            tableHtml += `
+                <tr>
+                    <td colspan="11" style="text-align: right; font-weight: bold; font-size: 26px;">Tổng tiền:</td>
+                    <td style="text-align: right; font-weight: bold; font-size: 26px;">${totalAmount.toLocaleString("vi-VN")} ₫</td>
+                </tr>`;
+        }
 
         tableHtml += "</table>";
         modalContent.innerHTML = tableHtml;
@@ -7430,8 +7503,8 @@ async function sendPrApproval(status) {
         closeModal_pr(); // Đóng modal sau khi gửi
     })
     .catch(error => {
-        // console.error("Lỗi:", error);
-        alert("Lỗi khi gửi dữ liệu.");
+        console.error("Lỗi:", error);
+        // alert("Lỗi khi gửi dữ liệu.");
     })
     .finally(() => {
         closeModal_pr();
@@ -7563,6 +7636,7 @@ function add_po_to_po_table(data) {
 
                 // Khi click, in ra giá trị của cả dòng
                 link.addEventListener("click", function () {
+                    console.log(row); // In ra giá trị của cả dòng
                     click_pr_to_po(row);
                 });
 
@@ -7619,10 +7693,11 @@ async function click_pr_to_po(row) {
             row[2],      // Mã vật tư
             "",          // Tên vật tư (tiếng Việt) - Input (400px)
             row[3],      // Đơn vị
-            row[5],      // Số PO của khách hàng
-            row[7],      // Số tiền từ PR
-            row[11].toLocaleString(),     // SL cần từ PR
-            row[10].toLocaleString(),     // SL cần từ PR
+            row[5],     
+            "",      // Đơn vị tiền tệ
+            "",      // giá bán
+            "",     // Xuất xứ hàng hóa
+            "",     // Ghi chú
             "",          // SL cần mua - Input (150px)
             "",          // Đơn giá - Input (150px)
             "",          // Thành tiền - Tự động tính toán
@@ -7641,7 +7716,7 @@ async function click_pr_to_po(row) {
             row.forEach((cell, index) => {
                 let newCell = document.createElement("td");
 
-                if ([3, 9, 10].includes(index)) {
+                if ([3, 7, 8, 9, 10, 14].includes(index)) {
                     // Tạo input cho các cột 3 (Tên vật tư tiếng Việt), 9 (SL cần mua), 10 (Đơn giá)
                     let input = document.createElement("input");
                     input.type = "text";
@@ -7649,7 +7724,7 @@ async function click_pr_to_po(row) {
                     input.style.width = index === 3 ? "400px" : "150px";
 
                     // Format số khi nhập liệu
-                    if ([9, 10].includes(index)) {
+                    if ([7, 8, 9, 10].includes(index)) {
                         // Xử lý khi người dùng đang gõ
                         input.addEventListener("input", function () {
                             let raw = input.value.replace(/[^0-9.]/g, "");
@@ -7684,6 +7759,7 @@ async function click_pr_to_po(row) {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
+                        option.style.textAlign = "center";
                         select.appendChild(option);
                     });
 
@@ -7692,6 +7768,18 @@ async function click_pr_to_po(row) {
                         updateCalculatedFields(newRow);
                     });
 
+                    newCell.appendChild(select);
+                } else if (index === 6) {
+                    // Tạo dropdown cho % Thuế GTGT
+                    let select = document.createElement("select");
+                    select.style.width = "150px";
+                    ["VND","USD","JPY","SGD","RWB"].forEach(optionValue => {
+                        let option = document.createElement("option");
+                        // option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
+                        option.textContent = optionValue;
+                        option.style.textAlign = "center";
+                        select.appendChild(option);
+                    });
                     newCell.appendChild(select);
                 } else if ([11, 13].includes(index)) {
                     // Cột tự động tính toán (Thành tiền, Tổng tiền)
@@ -7707,6 +7795,7 @@ async function click_pr_to_po(row) {
             let actionCell = document.createElement("td");
             let deleteButton = document.createElement("button");
             deleteButton.textContent = "Xóa";
+            deleteButton.style.backgroundColor = "red";
             deleteButton.classList.add("delete-btn");
             deleteButton.onclick = function () {
                 newRow.remove();
@@ -7908,7 +7997,8 @@ function getTablePOData() {
         rowData['pr_creator'] = document.getElementById("po_pr_operator_label").textContent
         rowData['sheet_id'] = document.getElementById("po_sheet_id_label").textContent
         rowData['po_creator'] = sessionStorage.getItem("fullname")
-        rowData['po_approver'] = sessionStorage.getItem("approver")
+        rowData['po_approver'] = sessionStorage.getItem("po_approver")
+        
         
         tableData.push(rowData);
     }
@@ -7917,6 +8007,10 @@ function getTablePOData() {
 }
 
 async function sendPO() {
+    const expt_date = document.getElementById("po_expect_delivery_date").value;
+    const pay_date = document.getElementById("po_payment_date").value;
+    const company = document.getElementById("po_company_input").value;
+
     document.getElementById("loadingIndicator").style.display = "block";
     let tableData = getTablePOData();
     let formData = new FormData();
@@ -8240,6 +8334,12 @@ async function getSpreadsheetData(spreadsheetId) {
 }
 
 document.getElementById("submitButton_po_release").addEventListener("click", async function() {
+    const date_de = document.getElementById("expect_recv_date_po_release").value;
+
+    if (date_de === "") {
+        alert("Vui lòng nhập ngày nhận hàng dự kiến!");
+        return;
+    }
     // Hiển thị loading khi bắt đầu gửi dữ liệu
     document.getElementById("loadingIndicator").style.display = "block";
 
@@ -8499,7 +8599,37 @@ function LoadFile_pre_payment(event) {
     }
 }
 
+function validatePrePayment() {
+    const content = document.getElementById("content_pre_payment").value.trim();
+    const files = document.getElementById("fileUpload_pre_payment").files;
+  
+    if (!content) {
+      alert("Vui lòng nhập nội dung.");
+      return;
+    }
+  
+    if (files.length === 0) {
+      alert("Vui lòng đính kèm ít nhất 1 file.");
+      return;
+    }
+  
+  }
+
 document.getElementById("submitButton_pre_payment").addEventListener("click", async function () {
+    const content = document.getElementById("content_pre_payment").value.trim();
+    const files = document.getElementById("fileUpload_pre_payment").files;
+  
+    if (!content) {
+      alert("Vui lòng nhập nội dung.");
+      document.getElementById("content_pre_payment").focus();
+      return;
+    }
+  
+    if (files.length === 0) {
+      alert("Vui lòng đính kèm ít nhất 1 file.");
+      return;
+    }
+
     // Hiển thị loading khi bắt đầu gửi dữ liệu
     document.getElementById("loadingIndicator").style.display = "block";
 
@@ -8713,6 +8843,20 @@ function LoadFile_po_receiving(event) {
 
 
 document.getElementById("submitButton_po_receiving").addEventListener("click", async function () {
+    const content = document.getElementById("content_po_receiving").value.trim();
+    const files = document.getElementById("fileUpload_po_receiving").files;
+  
+    if (!content) {
+      alert("Vui lòng nhập nội dung.");
+      document.getElementById("content_po_receiving").focus();
+      return;
+    }
+  
+    if (files.length === 0) {
+      alert("Vui lòng đính kèm ít nhất 1 file.");
+      return;
+    }
+
     document.getElementById("loadingIndicator").style.display = "block";
     const poReceiving = document.getElementById("po_po_receiving").value
     console.log(poReceiving)
@@ -8976,6 +9120,19 @@ function clearFinalPaymentForm() {
 }
 
 document.getElementById("submitButton_final_payment").addEventListener("click", async function () {
+    const content = document.getElementById("content_final_payment").value.trim();
+    const files = document.getElementById("fileUpload_final_payment").files;
+  
+    if (!content) {
+      alert("Vui lòng nhập nội dung.");
+      return;
+    }
+  
+    if (files.length === 0) {
+      alert("Vui lòng đính kèm ít nhất 1 file.");
+      return;
+    }
+    
     document.getElementById("loadingIndicator").style.display = "block";
     const poValue = document.getElementById("po_final_payment").value
     console.log(poValue)
