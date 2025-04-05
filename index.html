@@ -8,10 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"> -->
     <link href="https://unpkg.com/tabulator-tables@5.4.4/dist/css/tabulator.min.css" rel="stylesheet">
     <script src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
-
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 
 
@@ -109,21 +108,24 @@
                 </li>
 
                 <li onclick="showFrame('bom_creation')"> <i class="fa-solid fa-code-pull-request"></i> BOM Creation</li>
-                <li onclick="showFrame('approve_center')"> <i class="fa-solid fa-check"></i> Approval Center</li>
-                <!-- <li onclick="toggleSubmenu(event, 'approval_list', this)">
+                <!-- <li onclick="showFrame('approve_center')"> <i class="fa-solid fa-check"></i> Approval Center</li> -->
+                <li onclick="toggleSubmenu(event, 'approval_list', this)">
 
                     <i class="fa-solid fa-check"></i>
                         Approval Center
                         <i class="fa-solid fa-chevron-down arrow"></i>
         
                     <ul class="submenu" id="approval_list">
-                        <li onclick="showFrame('crm')">BOM</li>
-                        <li onclick="showFrame('survey')">QUOTATION</li>
-                        <li onclick="showFrame('design')">PR</li>
-                        <li onclick="showFrame('quotation')">PO</li>
+                        <li onclick="showFrame('bom_approval')">Bom</li>
+                        <li onclick="showFrame('quotation_approval')">Quotation</li>
+                        <li onclick="showFrame('pr_approval')">Purchase Request</li>
+                        <li onclick="showFrame('po_1_approval')">PO Level 1</li>
+                        <li onclick="showFrame('po_2_approval')">PO Level 2</li>
+                        <li onclick="showFrame('po_3_approval')">PO Level 3</li>
+                        <li onclick="showFrame('po_4_approval')">PO Level 4</li>
                     </ul>
                     
-                </li> -->
+                </li>
                 <li onclick="toggleSubmenu(event, 'export_list', this)">
     
                     <i class="fa-solid fa-download"></i>
@@ -134,6 +136,8 @@
                         <li onclick="showFrame('onhand')">Onhand</li>
                         <li onclick="showFrame('transaction_nhap')">Nhập</li>
                         <li onclick="showFrame('transaction_xuat')">Xuất</li>
+                        <li onclick="showFrame('export_pr')">Xuất PR / PO</li>
+                        <!-- <li onclick="showFrame('export_po')">Xuất PO</li> -->
                     </ul>
                 </li>
                 <li><button id="logout-btn" class="logout-btn"> <i class="fa-solid fa-right-from-bracket"></i> LOGOUT</button></li>
@@ -146,7 +150,9 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 3.31.1.35</h4>
+                <h4>Version 4.6.5.41/h4>
+
+                
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -1209,57 +1215,230 @@
                 <h1>Approval Center</h1>
                 
                 <button class="submit-btn" onclick="load_approval_ticket()">Refresh</button>
-                <!-- Vùng hiển thị bảng -->
-                <div id="table_approve_survey"></div>
 
-                <!-- Modal container -->
-                <div id="detailModal" style="display: none;">
-                    <button class="close-btn" onclick="closeModal()">×</button>
-                    <h2>Survey Details</h2>
+                <!-- Vùng hiển thị bảng Design + BOM APprove -->
+                <!-- <div id="table_approve_design"></div>
+                <div id="detailModal2" style="display: none;">
+                    <button class="close-btn" onclick="closeModal2()">×</button>
+                    <h2>Design Details</h2>
                 
                     <div class="form-row">
                         <label>Requestor:</label>
-                        <label id="operator_name_show"></label>
+                        <label id="operator_name_show2"></label>
                     </div>
                 
                     <div class="form-row">
                         <label>Request Time:</label>
-                        <label id="request_time_show"></label>
+                        <label id="request_time_show2"></label>
                     </div>
                 
                     <div class="form-row">
                         <label>CRM#:</label>
-                        <label id="crm_show"></label>
+                        <label id="crm_show2"></label>
                     </div>
-                
+
                     <div class="form-row">
-                        <label>Survey#:</label>
-                        <label id="survey_show"></label>
+                        <label>BOM#:</label>
+                        <label id="bom_show2"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Total Price:</label>
+                        <label id="total_price_show2"></label>
                     </div>
                 
                     <div class="form-row">
                         <label>Total Hours:</label>
-                        <label id="total_hours_show"></label>
+                        <label id="total_hours_show2"></label>
                     </div>
                 
                     <div class="form-row">
-                        <label>Content:     </label>
-                        <label id="content_show"></label>
+                        <label>Product Name:     </label>
+                        <label id="content_show2"></label>
                     </div>
                 
                     <div class="form-row">
                         <label>Link Reference:</label>
-                        <label id="link_show"></label>
+                        <label id="link_show2"></label>
                     </div>
                 
                     <div style="margin-top: 20px; text-align: center;">
-                        <button class="action-btn approve-btn" onclick="approveSurvey()">Approve</button>
-                        <button class="action-btn reject-btn" onclick="rejectSurvey()">Reject</button>
+                        <button class="action-btn approve-btn" onclick="approveDesign()">Approve</button>
+                        <button class="action-btn reject-btn" onclick="rejectDesign()">Reject</button>
                     </div>
                 </div>
                 
-                <div id="modalBackdrop" style="display: none;" onclick="closeModal()"></div>
+                <div id="modalBackdrop2" style="display: none;" onclick="closeModal2()"></div> -->
 
+                <!-- Quota Approve -->
+                <!-- <div id="table_approve_quotation"></div>
+
+                <div id="detailModal3" style="display: none;">
+                    <button class="close-btn" onclick="closeModal3()">×</button>
+                    <h2>Quotation Details</h2>
+                
+                    <div class="form-row">
+                        <label>Requestor:</label>
+                        <label id="operator_name_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Request Time:</label>
+                        <label id="request_time_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>CRM#:</label>
+                        <label id="crm_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>BOM#:</label>
+                        <label id="bom_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>QUOTATION#:</label>
+                        <label id="quotation_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>Quotation Price:</label>
+                        <label id="total_price_show3"></label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>BOM Price:</label>
+                        <label id="total_bom_price_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Product Name:     </label>
+                        <label id="content_show3"></label>
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Link Reference:</label>
+                        <label id="link_show3"></label>
+                    </div>
+                
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="action-btn approve-btn" onclick="approveQuotation()">Approve</button>
+                        <button class="action-btn reject-btn" onclick="rejectQuotation()">Reject</button>
+                    </div>
+                </div>
+                
+                <div id="modalBackdrop3" style="display: none;" onclick="closeModal3()"></div> -->
+                
+                <!-- PR Approve -->
+                <!-- <table id="dataTable_pr" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PR#</th>
+                            <th>Requestor</th>
+                            <th>Approver</th>
+                            <th>Department</th>
+                            <th>Warehouse</th>
+                            <th>Purpose</th>
+                            <th class="hidden">Spreadsheet_id</th> 
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                    </tbody>
+                </table>
+                
+                <div id="modal_pr" class="modal_pr">
+                    <div class="modal-content_pr">
+                        <span class="close_pr" onclick="closeModal_pr()">&times;</span>
+                        <h2>Chi tiết PR</h2>
+                        <div id="scroll_content"">
+                            <div id="modalContent_pr">Đang tải...</div>
+                        </div>
+
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button class="action-btn approve-btn-pr">Approve</button>
+                            <button class="action-btn reject-btn-pr">Reject</button>
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- PO Approve -->
+                <!-- <table id="dataTable_po" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PO#</th>
+                            <th>PR#</th>
+                            <th>Vendor</th>
+                            <th>PO Creator</th>
+                            <th>PR Creator</th>
+                            <th>PO Approver</th>
+                            <th class="hidden">PDF</th> 
+                            <th class="hidden">Files</th> 
+                            <th class="hidden">Status</th>
+                            <th>Tổng giá trị</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+
+                <div id="modal_po" class="modal_pr2" style="display: none;">
+                    <div class="modal-content_pr2">
+                        <span class="close_pr" onclick="closeModal_po()">&times;</span>
+                        <h2>Chi tiết PO</h2>
+                        <div id="scroll_content">
+                            <label>Date</label>
+                            <label id="po_date"></label><br>
+                            <label>Time</label>
+                            <label id="po_time"></label><br>
+                            <label>PO#</label>
+                            <label id="po_number"></label><br>
+                            <label>PR#</label>
+                            <label id="po_pr"></label><br>
+                            <label>Vendor</label>
+                            <label id="po_vendor"></label><br>
+                            <label>PO Creator</label>
+                            <label id="po_creator"></label><br>
+                            <label>PR Creator</label>
+                            <label id="po_pr_creator"></label><br>
+                            <label>PO Approver</label>
+                            <label id="po_approver"></label><br>
+                            <label>Tổng giá trị PO</label>
+                            <label id="po_total"></label><br>
+                
+                            <button id="po_pdf_view">Xem PDF</button>
+                            <button id="po_fils_view">Xem Files Upload</button>
+                        </div>
+                
+                        <div id="reject_reason_section" style="display: none; margin-top: 15px;">
+                            <label for="reject_reason">Lý do Reject:</label>
+                            <textarea id="reject_reason" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                        </div>
+                
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button id="po_approve">Approve</button>
+                            <button id="po_reject">Reject</button>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            <div id="bom_approval" class="frame">
+                <h1>BOM Approval</h1>
+
+                <button class="refresh-btn" onclick="design_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                  
+                
                 <!-- Vùng hiển thị bảng -->
                 <div id="table_approve_design"></div>
 
@@ -1315,7 +1494,14 @@
                 </div>
                 
                 <div id="modalBackdrop2" style="display: none;" onclick="closeModal2()"></div>
+            </div>
 
+            <div id="quotation_approval" class="frame">
+                <h1>Quotation Approval</h1>
+
+                <button class="refresh-btn" onclick="quotation_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
                 <!-- Vùng hiển thị bảng -->
                 <div id="table_approve_quotation"></div>
 
@@ -1376,8 +1562,15 @@
                 </div>
                 
                 <div id="modalBackdrop3" style="display: none;" onclick="closeModal3()"></div>
-                
-                <!-- PR Approve -->
+            </div>
+
+            <div id="pr_approval" class="frame">
+                <h1>PR Approval</h1>
+
+                <button class="refresh-btn" onclick="pr_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+
                 <table id="dataTable_pr" style="margin-top: 50px;">
                     <thead>
                         <tr>
@@ -1389,12 +1582,12 @@
                             <th>Department</th>
                             <th>Warehouse</th>
                             <th>Purpose</th>
-                            <th class="hidden">Spreadsheet_id</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Spreadsheet_id</th> 
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                       
                     </tbody>
                 </table>
                 
@@ -1412,8 +1605,14 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- PO Approve -->
+            <div id="po_1_approval" class="frame">
+                <h1>PO Level 1 Approval</h1>
+
+                <button class="refresh-btn" onclick="po_1_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
                 <table id="dataTable_po" style="margin-top: 50px;">
                     <thead>
                         <tr>
@@ -1477,10 +1676,215 @@
                         </div>
                     </div>
                 </div>
-                
-                
-                
             </div>
+
+            <div id="po_2_approval" class="frame">
+                <h1>PO Level 2 Approval</h1>
+
+                <button class="refresh-btn" onclick="po_2_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <table id="dataTable_po_2" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PO#</th>
+                            <th>PR#</th>
+                            <th>Vendor</th>
+                            <th>PO Creator</th>
+                            <th>PR Creator</th>
+                            <th class="hidden">PDF</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Files</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Status</th>
+                            <th class="hidden">Reason</th>
+                            <th>Tổng giá trị</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+
+                <div id="modal_po_2" class="modal_pr2" style="display: none;">
+                    <div class="modal-content_pr2">
+                        <span class="close_pr" onclick="closeModal_po_2()">&times;</span>
+                        <h2>Chi tiết PO</h2>
+                        <div id="scroll_content">
+                            <label>Date</label>
+                            <label id="po_2_date"></label><br>
+                            <label>Time</label>
+                            <label id="po_2_time"></label><br>
+                            <label>PO#</label>
+                            <label id="po_2_number"></label><br>
+                            <label>PR#</label>
+                            <label id="po_2_pr"></label><br>
+                            <label>Vendor</label>
+                            <label id="po_2_vendor"></label><br>
+                            <label>PO Creator</label>
+                            <label id="po_2_creator"></label><br>
+                            <label>PR Creator</label>
+                            <label id="po_2_pr_creator"></label><br>
+                            <label>Tổng giá trị PO</label>
+                            <label id="po_2_total"></label><br>
+                
+                            <button id="po_2_pdf_view">Xem PDF</button>
+                            <button id="po_2_fils_view">Xem Files Upload</button>
+                        </div>
+                
+                        <!-- Lý do Reject (Ẩn ban đầu) -->
+                        <div id="reject_reason_section_2" style="display: none; margin-top: 15px;">
+                            <label for="reject_reason_2">Lý do Reject:</label>
+                            <textarea id="reject_reason_2" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                        </div>
+                
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button id="po_2_approve">Approve</button>
+                            <button id="po_2_reject">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="po_3_approval" class="frame">
+                <h1>PO Level 3 Approval</h1>
+
+                <button class="refresh-btn" onclick="po_3_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <table id="dataTable_po_3" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PO#</th>
+                            <th>PR#</th>
+                            <th>Vendor</th>
+                            <th>PO Creator</th>
+                            <th>PR Creator</th>
+                            <th class="hidden">PDF</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Files</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Status</th>
+                            <th class="hidden">Reason</th>
+                            <th>Tổng giá trị</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+
+                <div id="modal_po_3" class="modal_pr2" style="display: none;">
+                    <div class="modal-content_pr2">
+                        <span class="close_pr" onclick="closeModal_po_3()">&times;</span>
+                        <h2>Chi tiết PO</h2>
+                        <div id="scroll_content">
+                            <label>Date</label>
+                            <label id="po_3_date"></label><br>
+                            <label>Time</label>
+                            <label id="po_3_time"></label><br>
+                            <label>PO#</label>
+                            <label id="po_3_number"></label><br>
+                            <label>PR#</label>
+                            <label id="po_3_pr"></label><br>
+                            <label>Vendor</label>
+                            <label id="po_3_vendor"></label><br>
+                            <label>PO Creator</label>
+                            <label id="po_3_creator"></label><br>
+                            <label>PR Creator</label>
+                            <label id="po_3_pr_creator"></label><br>
+                            <label>Tổng giá trị PO</label>
+                            <label id="po_3_total"></label><br>
+
+                            <button id="po_3_pdf_view">Xem PDF</button>
+                            <button id="po_3_fils_view">Xem Files Upload</button>
+                        </div>
+
+                        <!-- Lý do Reject (Ẩn ban đầu) -->
+                        <div id="reject_reason_section_3" style="display: none; margin-top: 15px;">
+                            <label for="reject_reason_3">Lý do Reject:</label>
+                            <textarea id="reject_reason_3" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                        </div>
+
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button id="po_3_approve">Approve</button>
+                            <button id="po_3_reject">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="po_4_approval" class="frame">
+                <h1>PO Level 4 Approval</h1>
+
+                <button class="refresh-btn" onclick="po_4_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <table id="dataTable_po_4" style="margin-top: 50px;">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>PO#</th>
+                            <th>PR#</th>
+                            <th>Vendor</th>
+                            <th>PO Creator</th>
+                            <th>PR Creator</th>
+                            <th class="hidden">PDF</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Files</th> <!-- Cột bị ẩn -->
+                            <th class="hidden">Status</th>
+                            <th class="hidden">Reason</th>
+                            <th>Tổng giá trị</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+                
+                <div id="modal_po_4" class="modal_pr2" style="display: none;">
+                    <div class="modal-content_pr2">
+                        <span class="close_pr" onclick="closeModal_po_4()">&times;</span>
+                        <h2>Chi tiết PO</h2>
+                        <div id="scroll_content">
+                            <label>Date</label>
+                            <label id="po_4_date"></label><br>
+                            <label>Time</label>
+                            <label id="po_4_time"></label><br>
+                            <label>PO#</label>
+                            <label id="po_4_number"></label><br>
+                            <label>PR#</label>
+                            <label id="po_4_pr"></label><br>
+                            <label>Vendor</label>
+                            <label id="po_4_vendor"></label><br>
+                            <label>PO Creator</label>
+                            <label id="po_4_creator"></label><br>
+                            <label>PR Creator</label>
+                            <label id="po_4_pr_creator"></label><br>
+                            <label>Tổng giá trị PO</label>
+                            <label id="po_4_total"></label><br>
+                
+                            <button id="po_4_pdf_view">Xem PDF</button>
+                            <button id="po_4_fils_view">Xem Files Upload</button>
+                        </div>
+                
+                        <!-- Lý do Reject (Ẩn ban đầu) -->
+                        <div id="reject_reason_section_4" style="display: none; margin-top: 15px;">
+                            <label for="reject_reason_4">Lý do Reject:</label>
+                            <textarea id="reject_reason_4" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                        </div>
+                
+                        <div style="margin-top: 50px; text-align: center;">
+                            <button id="po_4_approve">Approve</button>
+                            <button id="po_4_reject">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="onhand" class="frame">
                 
                 <h1>On-hand Inventory</h1>
@@ -1954,7 +2358,7 @@
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
-                        <div id="table-container_po_release" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                        <div id="table-container_po_release" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
                             <table id="po_release_table">
                                 <thead>
                                     <tr>
@@ -2079,7 +2483,7 @@
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
-                        <div id="table-container_pre_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                        <div id="table-container_pre_payment" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
                             <table id="pre_payment_table">
                                 <thead>
                                     <tr>
@@ -2277,7 +2681,7 @@
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
-                        <div id="table-container_final_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
+                        <div id="table-container_final_payment" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
                             <table id="final_payment_table">
                                 <thead>
                                     <tr>
@@ -2310,6 +2714,21 @@
                     </div>
                 </div>
             </div>
+
+            <div id="export_pr" class="frame">
+                <h1>Xuất chi tiết PR / PO</h1>
+                <button id="export_pr_btn" class="refresh-btn" onclick="load_detail_pr()">Xuất PR</button>
+                <button id="export_po_btn" class="refresh-btn" onclick="load_detail_po()">Xuất PO</button>
+                <!-- <div class="scrollable-frame">
+                    <div id="tableContainer">
+                        <div class="table-wrapper">
+                            <div id="xuatTable"></div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+
+            
 
         <!-- Modal -->
         <div id="filterModal" class="modal" style="display: none;">
