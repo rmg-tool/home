@@ -3743,6 +3743,93 @@ label + label {
     background-color: #e68900;
 }
 
+#po_2_pdf_view,
+#po_2_fils_view {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+#po_2_pdf_view {
+    background-color: #007bff;
+    color: white;
+}
+
+#po_2_pdf_view:hover {
+    background-color: #0056b3;
+}
+
+#po_2_fils_view {
+    background-color: #ff9800;
+    color: white;
+}
+
+#po_2_fils_view:hover {
+    background-color: #e68900;
+}
+
+#po_3_pdf_view,
+#po_3_fils_view {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+#po_3_pdf_view {
+    background-color: #007bff;
+    color: white;
+}
+
+#po_3_pdf_view:hover {
+    background-color: #0056b3;
+}
+
+#po_3_fils_view {
+    background-color: #ff9800;
+    color: white;
+}
+
+#po_3_fils_view:hover {
+    background-color: #e68900;
+}
+
+
+#po_4_pdf_view,
+#po_4_fils_view {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+#po_4_pdf_view {
+    background-color: #007bff;
+    color: white;
+}
+
+#po_4_pdf_view:hover {
+    background-color: #0056b3;
+}
+
+#po_4_fils_view {
+    background-color: #ff9800;
+    color: white;
+}
+
+#po_4_fils_view:hover {
+    background-color: #e68900;
+}
 /* PO RELEASE */
 
 #pur_po_release {
@@ -4412,3 +4499,27 @@ textarea[disabled] {
     background-color: #fff;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+.refresh-btn {
+    font-size: 18px;
+    padding: 12px 24px;
+    margin-top: 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .refresh-btn i {
+    margin-right: 8px;
+  }
+  
+  .refresh-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+  }
+  
