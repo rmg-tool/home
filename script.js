@@ -768,6 +768,79 @@ let po_need_to_pre_payment_list = []
 let po_need_to_receiving_list = []
 let po_need_to_final_payment_list = []
 
+let po_approval_2_list = []
+let po_approval_3_list = []
+let po_approval_4_list = []
+
+let detail_pr_data = [];
+let detail_po_data = [];
+
+async function load_detail_pr() {
+    return fetch('https://script.google.com/macros/s/AKfycbx7AbFWNtkEmz6kh13TNSNZDDVdYZaUCufmzUTmjaScj2eHxEzQrBBE_wFyxftorg4FqA/exec')
+        .then(res => res.json())
+        .then(data => {
+            const filteredData = data.content.map(row => 
+                row.filter((_, index) => index !== 8 && (index < 23 || index > 30))
+            );
+
+            // Tạo một worksheet từ dữ liệu đã lọc
+            const ws = XLSX.utils.aoa_to_sheet(filteredData);
+
+            // Tạo một workbook và thêm worksheet vào
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Detail PR");
+
+            // Xuất file Excel
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.-]/g, '').slice(0, 15); // yyyyMMddTHHmmss
+            const filename = `detail_pr_${timestamp}.xlsx`;
+            XLSX.writeFile(wb, filename);
+
+            console.log("Dữ liệu chi tiết PR đã xuất Excel.");
+        });
+}
+
+
+
+async function load_detail_po() {
+    return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
+        .then(res => res.json())
+        .then(data => {
+            detail_po_data = data.content;
+            console.log("Dữ liệu chi tiết PR đã tải xong.");
+        });
+}
+
+async function load_po_approve_2_list() {
+    return fetch('https://script.google.com/macros/s/AKfycbzA7zGoRs7-xiMTmIgF4CVcBvhDEqSdABhqlaRJj_RO8IZL1yi6r8YqCdyuBf49dGXSYg/exec')
+        .then(res => res.json())
+        .then(data => {
+            po_approval_2_list = data.content;
+            console.log("Dữ liệu danh sách phê duyệt PO 2 đã tải xong.");
+            // add_po_need_to_approve()
+        });
+}
+
+async function load_po_approve_3_list() {
+    return fetch('https://script.google.com/macros/s/AKfycbyZQo7eME4o8r4IcPmW3wg_WfzzvJ9cf5TwuDNKHmh1qr2r9cA2nai46MSH32z9fXq6wg/exec')
+        .then(res => res.json())
+        .then(data => {
+            po_approval_3_list = data.content;
+            console.log("Dữ liệu danh sách phê duyệt PO 3 đã tải xong.");
+            // add_po_need_to_approve()
+        });
+}
+
+async function load_po_approve_4_list() {
+    return fetch('https://script.google.com/macros/s/AKfycbzmv1n0cwQlS4LCw6_oroglNINiV4tF3bGvQGUd-iRQmZKc4CMV2MylbOH-iM7fb0rZ/exec')
+        .then(res => res.json())
+        .then(data => {
+            po_approval_4_list = data.content;
+            console.log("Dữ liệu danh sách phê duyệt PO 4 đã tải xong.");
+            // add_po_need_to_approve()
+        });
+}
+
 async function load_po_need_to_release() {
     return fetch('https://script.google.com/macros/s/AKfycbyNvLnAUPYAQ1VhsKLmUBt1jq2bExhq_X7Bj4_AtMpEuDD-0sFvptzaPAJV8Cfxmv6W/exec')
         .then(res => res.json())
@@ -776,7 +849,7 @@ async function load_po_need_to_release() {
 
             // Chỉ lấy các cột mong muốn từ mỗi hàng
             po_need_to_release_list = po_need_to_release_list.map(row => [
-                row[1], row[2], row[3], row[4], row[5], row[0], row[8], row[7]
+                row[1], row[2], row[3], row[4], row[5], row[0], row[8], row[6]
             ]);
 
             console.log("Dữ liệu PO cần ra đơn hàng đã tải xong.", po_need_to_release_list);
@@ -1115,8 +1188,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 pur_po_release:user[23] === "x",
                 pur_pre_payment:user[24] === "x",
                 pur_po_receiving:user[25] === "x",
-                pur_final_payment:user[26] === "x"
-
+                pur_final_payment:user[26] === "x",
+                bom_approval:user[29] === "x",
+                quotation_approval:user[30] === "x",
+                pr_approval:user[31] === "x",
+                po_1_approval:user[32] === "x",
+                po_2_approval:user[33] === "x",
+                po_3_approval:user[34] === "x",
+                po_4_approval:user[35] === "x",
+                export_pr:user[36] === "x",
+                export_po:user[37] === "x"
             };
 
             // Ghi log quyền để kiểm tra
@@ -1397,6 +1478,41 @@ async function showFrame(id) {
                 activeFrame.classList.add('active');
                 active_frame = id;
                 get_po_need_to_final_payment()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'bom_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                design_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'quotation_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                quotation_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'pr_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                pr_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'po_1_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                po_1_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'po_2_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                po_2_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'po_3_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                po_3_approval()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'po_4_approval') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                po_4_approval()
                 console.log("Access granted to frame:", id);
             } else {
                 activeFrame.classList.add('active');
@@ -3605,7 +3721,7 @@ async function rejectDesign() {
 async function load_approval_ticket() {
     document.getElementById("loadingIndicator").style.display = "block";
 
-    await Promise.all([design_approval(), quotation_approval(),displayTable_approve(),displayTable_approve2()]); // Run both fetch calls in parallel
+    await Promise.all([design_approval(), quotation_approval(),pr_approval(),po_1_approval()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
     document.getElementById("loadingIndicator").style.display = "none";
@@ -6182,7 +6298,7 @@ function calculateTotalPrice() {
     }
 
     // Cập nhật tổng giá trị vào bom-total-price với dấu phân cách
-    document.getElementById("bom-total-price").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+    document.getElementById("bom-total-price").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')}`;
 }
 
 // Hàm tính tổng giá trị cho từng dòng và toàn bảng
@@ -6210,38 +6326,8 @@ function calculateAssetPrice() {
     });
 
     // Cập nhật tổng giá trị vào phần tử bom-total-price-asset
-    document.getElementById("bom-total-price-asset").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+    document.getElementById("bom-total-price-asset").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')}`;
 }
-
-
-
-// Hàm tính tổng giá trị cho từng dòng và toàn bảng
-// function calculateLaborPrice() {
-//     const table = document.getElementById("table_labor"); // Lấy bảng theo ID
-//     const rows = table.querySelectorAll("tbody tr"); // Lấy tất cả các hàng trong tbody
-//     let totalPrice = 0; // Biến lưu tổng giá trị toàn bảng
-
-//     rows.forEach(row => {
-//         const input = row.querySelector("input[type='number']"); // Lấy ô input
-//         const pricePerUnitCell = row.cells[3]; // Cột Giá / Đơn vị
-//         const totalCell = row.cells[4]; // Cột Tổng giá
-
-//         const quantity = parseFloat(input.value) || 0; // Số giờ cần (nếu rỗng thì là 0)
-//         const pricePerUnit = parseFloat(pricePerUnitCell.textContent.replace(/,/g, '')) || 0; // Giá / Đơn vị (xóa dấu phẩy)
-        
-//         // Tính Tổng giá cho dòng hiện tại
-//         const total = quantity * pricePerUnit;
-
-//         // Hiển thị giá trị tính toán vào cột Tổng giá
-//         totalCell.textContent = total.toLocaleString('en-US'); // Hiển thị có dấu phẩy phân cách
-
-//         // Cộng dồn giá trị vào tổng giá trị toàn bảng
-//         totalPrice += total;
-//     });
-
-//     // Cập nhật tổng giá trị vào phần tử bom-total-price-labor
-//     document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
-// }
 
 function calculateLaborPrice() {
     const table = document.getElementById("table_labor"); // Lấy bảng theo ID
@@ -6276,7 +6362,7 @@ function calculateLaborPrice() {
     });
 
     // Cập nhật tổng giá trị vào phần tử bom-total-price-labor
-    document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')} VNĐ`;
+    document.getElementById("bom-total-price-labor").textContent = `Tổng giá trị: ${totalPrice.toLocaleString('en-US')}`;
 }
 
 
@@ -6296,7 +6382,7 @@ function calculateTotalBOMPrice() {
     const totalBOMPrice = assetTotal + laborTotal + bomTotal;
 
     // Hiển thị tổng BOM
-    document.getElementById("total_bom_price_final").textContent = `TỔNG GIÁ TRỊ CỦA BOM: ${totalBOMPrice.toLocaleString('en-US')} VNĐ`;
+    document.getElementById("total_bom_price_final").textContent = `TỔNG GIÁ TRỊ CỦA BOM: ${totalBOMPrice.toLocaleString('en-US')}`;
 }
 
 // Gọi hàm này sau khi tính toán xong các bảng con
@@ -7011,7 +7097,7 @@ function addItem_pr() {
     }
 
     if (customer === "") {
-        alert("Vui lòng chọn nhà cung cấp")
+        alert("Vui lòng chọn Khách hàng")
         document.getElementById("pr-vendor").focus()
         return
     }
@@ -7263,7 +7349,8 @@ function LoadFile_pr(event) {
 
 // PR Approve
 
-async function displayTable_approve() {
+async function pr_approval() {
+    document.getElementById("loadingIndicator").style.display = "block";
     await load_pr_approve_list();
     const data = pr_approve_list
     const tbody = document.getElementById("dataTable_pr").getElementsByTagName("tbody")[0];
@@ -7299,9 +7386,13 @@ async function displayTable_approve() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
+    document.getElementById("loadingIndicator").style.display = "none";
 }
 
-async function displayTable_approve2() {
+// Approve 1
+
+async function po_1_approval() {
+    document.getElementById("loadingIndicator").style.display = "block";
     await load_po_approve_list();
     const data = po_approval_list;
     console.log(data)
@@ -7337,6 +7428,7 @@ async function displayTable_approve2() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
+    document.getElementById("loadingIndicator").style.display = "none";
 }
 
 function openModal_po(row) {
@@ -7386,18 +7478,491 @@ function closeModal_po() {
     hide_reject_section()
 }
 
+// Approve 2
+
+async function po_2_approval() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await load_po_approve_2_list(); 
+    const data = po_approval_2_list;
+    console.log(data)
+    const tbody = document.getElementById("dataTable_po_2").getElementsByTagName("tbody")[0];
+    tbody.innerHTML = ""; // Xóa dữ liệu cũ nếu có
+
+    data.forEach(row => {
+        let tr = document.createElement("tr");
+
+        // Danh sách cột (theo thứ tự yêu cầu)
+        row.forEach((cell, index) => {
+            let td = document.createElement("td");
+            td.textContent = cell;
+
+            // Ẩn cột thứ 7 (PDF) và thứ 8 (Files)
+            if (index === 7 || index === 8 || index === 9 || index === 10) {
+                td.classList.add("hidden");
+            } else if (index === 11) {
+                // Định dạng cột tổng tiền
+                const formattedNumber = Number(cell).toLocaleString("en-US");
+                td.textContent = formattedNumber;
+            }
+
+            tr.appendChild(td);
+        });
+
+        // Thêm nút View
+        let actionTd = document.createElement("td");
+        let viewBtn = document.createElement("button");
+        viewBtn.textContent = "View";
+        viewBtn.onclick = function() {
+            // console.log(row);
+            openModal_po_2(row); // Gọi hàm mở modal với dữ liệu
+        };
+
+        actionTd.appendChild(viewBtn);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+    });
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function openModal_po_2(row) {
+    console.log(row)
+    // Cập nhật dữ liệu vào modal
+    document.getElementById("po_2_date").textContent = row[0];
+    document.getElementById("po_2_time").textContent = row[1];
+    document.getElementById("po_2_number").textContent = row[2];
+    document.getElementById("po_2_pr").textContent = row[3];
+    document.getElementById("po_2_vendor").textContent = row[4];
+    document.getElementById("po_2_creator").textContent = row[5];
+    document.getElementById("po_2_pr_creator").textContent = row[6];
+    document.getElementById("po_2_total").textContent = row[11].toLocaleString("en-US");
+
+    // Cập nhật link PDF
+    const poPdfViewBtn = document.getElementById("po_2_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "block";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
+
+    // Cập nhật link Files
+    const poFilesViewBtn = document.getElementById("po_2_fils_view");
+    if (row[8]) {
+        poFilesViewBtn.style.display = "block";
+        poFilesViewBtn.setAttribute("data-url", row[8]); // Lưu link Files
+        poFilesViewBtn.onclick = function() {
+            window.open(row[8], "_blank");
+        };
+    } else {
+        poFilesViewBtn.style.display = "none";
+    }
+
+    // Hiển thị modal
+    document.getElementById("modal_po_2").style.display = "block";
+}
 
 
+// Đóng modal
+function closeModal_po_2() {
+    document.getElementById("modal_po_2").style.display = "none";
+    hide_reject_section()
+}
 
-// function showDetails(columns, rowData) {
-//     let modal = document.getElementById("modal_pr");
-//     let modalContent = document.getElementById("modalContent_pr");
+function hide_reject_section_2() {
+    document.getElementById("reject_reason_2").value = ""; // Reset lý do Reject
+        // hide reject section
+    document.getElementById("reject_reason_section_2").style.display = "none";
+}
 
-//     let detailsText = columns.map((col, index) => `<strong>${col}:</strong> ${rowData[index]}`).join("<br>");
+// Gắn sự kiện cho nút Approve và Reject
+document.getElementById("po_2_approve").addEventListener("click", approvePO_2);
+document.getElementById("po_2_reject").addEventListener("click", rejectPO_2);
 
-//     modalContent.innerHTML = detailsText;
-//     modal.style.display = "block"; // Hiện modal
-// }
+function approvePO_2() {
+    sendApprovalRequest_2("Approved", "");
+}
+
+function rejectPO_2() {
+    // Hiển thị ô nhập lý do Reject
+    const rejectSection = document.getElementById("reject_reason_section_2");
+    
+    if (rejectSection.style.display === "none") {
+        rejectSection.style.display = "block";
+    } else {
+        const reason = document.getElementById("reject_reason_2").value.trim();
+        if (!reason) {
+            alert("Vui lòng nhập lý do từ chối.");
+            return;
+        }
+        sendApprovalRequest_2("Rejected", reason);
+    }
+}
+
+function sendApprovalRequest_2(status, reason) {
+    GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzDnsIXGgF-NndW9qoLdSvviJwlQLz-5pMOzcYXjxFMDO5JIzVcOVMpj906QB9WDnsQw/exec"
+    document.getElementById("loadingIndicator").style.display = "block";
+    const poData = {
+        date: document.getElementById("po_2_date").textContent,
+        time: document.getElementById("po_2_time").textContent,
+        po_number: document.getElementById("po_2_number").textContent,
+        pr_number: document.getElementById("po_2_pr").textContent,
+        vendor: document.getElementById("po_2_vendor").textContent,
+        po_creator: document.getElementById("po_2_creator").textContent,
+        pr_creator: document.getElementById("po_2_pr_creator").textContent,
+        total_amount: document.getElementById("po_2_total").textContent,
+
+        pdf_link: document.getElementById("po_2_pdf_view").getAttribute("data-url") || "", // Lấy link PDF
+        files_link: document.getElementById("po_2_fils_view").getAttribute("data-url") || "", // Lấy link Files
+        status: status,
+        reason: reason
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(poData)
+    }).then(() => {
+        info(`PO ${status} thành công!`);
+        closeModal_po_2();
+        hide_reject_section_2()
+        po_2_approval()
+    }).catch(error => {
+        console.error("Lỗi khi gửi dữ liệu:", error);
+        alert("Có lỗi xảy ra! Vui lòng thử lại.");
+    });
+}
+///############################################///
+///############################################///
+
+// Approve 3
+
+async function po_3_approval() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await load_po_approve_3_list(); 
+    const data = po_approval_3_list;
+    console.log(data)
+    const tbody = document.getElementById("dataTable_po_3").getElementsByTagName("tbody")[0];
+    tbody.innerHTML = ""; // Xóa dữ liệu cũ nếu có
+
+    data.forEach(row => {
+        let tr = document.createElement("tr");
+
+        // Danh sách cột (theo thứ tự yêu cầu)
+        row.forEach((cell, index) => {
+            let td = document.createElement("td");
+            td.textContent = cell;
+
+            // Ẩn cột thứ 7 (PDF) và thứ 8 (Files)
+            if (index === 7 || index === 8 || index === 9 || index === 10) {
+                td.classList.add("hidden");
+            } else if (index === 11) {
+                // Định dạng cột tổng tiền
+                const formattedNumber = Number(cell).toLocaleString("en-US");
+                td.textContent = formattedNumber;
+            }
+
+            tr.appendChild(td);
+        });
+
+        // Thêm nút View
+        let actionTd = document.createElement("td");
+        let viewBtn = document.createElement("button");
+        viewBtn.textContent = "View";
+        viewBtn.onclick = function() {
+            // console.log(row);
+            openModal_po_3(row); // Gọi hàm mở modal với dữ liệu
+        };
+
+        actionTd.appendChild(viewBtn);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+    });
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function openModal_po_3(row) {
+    console.log(row)
+    // Cập nhật dữ liệu vào modal
+    document.getElementById("po_3_date").textContent = row[0];
+    document.getElementById("po_3_time").textContent = row[1];
+    document.getElementById("po_3_number").textContent = row[2];
+    document.getElementById("po_3_pr").textContent = row[3];
+    document.getElementById("po_3_vendor").textContent = row[4];
+    document.getElementById("po_3_creator").textContent = row[5];
+    document.getElementById("po_3_pr_creator").textContent = row[6];
+    document.getElementById("po_3_total").textContent = row[11].toLocaleString("en-US");
+
+    // Cập nhật link PDF
+    const poPdfViewBtn = document.getElementById("po_3_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "block";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
+
+    // Cập nhật link Files
+    const poFilesViewBtn = document.getElementById("po_3_fils_view");
+    if (row[8]) {
+        poFilesViewBtn.style.display = "block";
+        poFilesViewBtn.setAttribute("data-url", row[8]); // Lưu link Files
+        poFilesViewBtn.onclick = function() {
+            window.open(row[8], "_blank");
+        };
+    } else {
+        poFilesViewBtn.style.display = "none";
+    }
+
+    // Hiển thị modal
+    document.getElementById("modal_po_3").style.display = "block";
+}
+
+
+// Đóng modal
+function closeModal_po_3() {
+    document.getElementById("modal_po_3").style.display = "none";
+    hide_reject_section()
+}
+
+function hide_reject_section_3() {
+    document.getElementById("reject_reason_3").value = ""; // Reset lý do Reject
+        // hide reject section
+    document.getElementById("reject_reason_section_3").style.display = "none";
+}
+
+// Gắn sự kiện cho nút Approve và Reject
+document.getElementById("po_3_approve").addEventListener("click", approvePO_3);
+document.getElementById("po_3_reject").addEventListener("click", rejectPO_3);
+
+function approvePO_3() {
+    sendApprovalRequest_3("Approved", "");
+}
+
+function rejectPO_3() {
+    // Hiển thị ô nhập lý do Reject
+    const rejectSection = document.getElementById("reject_reason_section_3");
+    
+    if (rejectSection.style.display === "none") {
+        rejectSection.style.display = "block";
+    } else {
+        const reason = document.getElementById("reject_reason_3").value.trim();
+        if (!reason) {
+            alert("Vui lòng nhập lý do từ chối.");
+            return;
+        }
+        sendApprovalRequest_3("Rejected", reason);
+    }
+}
+
+function sendApprovalRequest_3(status, reason) {
+    GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFJdrBPsgZdbJDQ8Oez9tMiou77KCjah7yOZgBEXSQ860W3PqBjzz_o92p3qci-Xrs/exec"
+    document.getElementById("loadingIndicator").style.display = "block";
+    const poData = {
+        date: document.getElementById("po_3_date").textContent,
+        time: document.getElementById("po_3_time").textContent,
+        po_number: document.getElementById("po_3_number").textContent,
+        pr_number: document.getElementById("po_3_pr").textContent,
+        vendor: document.getElementById("po_3_vendor").textContent,
+        po_creator: document.getElementById("po_3_creator").textContent,
+        pr_creator: document.getElementById("po_3_pr_creator").textContent,
+        total_amount: document.getElementById("po_3_total").textContent,
+
+        pdf_link: document.getElementById("po_3_pdf_view").getAttribute("data-url") || "", // Lấy link PDF
+        files_link: document.getElementById("po_3_fils_view").getAttribute("data-url") || "", // Lấy link Files
+        status: status,
+        reason: reason
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(poData)
+    }).then(() => {
+        info(`PO ${status} thành công!`);
+        closeModal_po_3();
+        hide_reject_section_3()
+        po_3_approval()
+    }).catch(error => {
+        console.error("Lỗi khi gửi dữ liệu:", error);
+        alert("Có lỗi xảy ra! Vui lòng thử lại.");
+    });
+}
+///############################################///
+///############################################///
+
+// Approve 4
+
+async function po_4_approval() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    await load_po_approve_4_list(); 
+    const data = po_approval_4_list;
+    console.log(data)
+    const tbody = document.getElementById("dataTable_po_4").getElementsByTagName("tbody")[0];
+    tbody.innerHTML = ""; // Xóa dữ liệu cũ nếu có
+
+    data.forEach(row => {
+        let tr = document.createElement("tr");
+
+        // Danh sách cột (theo thứ tự yêu cầu)
+        row.forEach((cell, index) => {
+            let td = document.createElement("td");
+            td.textContent = cell;
+
+            // Ẩn cột thứ 7 (PDF) và thứ 8 (Files)
+            if (index === 7 || index === 8 || index === 9 || index === 10) {
+                td.classList.add("hidden");
+            } else if (index === 11) {
+                // Định dạng cột tổng tiền
+                const formattedNumber = Number(cell).toLocaleString("en-US");
+                td.textContent = formattedNumber;
+            }
+
+            tr.appendChild(td);
+        });
+
+        // Thêm nút View
+        let actionTd = document.createElement("td");
+        let viewBtn = document.createElement("button");
+        viewBtn.textContent = "View";
+        viewBtn.onclick = function() {
+            // console.log(row);
+            openModal_po_4(row); // Gọi hàm mở modal với dữ liệu
+        };
+
+        actionTd.appendChild(viewBtn);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+    });
+    document.getElementById("loadingIndicator").style.display = "none";
+}
+
+function openModal_po_4(row) {
+    console.log(row)
+    // Cập nhật dữ liệu vào modal
+    document.getElementById("po_4_date").textContent = row[0];
+    document.getElementById("po_4_time").textContent = row[1];
+    document.getElementById("po_4_number").textContent = row[2];
+    document.getElementById("po_4_pr").textContent = row[3];
+    document.getElementById("po_4_vendor").textContent = row[4];
+    document.getElementById("po_4_creator").textContent = row[5];
+    document.getElementById("po_4_pr_creator").textContent = row[6];
+    document.getElementById("po_4_total").textContent = row[11].toLocaleString("en-US");
+
+    // Cập nhật link PDF
+    const poPdfViewBtn = document.getElementById("po_4_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "block";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
+
+    // Cập nhật link Files
+    const poFilesViewBtn = document.getElementById("po_4_fils_view");
+    if (row[8]) {
+        poFilesViewBtn.style.display = "block";
+        poFilesViewBtn.setAttribute("data-url", row[8]); // Lưu link Files
+        poFilesViewBtn.onclick = function() {
+            window.open(row[8], "_blank");
+        };
+    } else {
+        poFilesViewBtn.style.display = "none";
+    }
+
+    // Hiển thị modal
+    document.getElementById("modal_po_4").style.display = "block";
+}
+
+
+// Đóng modal
+function closeModal_po_4() {
+    document.getElementById("modal_po_4").style.display = "none";
+    hide_reject_section()
+}
+
+function hide_reject_section_4() {
+    document.getElementById("reject_reason_4").value = ""; // Reset lý do Reject
+        // hide reject section
+    document.getElementById("reject_reason_section_4").style.display = "none";
+}
+
+// Gắn sự kiện cho nút Approve và Reject
+document.getElementById("po_4_approve").addEventListener("click", approvePO_4);
+document.getElementById("po_4_reject").addEventListener("click", rejectPO_4);
+
+function approvePO_4() {
+    sendApprovalRequest_4("Approved", "");
+}
+
+function rejectPO_4() {
+    // Hiển thị ô nhập lý do Reject
+    const rejectSection = document.getElementById("reject_reason_section_4");
+    
+    if (rejectSection.style.display === "none") {
+        rejectSection.style.display = "block";
+    } else {
+        const reason = document.getElementById("reject_reason_4").value.trim();
+        if (!reason) {
+            alert("Vui lòng nhập lý do từ chối.");
+            return;
+        }
+        sendApprovalRequest_4("Rejected", reason);
+    }
+}
+
+function sendApprovalRequest_4(status, reason) {
+    GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzabggVMG2trkf8f3ilAyHBrshSHz57hxFzaDPaO2bFDhKDiZGlM91rjG51sMgI6n9CkQ/exec"
+    document.getElementById("loadingIndicator").style.display = "block";
+    const poData = {
+        date: document.getElementById("po_4_date").textContent,
+        time: document.getElementById("po_4_time").textContent,
+        po_number: document.getElementById("po_4_number").textContent,
+        pr_number: document.getElementById("po_4_pr").textContent,
+        vendor: document.getElementById("po_4_vendor").textContent,
+        po_creator: document.getElementById("po_4_creator").textContent,
+        pr_creator: document.getElementById("po_4_pr_creator").textContent,
+        total_amount: document.getElementById("po_4_total").textContent,
+
+        pdf_link: document.getElementById("po_4_pdf_view").getAttribute("data-url") || "", // Lấy link PDF
+        files_link: document.getElementById("po_4_fils_view").getAttribute("data-url") || "", // Lấy link Files
+        status: status,
+        reason: reason
+    };
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(poData)
+    }).then(() => {
+        info(`PO ${status} thành công!`);
+        closeModal_po_4();
+        hide_reject_section_4()
+        po_4_approval()
+    }).catch(error => {
+        console.error("Lỗi khi gửi dữ liệu:", error);
+        alert("Có lỗi xảy ra! Vui lòng thử lại.");
+    });
+}
+///############################################///
+///############################################///
 
 function closeModal_pr() {
     document.getElementById("modal_pr").style.display = "none";
@@ -7462,7 +8027,7 @@ async function showDetails(spreadsheetId, rowData) {
             tableHtml += `
                 <tr>
                     <td colspan="11" style="text-align: right; font-weight: bold; font-size: 26px;">Tổng tiền:</td>
-                    <td style="text-align: right; font-weight: bold; font-size: 26px;">${totalAmount.toLocaleString("vi-VN")} ₫</td>
+                    <td style="text-align: right; font-weight: bold; font-size: 26px;">${totalAmount.toLocaleString("vi-VN")}</td>
                 </tr>`;
         }
 
@@ -7724,7 +8289,7 @@ async function click_pr_to_po(row) {
                     input.style.width = index === 3 ? "400px" : "150px";
 
                     // Format số khi nhập liệu
-                    if ([7, 8, 9, 10].includes(index)) {
+                    if ([7, 9, 10].includes(index)) {
                         // Xử lý khi người dùng đang gõ
                         input.addEventListener("input", function () {
                             let raw = input.value.replace(/[^0-9.]/g, "");
@@ -7755,11 +8320,14 @@ async function click_pr_to_po(row) {
                     // Tạo dropdown cho % Thuế GTGT
                     let select = document.createElement("select");
                     select.style.width = "150px";
+                    select.style.border = "1px solid #ccc";
                     ["0%","8%", "10%"].forEach(optionValue => {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
                         option.style.textAlign = "center";
+                        // i want draw border color like input above
+                        option.style.fontWeight = "bold";
                         select.appendChild(option);
                     });
 
@@ -7773,7 +8341,7 @@ async function click_pr_to_po(row) {
                     // Tạo dropdown cho % Thuế GTGT
                     let select = document.createElement("select");
                     select.style.width = "150px";
-                    ["VND","USD","JPY","SGD","RWB"].forEach(optionValue => {
+                    ["VND","USD","JPY","SGD","RMB"].forEach(optionValue => {
                         let option = document.createElement("option");
                         // option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
@@ -7830,14 +8398,14 @@ function updateCalculatedFields(row) {
 
     // Tính toán Thành tiền
     let thanhTien = slCanMua * donGia;
-    thanhTienCell.textContent = thanhTien.toLocaleString(undefined, {
+    thanhTienCell.textContent = thanhTien.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
 
     // Tính toán Tổng tiền
     let tongTien = thanhTien + (thanhTien * phanTramThue / 100);
-    tongTienCell.textContent = tongTien.toLocaleString(undefined, {
+    tongTienCell.textContent = tongTien.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
@@ -7928,50 +8496,126 @@ function calculateTotalPricePO() {
     }
     
     // Hiển thị tổng giá trị
-    document.getElementById("po_total_price").innerText = `Tổng giá trị: ${total.toLocaleString()} VND`;
+    document.getElementById("po_total_price").innerText = `Tổng giá trị: ${total.toLocaleString()}`;
 }
 
 
+// function getTablePOData() {
+//     let table = document.getElementById("po_materialTable");
+//     let tbody = table.getElementsByTagName("tbody")[0];
+//     let rows = tbody.getElementsByTagName("tr");
+//     let tableData = [];
+    
+//     // Lặp qua từng hàng trong bảng
+//     for (let i = 0; i < rows.length; i++) {
+//         let cells = rows[i].getElementsByTagName("td");
+//         let rowData = {};
+        
+//         // Lấy dữ liệu từng cột trong hàng
+//         for (let j = 0; j < cells.length; j++) {
+//             let cell = cells[j];
+//             let value = "";
+            
+//             // Kiểm tra nếu ô chứa input
+//             let input = cell.querySelector("input");
+//             if (input) {
+//                 value = input.value.trim();
+//             } else {
+//                 // Kiểm tra nếu ô chứa select
+//                 let select = cell.querySelector("select");
+//                 if (select) {
+//                     value = select.value.trim();
+//                 } else {
+//                     // Lấy giá trị văn bản thông thường
+//                     value = cell.innerText.trim();
+//                 }
+//             }
+            
+//             // Chuyển đổi các cột số từ định dạng có dấu phẩy thành số
+//             if ([7, 8, 9, 10, 11, 13].includes(j)) {
+//                 value = parseFloat(value.replace(/,/g, '')) || 0;
+//             }
+            
+//             rowData[`col_${j}`] = value;
+//         }
+        
+//         // Thêm dữ liệu từ extraData vào từng hàng
+//         rowData["po_po_label"] = document.getElementById("po_po_label").innerText.trim();
+//         rowData["po_wh_label"] = document.getElementById("po_wh_label").innerText.trim();
+//         rowData["po_expect_delivery_date"] = document.getElementById("po_expect_delivery_date").value.trim();
+//         rowData["po_payment_date"] = document.getElementById("po_payment_date").value.trim();
+//         rowData["po_company_input"] = document.getElementById("po_company_input").value.trim();
+//         rowData["po_address_input"] = document.getElementById("po_address_input").value.trim();
+//         rowData["po_tax_input"] = document.getElementById("po_tax_input").value.trim();
+//         rowData["po_bank_add_input"] = document.getElementById("po_bank_add_input").value.trim();
+//         rowData["po_bank_acc_input"] = document.getElementById("po_bank_acc_input").value.trim();
+//         rowData["po_bank_name_input"] = document.getElementById("po_bank_name_input").value.trim();
+//         rowData["po_swift_input"] = document.getElementById("po_swift_input").value.trim();
+//         rowData["po_delivery_address_input"] = document.getElementById("po_delivery_address_input").value.trim();
+//         rowData["po_delivery_to_input"] = document.getElementById("po_delivery_to_input").value.trim();
+//         rowData["po_atts_input"] = document.getElementById("po_atts_input").value.trim();
+//         rowData["po_phone_input"] = document.getElementById("po_phone_input").value.trim();
+//         rowData["po_ship_via_input"] = document.getElementById("po_ship_via_input").value.trim();
+//         rowData["po_delivery_terms_input"] = document.getElementById("po_delivery_terms_input").value.trim();
+//         rowData["po_payment_terms_input"] = document.getElementById("po_payment_terms_input").value.trim();
+//         rowData["po_lead_time_input"] = document.getElementById("po_lead_time_input").value.trim();
+//         rowData["po_warranty_input"] = document.getElementById("po_warranty_input").value.trim();
+//         rowData["po_ship_value_input"] = document.getElementById("po_ship_value_input").value.trim();
+//         rowData['wh_and_dept'] = "RMG-PO-" + document.getElementById("po_po_label").innerText.trim().split("-")[1] + "-" + sessionStorage.getItem("dept");
+//         rowData['pr_creator'] = document.getElementById("po_pr_operator_label").textContent
+//         rowData['sheet_id'] = document.getElementById("po_sheet_id_label").textContent
+//         rowData['po_creator'] = sessionStorage.getItem("fullname")
+//         rowData['po_approver'] = sessionStorage.getItem("po_approver")
+        
+        
+//         tableData.push(rowData);
+//     }
+    
+//     return tableData;
+// }
+
 function getTablePOData() {
     let table = document.getElementById("po_materialTable");
+    let thead = table.getElementsByTagName("thead")[0];
+    let headerCells = thead.getElementsByTagName("th");
     let tbody = table.getElementsByTagName("tbody")[0];
     let rows = tbody.getElementsByTagName("tr");
     let tableData = [];
-    
-    // Lặp qua từng hàng trong bảng
+
     for (let i = 0; i < rows.length; i++) {
         let cells = rows[i].getElementsByTagName("td");
         let rowData = {};
-        
-        // Lấy dữ liệu từng cột trong hàng
+
         for (let j = 0; j < cells.length; j++) {
             let cell = cells[j];
             let value = "";
-            
-            // Kiểm tra nếu ô chứa input
+
             let input = cell.querySelector("input");
             if (input) {
                 value = input.value.trim();
             } else {
-                // Kiểm tra nếu ô chứa select
                 let select = cell.querySelector("select");
                 if (select) {
                     value = select.value.trim();
                 } else {
-                    // Lấy giá trị văn bản thông thường
                     value = cell.innerText.trim();
                 }
             }
-            
-            // Chuyển đổi các cột số từ định dạng có dấu phẩy thành số
+
+            // Kiểm tra cột bắt buộc (trừ cột 3, 7, 8, 14)
+            if (![3, 7, 8, 14].includes(j) && !value) {
+                let columnName = headerCells[j] ? headerCells[j].innerText.trim() : `cột ${j + 1}`;
+                alert(`Dòng ${i + 1} cột ${columnName} là bắt buộc nhập.`);
+                return null;
+            }
+
             if ([7, 8, 9, 10, 11, 13].includes(j)) {
                 value = parseFloat(value.replace(/,/g, '')) || 0;
             }
-            
+
             rowData[`col_${j}`] = value;
         }
-        
-        // Thêm dữ liệu từ extraData vào từng hàng
+
         rowData["po_po_label"] = document.getElementById("po_po_label").innerText.trim();
         rowData["po_wh_label"] = document.getElementById("po_wh_label").innerText.trim();
         rowData["po_expect_delivery_date"] = document.getElementById("po_expect_delivery_date").value.trim();
@@ -7994,25 +8638,34 @@ function getTablePOData() {
         rowData["po_warranty_input"] = document.getElementById("po_warranty_input").value.trim();
         rowData["po_ship_value_input"] = document.getElementById("po_ship_value_input").value.trim();
         rowData['wh_and_dept'] = "RMG-PO-" + document.getElementById("po_po_label").innerText.trim().split("-")[1] + "-" + sessionStorage.getItem("dept");
-        rowData['pr_creator'] = document.getElementById("po_pr_operator_label").textContent
-        rowData['sheet_id'] = document.getElementById("po_sheet_id_label").textContent
-        rowData['po_creator'] = sessionStorage.getItem("fullname")
-        rowData['po_approver'] = sessionStorage.getItem("po_approver")
-        
-        
+        rowData['pr_creator'] = document.getElementById("po_pr_operator_label").textContent;
+        rowData['sheet_id'] = document.getElementById("po_sheet_id_label").textContent;
+        rowData['po_creator'] = sessionStorage.getItem("fullname");
+        rowData['po_approver'] = sessionStorage.getItem("po_approver");
+
         tableData.push(rowData);
     }
-    
+
     return tableData;
 }
+
 
 async function sendPO() {
     const expt_date = document.getElementById("po_expect_delivery_date").value;
     const pay_date = document.getElementById("po_payment_date").value;
     const company = document.getElementById("po_company_input").value;
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    if (!expt_date || !pay_date || !company) {
+        alert("Vui lòng nhập đầy đủ thông tin bắt buộc.");
+        return;
+    }
+    
     let tableData = getTablePOData();
+    if (!tableData) {
+        return; // Dừng lại nếu thiếu dữ liệu
+    }
+    document.getElementById("loadingIndicator").style.display = "block";
+
     let formData = new FormData();
     formData.append("data", JSON.stringify(tableData));
 
@@ -8198,6 +8851,7 @@ async function get_po_need_to_release() {
 
     po_need_to_release_list.forEach((rowData, rowIndex) => {
         const row = document.createElement("tr");
+        console.log(row)
 
         // Thêm các ô dữ liệu vào hàng
         row.innerHTML = `
@@ -8373,12 +9027,6 @@ document.getElementById("submitButton_po_release").addEventListener("click", asy
             vendor_bank_acc = spreadsheetData[0]["po_bank_acc_input"] || "";
             payment_date2 = spreadsheetData[0]["po_payment_date"] || "";
 
-
-            console.log("Địa chỉ nhà cung cấp:", vendor_addr);
-            console.log("Số điện thoại:", vendor_phone);
-            console.log("Tên ngân hàng:", vendor_bank_name);
-            console.log("Số tài khoản:", vendor_bank_acc);
-            console.log("Ngày thanh toán:", payment_date2);
         }
     } catch (error) {
         alert("Lỗi khi lấy dữ liệu từ Google Sheets: " + error.message);
@@ -8406,6 +9054,27 @@ document.getElementById("submitButton_po_release").addEventListener("click", asy
         files: [] // Chứa dữ liệu file
     };
 
+    let formData2 = {
+        pr: document.getElementById("pr_po_release").value,
+        po: document.getElementById("po_po_release").value,
+        po_creator: document.getElementById("po_creator_po_release").value,
+        pr_creator: pr_creator2,
+        vendor: document.getElementById("vendor_po_release").value,
+        total_value: document.getElementById("total_value_po_release").value,
+        pre_pay: 0,
+        remain_pay: document.getElementById("remain_pay_po_release").value,
+        expect_recv_date: document.getElementById("expect_recv_date_po_release").value,
+        content: document.getElementById("content_po_release").value,
+        operator: sessionStorage.getItem("fullname"),
+        addr: vendor_addr,
+        phone: vendor_phone,
+        bank_name: vendor_bank_name,
+        bank_acc: vendor_bank_acc,
+        payment_date: payment_date2,
+        
+        files: [] // Dữ liệu file upload
+    };
+
     let fileInput = document.getElementById("fileUpload_po_release");
     if (fileInput.files.length > 0) {
         let filePromises = [];
@@ -8424,15 +9093,85 @@ document.getElementById("submitButton_po_release").addEventListener("click", asy
             }));
         }
 
+        // 📂 Xử lý file upload (chuyển thành base64)
+        let fileInput2 = document.getElementById("fileUpload_po_release");
+        if (fileInput2.files.length > 0) {
+            for (let file of fileInput2.files) {
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                await new Promise(resolve => {
+                    reader.onload = function () {
+                        let base64 = reader.result.split(",")[1]; // Lấy phần base64 sau dấu ","
+                        formData2.files.push({
+                            fileName: file.name,
+                            mimeType: file.type,
+                            fileData: base64
+                        });
+                        resolve();
+                    };
+                });
+            }
+        }
+
         Promise.all(filePromises).then(filesBase64 => {
             formData.files = filesBase64;
 
-            sendPoRelease(formData);
+            const tra_truoc = document.getElementById("pre_pay_po_release").value
+            if ( tra_truoc === "" || tra_truoc === "0" || tra_truoc === 0) {
+                console.log("Skip Pre-payment")
+                Promise.all([
+                    sendSkipPayment(formData2),
+                    sendPoRelease(formData)
+                ])
+                .then(() => {
+                    console.log("Cả hai hàm đã hoàn thành!");
+                })
+            } else {
+                console.log("Process Pre-payment")
+                sendPoRelease(formData);
+            }
         });
     } else {
-        sendPoRelease(formData);
+        const tra_truoc = document.getElementById("pre_pay_po_release").value
+        if ( tra_truoc === "" || tra_truoc === "0" || tra_truoc === 0) {
+            console.log("Skip Pre-payment")
+            Promise.all([
+                sendSkipPayment(formData2),
+                sendPoRelease(formData)
+            ])
+            .then(() => {
+                console.log("Cả hai hàm đã hoàn thành!");
+            })
+        } else {
+            console.log("Process Pre-payment")
+            sendPoRelease(formData);
+        }
+        
     }
 });
+
+async function sendSkipPayment(formData) {
+    const url = "https://script.google.com/macros/s/AKfycbzizLZKv-ahyrZpHTJxuSyMnfVJ9-cscB0gyeEmz3dqeScP72E4ZXVensa1uaQxCS9iRw/exec";
+    try {
+        await fetch(url, {
+            method: "POST",
+            mode: 'no-cors',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        // Với no-cors, không thể kiểm tra phản hồi, giả định thành công
+        // info("Dữ liệu đã gửi thành công!");
+        clearForm();
+        get_po_need_to_release();
+    } catch (error) {
+        alert("Đã xảy ra lỗi khi gửi dữ liệu!");
+        console.error("Lỗi khi gửi dữ liệu:", error);
+    } finally {
+        document.getElementById("loadingIndicator").style.display = "none";
+    }
+}
+
 
 // Hàm gửi dữ liệu và xử lý trạng thái loading
 function sendPoRelease(formData) {
