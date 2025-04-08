@@ -1287,60 +1287,60 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function load_data_nhap() {
     warning("Đang lấy dữ liệu")
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await Promise.all([load_mml(), load_location()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     info("Lấy dữ liệu thành công")
 }
 
 async function load_data_xuat() {
     warning("Đang lấy dữ liệu")
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await Promise.all([load_onhand()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     info("Lấy dữ liệu thành công")
 }
 
 async function load_data_mml() {
     warning("Đang lấy dữ liệu")
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await show_onhand()
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     info("Lấy dữ liệu thành công")
 }
 
 async function load_data_xuat_export() {
     warning("Đang lấy dữ liệu")
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await show_xuat()
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     info("Lấy dữ liệu thành công")
 }
 
 async function load_data_nhap_export() {
     warning("Đang lấy dữ liệu")
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await show_nhap()
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     info("Lấy dữ liệu thành công")
 }
 
@@ -2403,7 +2403,7 @@ async function crm_post() {
         return
     }
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById("button_crm").disabled = true;
 
     // Kiểm tra cột đầu tiên
@@ -2414,7 +2414,7 @@ async function crm_post() {
     } else {
         console.log('Customer does not exist in the first column');
         alert("Sai tên Khách hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("button_crm").disabled = false;
         return
     }
@@ -2463,7 +2463,7 @@ async function crm_post() {
     }
 
     reset_crm()
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById("button_crm").disabled = false;
 }
 
@@ -2550,7 +2550,7 @@ async function crm_to_design() {
         return
     }
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById("button_crm").disabled = true;
 
     // Kiểm tra cột đầu tiên
@@ -2561,7 +2561,7 @@ async function crm_to_design() {
     } else {
         console.log('Customer does not exist in the first column');
         alert("Sai tên Khách hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("button_crm").disabled = false;
         return
     }
@@ -2632,7 +2632,7 @@ async function crm_to_design() {
         crm_to_quotation_table.append("link", "")
         crm_to_quotation_table.append("design_id", "")
 
-        document.getElementById("loadingIndicator").style.display = "block";
+        startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -2645,7 +2645,7 @@ async function crm_to_design() {
         console.error('Error:', error);
     }
     info("Báo giá thành công")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById("button_crm").disabled = false;
 }
 
@@ -2829,7 +2829,7 @@ async function submitForm_survey() {
     const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm số 0 nếu cần
 
     const datetime_id = `${year}/${month}/${day}`;
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById("submitButton_survey").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -2840,7 +2840,7 @@ async function submitForm_survey() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM#")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_survey").disabled = false;
         return
     }
@@ -2849,7 +2849,7 @@ async function submitForm_survey() {
     console.table(findCrm2)
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu thiết kế")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_survey").disabled = false;
         return
     }
@@ -2899,14 +2899,14 @@ async function submitForm_survey() {
     reset_survey()
     info("Gửi yêu cầu thiết kế thành công!")
     get_survey_need_to_process()
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById("submitButton_survey").disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_survey_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_crm(), load_survey()]);
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
@@ -2979,7 +2979,7 @@ async function get_survey_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function get_content_and_operator(array_data, crm_id) {
@@ -3153,7 +3153,7 @@ async function submitForm_design() {
         return
     }
     
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById("submitButton_design").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -3164,7 +3164,7 @@ async function submitForm_design() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được duyệt")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_design").disabled = false;
         return
     }
@@ -3183,7 +3183,7 @@ async function submitForm_design() {
 
         if (findCrm2.length === 0) {
             alert("CRM# này đang chờ duyệt");
-            document.getElementById("loadingIndicator").style.display = "none";
+            endLoading()
             document.getElementById("submitButton_design").disabled = false;
             return;
         }
@@ -3197,7 +3197,7 @@ async function submitForm_design() {
 
     if (findCrm3.length > 0) {
         alert("CRM# này đã được duyệt")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_design").disabled = false;
         return
     }
@@ -3267,7 +3267,7 @@ async function submitForm_design() {
     reset_design()
     info("Gửi yêu cầu báo giá thành công!")
     get_design_need_to_process()
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById("submitButton_design").disabled = false;
     return false; // Prevent the default form submission
 }
@@ -3277,7 +3277,7 @@ let bomCrmSelect = document.getElementById("bom-crm");
 let bomDraftCrmSelect = document.getElementById("bomDraftDropdown");
 async function get_design_need_to_process() {
     crmList = []
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_survey(), load_design(), load_design_approval()]);
 
 
@@ -3509,7 +3509,7 @@ async function get_design_need_to_process() {
     tableContainer2.innerHTML = "";
     tableContainer2.appendChild(table2);
 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 
@@ -3517,12 +3517,12 @@ async function get_design_need_to_process() {
 
 async function design_approval() {
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await Promise.all([load_design(), load_design_approval()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     design_data.shift()
 
@@ -3659,7 +3659,7 @@ async function approveDesign() {
         design_table_approved.append("link", select_design_to_approve[12])
         design_table_approved.append("design_id", select_design_to_approve[13])
 
-        document.getElementById("loadingIndicator").style.display = "block";
+        startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -3674,7 +3674,7 @@ async function approveDesign() {
     load_approval_ticket()
     closeModal2();
     info("Design Ticket Approved")
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 }
 
 // Hàm xử lý khi nhấn Reject
@@ -3699,7 +3699,7 @@ async function rejectDesign() {
         design_table_rejected.append("link", select_design_to_approve[12])
         design_table_rejected.append("design_id", select_design_to_approve[13])
 
-        document.getElementById("loadingIndicator").style.display = "block";
+        startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -3714,17 +3714,17 @@ async function rejectDesign() {
     load_approval_ticket()
     closeModal2();
     info("Design Ticket Rejected")
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 }
 
 
 async function load_approval_ticket() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await Promise.all([design_approval(), quotation_approval(),pr_approval(),po_1_approval()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 //////////////////////////////
@@ -3840,7 +3840,7 @@ async function submitForm_quotation() {
         return
     }
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById("submitButton_quotation").disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -3851,7 +3851,7 @@ async function submitForm_quotation() {
     // console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM chưa được duyệt báo giá")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_quotation").disabled = false;
         return
     }
@@ -3870,7 +3870,7 @@ async function submitForm_quotation() {
 
         if (findCrm2.length === 0) {
             alert("CRM# này đang chờ duyệt");
-            document.getElementById("loadingIndicator").style.display = "none";
+            endLoading()
             document.getElementById("submitButton_quotation").disabled = false;
             return;
         }
@@ -3884,7 +3884,7 @@ async function submitForm_quotation() {
 
     if (findCrm3.length > 0) {
         alert("CRM# này đã được duyệt")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById("submitButton_quotation").disabled = false;
         return
     }
@@ -3957,14 +3957,14 @@ async function submitForm_quotation() {
     reset_quotation()
     get_quotation_need_to_process()
     info("Gửi yêu cầu chờ nhận đơn hàng thành công!")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById("submitButton_quotation").disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_quotation_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_design_approval(), load_quotation(), load_quotation_approval()]);
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
@@ -4183,19 +4183,19 @@ async function get_quotation_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer2.innerHTML = "";
     tableContainer2.appendChild(table2);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 ///* Quotation approval ///
 
 async function quotation_approval() {
     // Show the loading indicator
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     await Promise.all([load_quotation(), load_quotation_approval()]); // Run both fetch calls in parallel
 
     // Hide the loading indicator once loading is complete
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     quotation_data.shift()
 
@@ -4341,7 +4341,7 @@ async function approveQuotation() {
         quotation_table_approved.append("folderUrl", select_quotation_to_approve[11])
         quotation_table_approved.append("bom_price", select_quotation_to_approve[12])
 
-        document.getElementById("loadingIndicator").style.display = "block";
+        startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbwSxghu5wSRFWmYtivSqcZHnqKtl88MyOJ0anJTKg7X2YLAu4cPcGFSEXAAV_1T2w3O/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -4356,7 +4356,7 @@ async function approveQuotation() {
     load_approval_ticket()
     closeModal3();
     info("Quotation Ticket Approved")
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 }
 
 // Hàm xử lý khi nhấn Reject
@@ -4380,7 +4380,7 @@ async function rejectQuotation() {
         quotation_table_rejected.append("folderUrl", select_quotation_to_approve[11])
         quotation_table_rejected.append("bom_price", select_quotation_to_approve[12])
 
-        document.getElementById("loadingIndicator").style.display = "block";
+        startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbwSxghu5wSRFWmYtivSqcZHnqKtl88MyOJ0anJTKg7X2YLAu4cPcGFSEXAAV_1T2w3O/exec', {
             method: 'POST',
             mode: 'no-cors',
@@ -4395,7 +4395,7 @@ async function rejectQuotation() {
     load_approval_ticket()
     closeModal3();
     info("Quotation Ticket Rejected")
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 }
 
 //////////////////////////////
@@ -4518,7 +4518,7 @@ async function submitForm_order() {
         return
     }
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById('submitButton_order').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -4529,7 +4529,7 @@ async function submitForm_order() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai QUOTATION# hoặc QUOTATION# chưa được duyệt")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_order').disabled = false;
         return
     }
@@ -4540,7 +4540,7 @@ async function submitForm_order() {
     console.table(findCrm2)
     if (findCrm2.length >0) {
         alert("QUOTATION# này đã được yêu cầu SX, đặt hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_order').disabled = false;
         return
     }
@@ -4573,14 +4573,14 @@ async function submitForm_order() {
     reset_order()
     get_order_need_to_process()
     info("Gửi yêu cầu SX - Đặt hàng thành công!")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById('submitButton_order').disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_order_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_quotation_approval(), load_order(), load_crm()]);
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
@@ -4670,7 +4670,7 @@ async function get_order_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 
@@ -4790,7 +4790,7 @@ async function submitForm_mfg() {
     }
 
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById('submitButton_mfg').disabled = true;
     warning("Đang xử lý yêu cầu  ... ")
 
@@ -4800,7 +4800,7 @@ async function submitForm_mfg() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được chờ nhận đơn hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_mfg').disabled = false;
         return
     }
@@ -4809,7 +4809,7 @@ async function submitForm_mfg() {
     console.table(findCrm2)
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu giao hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_mfg').disabled = false;
         return
     }
@@ -4842,14 +4842,14 @@ async function submitForm_mfg() {
     reset_mfg()
     get_mfg_need_to_process()
     info("Gửi yêu cầu giao hàng thành công!")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById('submitButton_mfg').disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_mfg_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_order(), load_mfg()]);
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
@@ -4946,7 +4946,7 @@ async function get_mfg_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 
@@ -5070,7 +5070,7 @@ async function submitForm_delivery() {
     }
 
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById('submitButton_delivery').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -5081,7 +5081,7 @@ async function submitForm_delivery() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được sản xuất")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_delivery').disabled = false;
         return
     }
@@ -5090,7 +5090,7 @@ async function submitForm_delivery() {
     console.table(findCrm2)
     if (findCrm2.length >0) {
         alert("CRM# này đã được yêu cầu thanh toán")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_delivery').disabled = false;
         return
     }
@@ -5125,14 +5125,14 @@ async function submitForm_delivery() {
     reset_delivery()
     get_delivery_need_to_process()
     info("Gửi yêu cầu thanh toán thành công!")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById('submitButton_delivery').disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_delivery_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_mfg(), load_delivery()]);
 
     // Lấy giá trị từ cột thứ 4 của delivery_data
@@ -5230,7 +5230,7 @@ async function get_delivery_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 
@@ -5270,7 +5270,7 @@ async function submitForm_payment() {
     }
 
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     document.getElementById('submitButton_payment').disabled = true;
 
     warning("Đang xử lý yêu cầu  ... ")
@@ -5281,7 +5281,7 @@ async function submitForm_payment() {
     console.table(findCrm)
     if (findCrm.length === 0) {
         alert("Sai CRM# hoặc CRM# chưa được giao hàng")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_payment').disabled = false;
         return
     }
@@ -5290,7 +5290,7 @@ async function submitForm_payment() {
     console.table(findCrm2)
     if (findCrm2.length >0) {
         alert("CRM# này đã hoàn tất thanh toán")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         document.getElementById('submitButton_payment').disabled = false;
         return
     }
@@ -5318,14 +5318,14 @@ async function submitForm_payment() {
     reset_payment()
     get_payment_need_to_process()
     info("Hoàn tất thanh toán!")
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     document.getElementById('submitButton_payment').disabled = false;
 
     return false; // Prevent the default form submission
 }
 
 async function get_payment_need_to_process() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_delivery(), load_payment()]);
 
     // Lấy giá trị từ cột thứ 4 của payment_data
@@ -5442,7 +5442,7 @@ async function get_payment_need_to_process() {
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 ///* CANCEL ///
@@ -5555,7 +5555,7 @@ submitBtn.addEventListener("click", async () => {
             alert("Không tìm thấy frame nào đang hiển thị!");
             return
     }
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     submitBtn.disabled = true;
     try {
         let cancel_table = new FormData();
@@ -5581,7 +5581,7 @@ submitBtn.addEventListener("click", async () => {
     console.log(`CRM#: ${crm_no}`);
     resetModal()
     modal_cancel.style.display = "none"; // Close the modal
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
     submitBtn.disabled = false;
 
     reset_survey()
@@ -5968,7 +5968,7 @@ function handleModalSelection_bom2(selectedOption) {
 
 async function get_crm_need_to_create_bom() {
     crmList = []
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_survey(), load_design(), load_design_approval(),load_bom(),load_bom_draft()]);
 
 
@@ -6087,12 +6087,12 @@ async function get_crm_need_to_create_bom() {
         bom_selected(selectedValue)
       });
 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 async function get_crm_need_to_load_bom_draft() {
     crmList = [];
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_bom(), load_bom_draft()]);
     
     // Xóa các option cũ trong select (nếu có)
@@ -6147,7 +6147,7 @@ async function get_crm_need_to_load_bom_draft() {
     
     bomDraftCrmSelect.addEventListener("change", bomDraftCrmSelect._changeHandler);
 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 
@@ -6184,7 +6184,7 @@ async function updateBOMDraft(value) {
     const found_draft = found_draft2.filter(row => parseDateTime(row).getTime() === maxDateTime.getTime());
 
     showModal_bom_load()
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     warning("Đang cập nhật lại tồn kho và giá trị BOM Draft, vui lòng chờ trong giây lát...");
     await Promise.all([load_onhand(), load_mml()]);
 
@@ -6215,7 +6215,7 @@ async function updateBOMDraft(value) {
     // table.innerHTML = ''; // Xóa nội dung cũ
 
 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function load_item_draft(found_draft) {
@@ -6495,7 +6495,7 @@ function get_bom_item() {
 
 // Example arrays
 async function send_bom_create() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const wh = document.getElementById("bom-wh").textContent;
     const operator = sessionStorage.getItem("fullname");
     const customer_id = document.getElementById("bom-customerID").textContent;
@@ -6544,7 +6544,7 @@ async function send_bom_create() {
     async function sendDataToGoogleSheets() {
         try {
             // Hiển thị loading indicator
-            document.getElementById("loadingIndicator").style.display = "block";
+            startLoading()
     
             const response = await fetch(scriptUrl, {
                 method: "POST",
@@ -6563,7 +6563,7 @@ async function send_bom_create() {
             // Nếu không dùng no-cors:
             const result = await response.text();
             console.log("Đã gửi data thành công:", result);
-            document.getElementById("loadingIndicator").style.display = "none";
+            endLoading()
             info("Đã tạo BOM thành công")
             clearModalContent();
             hideModal_bom();
@@ -6582,7 +6582,7 @@ async function send_bom_create() {
     
 }
 async function send_bom_draft() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const wh = document.getElementById("bom-wh").textContent;
     const operator = sessionStorage.getItem("fullname");
     const customer_id = document.getElementById("bom-customerID").textContent;
@@ -6599,7 +6599,7 @@ async function send_bom_draft() {
     async function sendDataToGoogleSheets() {
         try {
             // Hiển thị loading indicator
-            document.getElementById("loadingIndicator").style.display = "block";
+            startLoading()
     
             const response = await fetch(scriptUrl, {
                 method: "POST",
@@ -6616,7 +6616,7 @@ async function send_bom_draft() {
             // Nếu không dùng no-cors:
             const result = await response.text();
             console.log("Đã gửi data thành công:", result);
-            document.getElementById("loadingIndicator").style.display = "none";
+            endLoading()
             info("Đã lưu BOM tạm thành công")
             clearModalContent();
             hideModal_bom();
@@ -6644,12 +6644,12 @@ async function get_bom_scorecard() {
 }
 
 async function get_bom_link() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const bom_input = document.getElementById("input_bom_to_export").value
 
     if (bom_input === "") {
         alert("Vui lòng nhập BOM")
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         clear_bom_link_table()
         return;
     }
@@ -6687,7 +6687,7 @@ async function get_bom_link() {
         clear_bom_link_table()
     }
     document.getElementById("input_bom_to_export").value = "";
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
 
 }
@@ -6749,11 +6749,11 @@ function populateOperatorFilter() {
 // 🛠️ Hiển thị dữ liệu trong bảng
 async function displayTableData() {
     clear_filter()
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_bom_link();
 
     if (bom_link_filter_data.length === 0) {
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         return;
     }
 
@@ -6787,7 +6787,7 @@ async function displayTableData() {
         });
 
         tableBody.appendChild(row);
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     });
 }
 
@@ -6870,9 +6870,9 @@ function toggleSubmenu(event, submenuId, element) {
 async function showModal_pr() {
     document.getElementById('pr-modal').classList.add('show');
     document.getElementById("pr_dept").value = sessionStorage.getItem("dept");
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_mml(), load_vendor()]);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function clearPrModalContent() {
@@ -7154,9 +7154,9 @@ function addItem_pr() {
         <td>${customer}</td>
         <td>${po}</td>
         <td>${date}</td>
-        <td>${price.toLocaleString()}</td>
-        <td>${quantity.toLocaleString()}</td>
-        <td>${total.toLocaleString()}</td>
+        <td>${price.toLocaleString('en-US')}</td>
+        <td>${quantity.toLocaleString('en-US')}</td>
+        <td>${total.toLocaleString('en-US')}</td>
         <td>${fileListHTML || ""}</td>
         <td><input type="hidden" class="fileDataJSON" value='${JSON.stringify(filesArray)}'></td>
         <td><button class="btn-delete bom-clear" onclick="deleteRow_pr(this)">Xóa</button></td>
@@ -7205,7 +7205,7 @@ function send_pr() {
         alert("Vui lòng chọn mục đích mua hàng")
         return
     }
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     let table = document.getElementById("pr-item-table").getElementsByTagName('tbody')[0];
     let rows = table.getElementsByTagName("tr");
     let data = [];
@@ -7255,7 +7255,7 @@ function send_pr() {
     .then(() => info("Dữ liệu đã được gửi thành công!"))
     .catch(console.log("Lỗi khi gửi dữ liệu:"))
     .finally(() => {
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
         clearItem_pr();
         clearPrModalContent();
         hideModal_pr();
@@ -7350,7 +7350,7 @@ function LoadFile_pr(event) {
 // PR Approve
 
 async function pr_approval() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_pr_approve_list();
     const data = pr_approve_list
     const tbody = document.getElementById("dataTable_pr").getElementsByTagName("tbody")[0];
@@ -7386,13 +7386,13 @@ async function pr_approval() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 // Approve 1
 
 async function po_1_approval() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_approve_list();
     const data = po_approval_list;
     console.log(data)
@@ -7428,7 +7428,7 @@ async function po_1_approval() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function openModal_po(row) {
@@ -7481,7 +7481,7 @@ function closeModal_po() {
 // Approve 2
 
 async function po_2_approval() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_approve_2_list(); 
     const data = po_approval_2_list;
     console.log(data)
@@ -7521,7 +7521,7 @@ async function po_2_approval() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function openModal_po_2(row) {
@@ -7603,7 +7603,7 @@ function rejectPO_2() {
 
 function sendApprovalRequest_2(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzDnsIXGgF-NndW9qoLdSvviJwlQLz-5pMOzcYXjxFMDO5JIzVcOVMpj906QB9WDnsQw/exec"
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poData = {
         date: document.getElementById("po_2_date").textContent,
         time: document.getElementById("po_2_time").textContent,
@@ -7643,7 +7643,7 @@ function sendApprovalRequest_2(status, reason) {
 // Approve 3
 
 async function po_3_approval() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_approve_3_list(); 
     const data = po_approval_3_list;
     console.log(data)
@@ -7683,7 +7683,7 @@ async function po_3_approval() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function openModal_po_3(row) {
@@ -7765,7 +7765,7 @@ function rejectPO_3() {
 
 function sendApprovalRequest_3(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFJdrBPsgZdbJDQ8Oez9tMiou77KCjah7yOZgBEXSQ860W3PqBjzz_o92p3qci-Xrs/exec"
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poData = {
         date: document.getElementById("po_3_date").textContent,
         time: document.getElementById("po_3_time").textContent,
@@ -7805,7 +7805,7 @@ function sendApprovalRequest_3(status, reason) {
 // Approve 4
 
 async function po_4_approval() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_approve_4_list(); 
     const data = po_approval_4_list;
     console.log(data)
@@ -7845,7 +7845,7 @@ async function po_4_approval() {
         tr.appendChild(actionTd);
         tbody.appendChild(tr);
     });
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 function openModal_po_4(row) {
@@ -7927,7 +7927,7 @@ function rejectPO_4() {
 
 function sendApprovalRequest_4(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzabggVMG2trkf8f3ilAyHBrshSHz57hxFzaDPaO2bFDhKDiZGlM91rjG51sMgI6n9CkQ/exec"
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poData = {
         date: document.getElementById("po_4_date").textContent,
         time: document.getElementById("po_4_time").textContent,
@@ -8040,7 +8040,7 @@ async function showDetails(spreadsheetId, rowData) {
 }
 
 async function sendPrApproval(status) {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     if (selectedRowData.length === 0) {
         alert("Không có dữ liệu nào được chọn!");
         return;
@@ -8075,7 +8075,7 @@ async function sendPrApproval(status) {
         closeModal_pr();
         load_approval_ticket()
         info("Gửi dữ liệu thành công!");
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     });
 }
 
@@ -8095,9 +8095,9 @@ document.querySelectorAll("#dataTable_pr tbody tr").forEach(row => {
 
 async function showModal_po() {
     document.getElementById('po-modal').classList.add('show');
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_vendor_pr()]);
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 }
 
 async function hideModal_po() {
@@ -8169,7 +8169,7 @@ function LoadFile_po(event) {
 
 
 async function load_pr_to_po() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     return fetch('https://script.google.com/macros/s/AKfycbyUqg5vHiCN6DfJ0JsZR_S7cOyhHeNSIGQ_YQug5hcvxRCLsK7sns9zkHYtCWUc0yti/exec')
         .then(res => res.json())
         .then(data => {
@@ -8177,7 +8177,7 @@ async function load_pr_to_po() {
             console.log("Danh sách PR cần tạo PR đã tải xong.");
             add_po_to_po_table(pr_to_po_data);
             calculateTotalPricePO()
-            document.getElementById("loadingIndicator").style.display = "none";
+            endLoading()
         });
 }
 
@@ -8496,7 +8496,7 @@ function calculateTotalPricePO() {
     }
     
     // Hiển thị tổng giá trị
-    document.getElementById("po_total_price").innerText = `Tổng giá trị: ${total.toLocaleString()}`;
+    document.getElementById("po_total_price").innerText = `Tổng giá trị: ${total.toLocaleString('en-US')}`;
 }
 
 
@@ -8664,7 +8664,7 @@ async function sendPO() {
     if (!tableData) {
         return; // Dừng lại nếu thiếu dữ liệu
     }
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     let formData = new FormData();
     formData.append("data", JSON.stringify(tableData));
@@ -8687,7 +8687,7 @@ async function sendPO() {
     .catch(error => console.error("Error:", error));
 
     hideModal_po()
-    // document.getElementById("loadingIndicator").style.display = "none";
+    // endLoading()
     load_pr_to_po()
     info("Dữ liệu đã được gửi thành công!");
 }
@@ -8734,7 +8734,7 @@ function clearPOModal() {
 }
 
 async function sendPoApproval(status) {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     if (selectedRowData.length === 0) {
         alert("Không có dữ liệu nào được chọn!");
         return;
@@ -8768,7 +8768,7 @@ async function sendPoApproval(status) {
         closeModal_pr();
         load_approval_ticket()
         info("Gửi dữ liệu thành công!");
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     });
 }
 
@@ -8794,7 +8794,7 @@ function rejectPO() {
 
 function sendApprovalRequest(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiE0JdeVF9wdxGDJ5V_fay65dZwUGIw2n1TQuv54uL_eykf_FfhEHANMB-qGpKA9UKDQ/exec"
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poData = {
         date: document.getElementById("po_date").textContent,
         time: document.getElementById("po_time").textContent,
@@ -8842,9 +8842,9 @@ document.getElementById("po_reject").addEventListener("click", rejectPO);
 // PO RELEASE
 
 async function get_po_need_to_release() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await Promise.all([load_purchase_order(), load_po_need_to_release()]); 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     const tableBody = document.querySelector("#po_release_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -8878,7 +8878,7 @@ async function get_po_need_to_release() {
             document.getElementById("po_po_release").value = po_need_to_release_list[index][0];
             document.getElementById("po_creator_po_release").value = po_need_to_release_list[index][3];
             document.getElementById("vendor_po_release").value = po_need_to_release_list[index][2];
-            document.getElementById("total_value_po_release").value = po_need_to_release_list[index][6].toLocaleString();
+            document.getElementById("total_value_po_release").value = po_need_to_release_list[index][6].toLocaleString('en-US');
             
         });
     });
@@ -8904,8 +8904,8 @@ document.getElementById("pre_pay_po_release").addEventListener("input", function
         let remainPay = totalValue - prePay;
 
         // Định dạng số có dấu phẩy ngăn cách hàng nghìn
-        this.value = prePay.toLocaleString();
-        document.getElementById("remain_pay_po_release").value = remainPay.toLocaleString();
+        this.value = prePay.toLocaleString('en-US');
+        document.getElementById("remain_pay_po_release").value = remainPay.toLocaleString('en-US');
     }
 });
 
@@ -8995,7 +8995,7 @@ document.getElementById("submitButton_po_release").addEventListener("click", asy
         return;
     }
     // Hiển thị loading khi bắt đầu gửi dữ liệu
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     const poNumber = document.getElementById("po_po_release").value;
     const found_po = po_data_raw.find(row => row[2] === poNumber);
@@ -9031,7 +9031,7 @@ document.getElementById("submitButton_po_release").addEventListener("click", asy
     } catch (error) {
         alert("Lỗi khi lấy dữ liệu từ Google Sheets: " + error.message);
         console.error("Lỗi khi lấy dữ liệu từ Google Sheets:", error);
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     }
 
     let formData = {
@@ -9168,7 +9168,7 @@ async function sendSkipPayment(formData) {
         alert("Đã xảy ra lỗi khi gửi dữ liệu!");
         console.error("Lỗi khi gửi dữ liệu:", error);
     } finally {
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     }
 }
 
@@ -9195,7 +9195,7 @@ function sendPoRelease(formData) {
     })
     .finally(() => {
         // Ẩn loading sau khi hoàn thành hoặc có lỗi
-        document.getElementById("loadingIndicator").style.display = "none";
+        endLoading()
     });
 }
 
@@ -9216,9 +9216,9 @@ function clearForm() {
 // PO Pre-payment
 
 async function get_po_need_to_pre_payment() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_need_to_pre_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     const tableBody = document.querySelector("#pre_payment_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -9233,8 +9233,8 @@ async function get_po_need_to_pre_payment() {
             <td><a href="#" class="po-link" data-index="${rowIndex}">${rowData[2]}</a></td>
             <td>${rowData[3]}</td>
             <td>${rowData[5]}</td>
-            <td>${rowData[6].toLocaleString()}</td>
-            <td>${rowData[7].toLocaleString()}</td>
+            <td>${rowData[6].toLocaleString('en-US')}</td>
+            <td>${rowData[7].toLocaleString('en-US')}</td>
             <td>${rowData[4]}</td>
             <td><button class="view-pdf-btn" data-link="${rowData[12]}">Xem Files Upload</button></td>
         `;
@@ -9250,9 +9250,9 @@ async function get_po_need_to_pre_payment() {
             console.log("Dữ liệu hàng:", po_need_to_pre_payment_list[index]);
             document.getElementById("po_pre_payment").value = po_need_to_pre_payment_list[index][2];
             document.getElementById("pr_pre_payment").value = po_need_to_pre_payment_list[index][3];
-            document.getElementById("total_value_pre_payment").value = po_need_to_pre_payment_list[index][6].toLocaleString();
-            document.getElementById("pre_pay_pre_payment").value = po_need_to_pre_payment_list[index][7].toLocaleString();
-            document.getElementById("remain_pay_pre_payment").value = po_need_to_pre_payment_list[index][8].toLocaleString();
+            document.getElementById("total_value_pre_payment").value = po_need_to_pre_payment_list[index][6].toLocaleString('en-US');
+            document.getElementById("pre_pay_pre_payment").value = po_need_to_pre_payment_list[index][7].toLocaleString('en-US');
+            document.getElementById("remain_pay_pre_payment").value = po_need_to_pre_payment_list[index][8].toLocaleString('en-US');
             document.getElementById("vendor_pre_payment").value = po_need_to_pre_payment_list[index][5];
             document.getElementById("vendor_addr_pre_payment").value = po_need_to_pre_payment_list[index][13];
             document.getElementById("vendor_phone_pre_payment").value = po_need_to_pre_payment_list[index][14];
@@ -9370,7 +9370,7 @@ document.getElementById("submitButton_pre_payment").addEventListener("click", as
     }
 
     // Hiển thị loading khi bắt đầu gửi dữ liệu
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
 
     // 📝 Lấy dữ liệu từ form
     let formData = {
@@ -9470,9 +9470,9 @@ function clearPrePaymentForm() {
 // PO RECEIVING
 
 async function get_po_need_to_po_receiving() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_need_to_receiving() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     const tableBody = document.querySelector("#po_receiving_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -9503,7 +9503,7 @@ async function get_po_need_to_po_receiving() {
             console.log("Dữ liệu hàng:", po_need_to_receiving_list[index]);
             document.getElementById("po_po_receiving").value = po_need_to_receiving_list[index][2];
             document.getElementById("pr_po_receiving").value = po_need_to_receiving_list[index][3];
-            document.getElementById("total_value_po_receiving").value = po_need_to_receiving_list[index][7].toLocaleString();
+            document.getElementById("total_value_po_receiving").value = po_need_to_receiving_list[index][7].toLocaleString('en-US');
             document.getElementById("content_pre_pay_po_receiving").value = po_need_to_receiving_list[index][11];
 
         });
@@ -9596,7 +9596,7 @@ document.getElementById("submitButton_po_receiving").addEventListener("click", a
       return;
     }
 
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poReceiving = document.getElementById("po_po_receiving").value
     console.log(poReceiving)
     const foundPO = po_need_to_receiving_list.find(row => row[2] === poReceiving);
@@ -9686,9 +9686,9 @@ function clearPOReceivingForm() {
 // PO Final payment
 
 async function get_po_need_to_final_payment() {
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     await load_po_need_to_final_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
-    document.getElementById("loadingIndicator").style.display = "none";
+    endLoading()
 
     const tableBody = document.querySelector("#final_payment_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -9704,7 +9704,7 @@ async function get_po_need_to_final_payment() {
             <td>${rowData[3]}</td>
             <td>${rowData[6]}</td>
             <td>${rowData[18]}</td>
-            <td>${rowData[9].toLocaleString()}</td>
+            <td>${rowData[9].toLocaleString('en-US')}</td>
             <td>${rowData[12]}</td>
         `;
 
@@ -9721,9 +9721,9 @@ async function get_po_need_to_final_payment() {
             document.getElementById("pr_final_payment").value = po_need_to_final_payment_list[index][3];
             document.getElementById("po_creator_final_payment").value = po_need_to_final_payment_list[index][4];
             document.getElementById("pr_creator_final_payment").value = po_need_to_final_payment_list[index][5];
-            document.getElementById("total_value_final_payment").value = po_need_to_final_payment_list[index][7].toLocaleString();
-            document.getElementById("pre_pay_final_payment").value = po_need_to_final_payment_list[index][8].toLocaleString();
-            document.getElementById("remain_pay_final_payment").value = po_need_to_final_payment_list[index][9].toLocaleString();
+            document.getElementById("total_value_final_payment").value = po_need_to_final_payment_list[index][7].toLocaleString('en-US');
+            document.getElementById("pre_pay_final_payment").value = po_need_to_final_payment_list[index][8].toLocaleString('en-US');
+            document.getElementById("remain_pay_final_payment").value = po_need_to_final_payment_list[index][9].toLocaleString('en-US');
             document.getElementById("vendor_final_payment").value = po_need_to_final_payment_list[index][6];
             document.getElementById("vendor_addr_final_payment").value = po_need_to_final_payment_list[index][13];
             document.getElementById("vendor_phone_final_payment").value = po_need_to_final_payment_list[index][14];
@@ -9872,7 +9872,7 @@ document.getElementById("submitButton_final_payment").addEventListener("click", 
       return;
     }
     
-    document.getElementById("loadingIndicator").style.display = "block";
+    startLoading()
     const poValue = document.getElementById("po_final_payment").value
     console.log(poValue)
     const foundPO = po_need_to_final_payment_list.find(row => row[2] === poValue);
@@ -9942,3 +9942,16 @@ document.getElementById("submitButton_final_payment").addEventListener("click", 
         clearFinalPaymentForm()
     }
 });
+
+function startLoading() {
+    document.getElementById("loadingIndicator").style.display = "block";
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(btn => btn.disabled = true);
+  }
+  
+  function endLoading() {
+    document.getElementById("loadingIndicator").style.display = "none";
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(btn => btn.disabled = false);
+  }
+  
