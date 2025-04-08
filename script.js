@@ -2997,8 +2997,8 @@ function closeModal() {
     document.getElementById("secondaryModal").style.display = 'none';
     document.getElementById("secondaryModal2").style.display = 'none';
     document.getElementById("secondaryModal_bom").style.display = 'none';
-    document.getElementById("detailModal").style.display = "none";
-    document.getElementById("modalBackdrop").style.display = "none";
+    // document.getElementById("detailModal").style.display = "none";
+    // document.getElementById("modalBackdrop").style.display = "none";
 }
 ///* Design + BOM ///
 
