@@ -148,7 +148,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 4.6.5.41/h4>
+                <h4>Version 4.13.12.8/h4>
 
                 
 
@@ -1446,7 +1446,16 @@
                         <!-- Lý do Reject (Ẩn ban đầu) -->
                         <div id="reject_reason_section" style="display: none; margin-top: 15px;">
                             <label for="reject_reason">Lý do Reject:</label>
-                            <textarea id="reject_reason" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                            <!-- <textarea id="reject_reason" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea> -->
+                            <select id="reject_reason">
+                                <option value="" disabled selected>Chọn lý do từ chối</option>
+                                <option value="Sai sót trong thông tin PO">Sai sót trong thông tin PO</option>
+                                <option value="Nhà cung cấp không đáp ứng yêu cầu">Nhà cung cấp không đáp ứng yêu cầu</option>
+                                <option value="PR liên quan cần cập nhật">PR liên quan cần cập nhật</option>
+                                <option value="Thay đổi yêu cầu">Thay đổi yêu cầu</option>
+                                <option value="Vấn đề ngân sách hoặc thanh toán">Vấn đề ngân sách hoặc thanh toán</option>
+                                <option value="Chính sách và quy trình">Chính sách và quy trình</option>
+                            </select>                              
                         </div>
                 
                         <div style="margin-top: 50px; text-align: center;">
@@ -1515,7 +1524,16 @@
                         <!-- Lý do Reject (Ẩn ban đầu) -->
                         <div id="reject_reason_section_2" style="display: none; margin-top: 15px;">
                             <label for="reject_reason_2">Lý do Reject:</label>
-                            <textarea id="reject_reason_2" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                            <!-- <textarea id="reject_reason_2" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea> -->
+                            <select id="reject_reason_2">
+                                <option value="" disabled selected>Chọn lý do từ chối</option>
+                                <option value="Sai sót trong thông tin PO">Sai sót trong thông tin PO</option>
+                                <option value="Nhà cung cấp không đáp ứng yêu cầu">Nhà cung cấp không đáp ứng yêu cầu</option>
+                                <option value="PR liên quan cần cập nhật">PR liên quan cần cập nhật</option>
+                                <option value="Thay đổi yêu cầu">Thay đổi yêu cầu</option>
+                                <option value="Vấn đề ngân sách hoặc thanh toán">Vấn đề ngân sách hoặc thanh toán</option>
+                                <option value="Chính sách và quy trình">Chính sách và quy trình</option>
+                            </select>  
                         </div>
                 
                         <div style="margin-top: 50px; text-align: center;">
@@ -1584,7 +1602,15 @@
                         <!-- Lý do Reject (Ẩn ban đầu) -->
                         <div id="reject_reason_section_3" style="display: none; margin-top: 15px;">
                             <label for="reject_reason_3">Lý do Reject:</label>
-                            <textarea id="reject_reason_3" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                            <select id="reject_reason_3">
+                                <option value="" disabled selected>Chọn lý do từ chối</option>
+                                <option value="Sai sót trong thông tin PO">Sai sót trong thông tin PO</option>
+                                <option value="Nhà cung cấp không đáp ứng yêu cầu">Nhà cung cấp không đáp ứng yêu cầu</option>
+                                <option value="PR liên quan cần cập nhật">PR liên quan cần cập nhật</option>
+                                <option value="Thay đổi yêu cầu">Thay đổi yêu cầu</option>
+                                <option value="Vấn đề ngân sách hoặc thanh toán">Vấn đề ngân sách hoặc thanh toán</option>
+                                <option value="Chính sách và quy trình">Chính sách và quy trình</option>
+                            </select>  
                         </div>
 
                         <div style="margin-top: 50px; text-align: center;">
@@ -1653,7 +1679,16 @@
                         <!-- Lý do Reject (Ẩn ban đầu) -->
                         <div id="reject_reason_section_4" style="display: none; margin-top: 15px;">
                             <label for="reject_reason_4">Lý do Reject:</label>
-                            <textarea id="reject_reason_4" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea>
+                            <!-- <textarea id="reject_reason_4" rows="3" style="width: 100%;" placeholder="Nhập lý do..."></textarea> -->
+                            <select id="reject_reason_4">
+                                <option value="" disabled selected>Chọn lý do từ chối</option>
+                                <option value="Sai sót trong thông tin PO">Sai sót trong thông tin PO</option>
+                                <option value="Nhà cung cấp không đáp ứng yêu cầu">Nhà cung cấp không đáp ứng yêu cầu</option>
+                                <option value="PR liên quan cần cập nhật">PR liên quan cần cập nhật</option>
+                                <option value="Thay đổi yêu cầu">Thay đổi yêu cầu</option>
+                                <option value="Vấn đề ngân sách hoặc thanh toán">Vấn đề ngân sách hoặc thanh toán</option>
+                                <option value="Chính sách và quy trình">Chính sách và quy trình</option>
+                            </select>  
                         </div>
                 
                         <div style="margin-top: 50px; text-align: center;">
@@ -2496,15 +2531,57 @@
 
             <div id="export_pr" class="frame">
                 <h1>Xuất chi tiết PR / PO</h1>
-                <button id="export_pr_btn" class="refresh-btn" onclick="load_detail_pr()">Xuất PR</button>
-                <button id="export_po_btn" class="refresh-btn" onclick="load_detail_po()">Xuất PO</button>
-                <!-- <div class="scrollable-frame">
-                    <div id="tableContainer">
-                        <div class="table-wrapper">
-                            <div id="xuatTable"></div>
-                        </div>
+                <button id="export_pr_btn" class="refresh-btn" onclick="updateAndLoadPR()">Xuất PR</button>
+                <button id="export_po_btn" class="refresh-btn" onclick="updateAndLoadPO()">Xuất PO</button>
+                
+                <!-- modal export PR -->
+                <div id="pr_export_modal" class="modal">
+                    <div class="modal-content">
+                      <span onclick="document.getElementById('pr_export_modal').style.display='none'">&times;</span>
+                      <h3>Lọc dữ liệu PR</h3>
+                  
+                      <label for="pr_export_modal_date">Ngày tạo PR:</label>
+                      <input type="date" id="pr_export_modal_date" />
+                  
+                      <label for="pr_export_modal_branch">Chi nhánh:</label>
+                      <select id="pr_export_modal_branch">
+                        <option value="">-- Tất cả --</option>
+                      </select>
+                  
+                      <label for="pr_export_modal_operator">Operator:</label>
+                      <select id="pr_export_modal_operator">
+                        <option value="">-- Tất cả --</option>
+                      </select>
+                  
+                      <button style="background-color: green; width: 100px;" onclick="filterAndExportPR()">Xuất Excel</button>
+                      <button style="width: 100px;" onclick="hideModalExportPR()">Đóng</button>
                     </div>
-                </div> -->
+                  </div>
+
+                  <!-- modal export PO -->
+                <div id="po_export_modal" class="modal">
+                    <div class="modal-content">
+                      <span onclick="document.getElementById('po_export_modal').style.display='none'">&times;</span>
+                      <h3>Lọc dữ liệu PO</h3>
+                  
+                      <label for="po_export_modal_date">Ngày tạo PR:</label>
+                      <input type="date" id="po_export_modal_date" />
+                  
+                      <label for="po_export_modal_branch">Chi nhánh:</label>
+                      <select id="po_export_modal_branch">
+                        <option value="">-- Tất cả --</option>
+                      </select>
+                  
+                      <label for="po_export_modal_operator">Operator:</label>
+                      <select id="po_export_modal_operator">
+                        <option value="">-- Tất cả --</option>
+                      </select>
+                  
+                      <button style="background-color: green; width: 100px;" onclick="filterAndExportPO()">Xuất Excel</button>
+                      <button style="width: 100px;" onclick="hideModalExportPO()">Đóng</button>
+                    </div>
+                  </div>
+                  
             </div>
 
             
