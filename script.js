@@ -775,40 +775,205 @@ let po_approval_4_list = []
 let detail_pr_data = [];
 let detail_po_data = [];
 
+async function updateBeforeExport() {
+    startLoading();
+    const url = 'https://script.google.com/macros/s/AKfycbziYKt0K_0_3kAuOR58ykuG03128L0dNA1cUhcQ2aZ2jitEbRXLTkEeFB4F5cLD-m27/exec'; // Thay bằng URL Web App của bạn
+    const res = await fetch(url);
+    const text = await res.text();
+    console.log(text); // Đã chạy xong cập nhật PR và PO.
+}
+
+async function updateAndLoadPR() {
+    // 1. Chạy cập nhật trước
+    await updateBeforeExport();
+  
+    // 2. Sau đó mới load dữ liệu
+    await load_detail_pr();
+    endLoading();
+}
+
+async function updateAndLoadPO() {
+    // 1. Chạy cập nhật trước
+    await updateBeforeExport();
+  
+    // 2. Sau đó mới load dữ liệu
+    await load_detail_po();
+    endLoading();
+}
+  
+
+let prExportData = [];
+
 async function load_detail_pr() {
     return fetch('https://script.google.com/macros/s/AKfycbx7AbFWNtkEmz6kh13TNSNZDDVdYZaUCufmzUTmjaScj2eHxEzQrBBE_wFyxftorg4FqA/exec')
         .then(res => res.json())
         .then(data => {
-            const filteredData = data.content.map(row => 
+            prExportData = data.content.map(row =>
                 row.filter((_, index) => index !== 8 && (index < 23 || index > 30))
             );
 
-            // Tạo một worksheet từ dữ liệu đã lọc
-            const ws = XLSX.utils.aoa_to_sheet(filteredData);
+            prExportData.shift();
 
-            // Tạo một workbook và thêm worksheet vào
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Detail PR");
+            // Lấy giá trị duy nhất cho Operator (cột 3)
+            const operators = [...new Set(prExportData.map(row => row[3]).filter(v => v))];
+            const operatorSelect = document.getElementById('pr_export_modal_operator');
+            operatorSelect.innerHTML = '<option value="">-- Tất cả --</option>';
+            operators.forEach(op => {
+                const option = document.createElement('option');
+                option.value = op;
+                option.textContent = op;
+                operatorSelect.appendChild(option);
+            });
 
-            // Xuất file Excel
-            const now = new Date();
-            const timestamp = now.toISOString().replace(/[:.-]/g, '').slice(0, 15); // yyyyMMddTHHmmss
-            const filename = `detail_pr_${timestamp}.xlsx`;
-            XLSX.writeFile(wb, filename);
+            // Lấy giá trị duy nhất cho Chi nhánh (cột 6)
+            const branches = [...new Set(prExportData.map(row => row[6]).filter(v => v))];
+            const branchSelect = document.getElementById('pr_export_modal_branch');
+            branchSelect.innerHTML = '<option value="">-- Tất cả --</option>';
+            branches.forEach(br => {
+                const option = document.createElement('option');
+                option.value = br;
+                option.textContent = br;
+                branchSelect.appendChild(option);
+            });
 
-            console.log("Dữ liệu chi tiết PR đã xuất Excel.");
+            // Mở modal
+            document.getElementById('pr_export_modal').style.display = 'block';
         });
 }
 
+function filterAndExportPR() {
+    const date = document.getElementById('pr_export_modal_date').value;
+    const branch = document.getElementById('pr_export_modal_branch').value;
+    const operator = document.getElementById('pr_export_modal_operator').value;
 
+    const filtered = prExportData.filter(row => {
+        const matchDate = date === '' || (row[0] && row[0].startsWith(date));
+        
+        const matchBranch = branch === '' || row[6] === branch;
+        const matchOperator = operator === '' || row[3] === operator;
+        return matchDate && matchBranch && matchOperator;
+    });
+
+    const header = [
+        'Ngày tạo PR', 'Thời gian tạo PR', 'PR #', 'Người yêu cầu', 'Người duyệt PR',
+        'Bộ phận', 'Chi nhánh', 'Mục đích mua hàng', 'Ngày duyệt PR', 'Thời gian duyệt PR',
+        'Trạng thái PR', 'Loại vật tư', 'Tên vật tư', 'Mã vật tư', 'Thông số kỹ thuật',
+        'Đơn vị', 'Tên khách hàng', 'Số PO của khách hàng', 'Ngày cần có vật tư',
+        'Đơn giá / đơn vị dự kiến', 'Số lượng cần', 'Tổng tiền'
+    ];    
+      
+    const exportData = [header, ...filtered];
+
+    const ws = XLSX.utils.aoa_to_sheet(exportData);
+    // const ws = XLSX.utils.aoa_to_sheet(filtered);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Detail PR");
+
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.-]/g, '').slice(0, 15);
+    const filename = `detail_pr_${timestamp}.xlsx`;
+    XLSX.writeFile(wb, filename);
+
+    document.getElementById('pr_export_modal').style.display = 'none';
+}
+
+function hideModalExportPR() {
+    document.getElementById('pr_export_modal').style.display = 'none';
+}
+
+function hideModalExportPO() {
+    document.getElementById('po_export_modal').style.display = 'none';
+}
+
+
+// async function load_detail_po() {
+//     return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
+//         .then(res => res.json())
+//         .then(data => {
+//             const columnsToRemove = new Set([10, 11, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57]);
+//             detail_po_data = data.content.map(row =>
+//                 row.filter((_, index) => !columnsToRemove.has(index))
+//             );
+//         });
+// }
+
+let poExportData = [];
 
 async function load_detail_po() {
     return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
         .then(res => res.json())
         .then(data => {
-            detail_po_data = data.content;
-            console.log("Dữ liệu chi tiết PR đã tải xong.");
+            const columnsToRemove = new Set([10, 11, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57]);
+            poExportData = data.content.map(row =>
+                row.filter((_, index) => !columnsToRemove.has(index))
+            );
+
+            poExportData.shift(); // Bỏ header gốc nếu có
+
+            // Lấy giá trị duy nhất cho Operator (cột 5)
+            const operators = [...new Set(poExportData.map(row => row[5]).filter(v => v))];
+            const operatorSelect = document.getElementById('po_export_modal_operator');
+            operatorSelect.innerHTML = '<option value="">-- Tất cả --</option>';
+            operators.forEach(op => {
+                const option = document.createElement('option');
+                option.value = op;
+                option.textContent = op;
+                operatorSelect.appendChild(option);
+            });
+
+            // Lấy giá trị duy nhất cho Chi nhánh (cột cuối)
+            const branches = [...new Set(poExportData.map(row => row[row.length - 1]).filter(v => v))];
+            const branchSelect = document.getElementById('po_export_modal_branch');
+            branchSelect.innerHTML = '<option value="">-- Tất cả --</option>';
+            branches.forEach(br => {
+                const option = document.createElement('option');
+                option.value = br;
+                option.textContent = br;
+                branchSelect.appendChild(option);
+            });
+
+            document.getElementById('po_export_modal').style.display = 'block';
         });
+}
+
+function filterAndExportPO() {
+    const date = document.getElementById('po_export_modal_date').value;
+    const branch = document.getElementById('po_export_modal_branch').value;
+    const operator = document.getElementById('po_export_modal_operator').value;
+
+    const filtered = poExportData.filter(row => {
+        const matchDate = date === '' || (row[0] && row[0].startsWith(date));
+        const matchOperator = operator === '' || row[5] === operator;
+        const matchBranch = branch === '' || row[row.length - 1] === branch;
+        return matchDate && matchOperator && matchBranch;
+    });
+
+    const header = [
+        "Ngày tạo PO", "Thời gian tạo PO", "PO #", "PR #", "Khách hàng",
+        "Người tạo PO", "Người tạo PR", "Người Approve", "Link xem PDF PO",
+        "Link xem files đính kèm", "Tổng giá trị PO", "Ngày approve PO",
+        "Thời gian approve PO", "Approve / Reject", "Lý do reject", "Loại vật tư",
+        "Tên vật tư", "Tên vật tư (tiếng việt)", "Mã vật tư", "Đơn vị",
+        "Đơn vị tiền tệ", "Giá bán", "Xuất xứ hàng hóa", "Số lượng cần mua",
+        "Đơn giá", "Thành tiền", "% Thuế GTGT", "Tổng tiền", "Ghi chú",
+        "Ngày giao hàng dự kiến", "Ngày thanh toán dự kiến", "Delivery address",
+        "Delivery to", "Attts:", "Phone#", "Ship via", "Delivery terms",
+        "Payment terms", "Lead time", "Warranty", "Shipping Value",
+        "Số PO của khách hàng", "Số lượng cần từ PR", "Số tiền từ PR", "Chi nhánh"
+    ];
+
+    const exportData = [header, ...filtered];
+
+    const ws = XLSX.utils.aoa_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Detail PO");
+
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.-]/g, '').slice(0, 15);
+    const filename = `detail_po_${timestamp}.xlsx`;
+    XLSX.writeFile(wb, filename);
+
+    document.getElementById('po_export_modal').style.display = 'none';
 }
 
 async function load_po_approve_2_list() {
@@ -7566,10 +7731,19 @@ function openModal_po_2(row) {
 
 
 // Đóng modal
-function closeModal_po_2() {
-    document.getElementById("modal_po_2").style.display = "none";
-    hide_reject_section()
-}
+function hide_reject_section_2() {
+    const rejectSection = document.getElementById("reject_reason_section_2");
+    if (rejectSection) {
+      rejectSection.style.display = "none";
+    }
+  
+    // Optional: reset lại dropdown nếu muốn
+    const rejectSelect = document.getElementById("reject_reason_2");
+    if (rejectSelect) {
+      rejectSelect.value = "";
+    }
+  }
+  
 
 function hide_reject_section_2() {
     document.getElementById("reject_reason_2").value = ""; // Reset lý do Reject
@@ -7603,6 +7777,11 @@ function rejectPO_2() {
 
 function sendApprovalRequest_2(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzDnsIXGgF-NndW9qoLdSvviJwlQLz-5pMOzcYXjxFMDO5JIzVcOVMpj906QB9WDnsQw/exec"
+    const reason_value = document.getElementById("reject_reason_2").value
+    if (status === "Rejected" && !reason_value) {
+        alert("Vui lòng chọn lí do Reject");
+        return;
+    }
     startLoading()
     const poData = {
         date: document.getElementById("po_2_date").textContent,
@@ -7730,14 +7909,21 @@ function openModal_po_3(row) {
 // Đóng modal
 function closeModal_po_3() {
     document.getElementById("modal_po_3").style.display = "none";
-    hide_reject_section()
+    hide_reject_section_3()
 }
 
 function hide_reject_section_3() {
-    document.getElementById("reject_reason_3").value = ""; // Reset lý do Reject
-        // hide reject section
-    document.getElementById("reject_reason_section_3").style.display = "none";
-}
+    const rejectSection = document.getElementById("reject_reason_section_3");
+    if (rejectSection) {
+      rejectSection.style.display = "none";
+    }
+  
+    // Optional: reset lại dropdown nếu muốn
+    const rejectSelect = document.getElementById("reject_reason_3");
+    if (rejectSelect) {
+      rejectSelect.value = "";
+    }
+}  
 
 // Gắn sự kiện cho nút Approve và Reject
 document.getElementById("po_3_approve").addEventListener("click", approvePO_3);
@@ -7765,6 +7951,12 @@ function rejectPO_3() {
 
 function sendApprovalRequest_3(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFJdrBPsgZdbJDQ8Oez9tMiou77KCjah7yOZgBEXSQ860W3PqBjzz_o92p3qci-Xrs/exec"
+    const reason_value = document.getElementById("reject_reason_3").value
+
+    if (status === "Rejected" && !reason_value) {
+        alert("Vui lòng chọn lí do Reject");
+        return;
+    }
     startLoading()
     const poData = {
         date: document.getElementById("po_3_date").textContent,
@@ -7892,14 +8084,22 @@ function openModal_po_4(row) {
 // Đóng modal
 function closeModal_po_4() {
     document.getElementById("modal_po_4").style.display = "none";
-    hide_reject_section()
+    hide_reject_section_4()
 }
 
 function hide_reject_section_4() {
-    document.getElementById("reject_reason_4").value = ""; // Reset lý do Reject
-        // hide reject section
-    document.getElementById("reject_reason_section_4").style.display = "none";
-}
+    const rejectSection = document.getElementById("reject_reason_section_4");
+    if (rejectSection) {
+      rejectSection.style.display = "none";
+    }
+  
+    // Optional: reset lại dropdown nếu muốn
+    const rejectSelect = document.getElementById("reject_reason_4");
+    if (rejectSelect) {
+      rejectSelect.value = "";
+    }
+  }
+  
 
 // Gắn sự kiện cho nút Approve và Reject
 document.getElementById("po_4_approve").addEventListener("click", approvePO_4);
@@ -7927,6 +8127,12 @@ function rejectPO_4() {
 
 function sendApprovalRequest_4(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzabggVMG2trkf8f3ilAyHBrshSHz57hxFzaDPaO2bFDhKDiZGlM91rjG51sMgI6n9CkQ/exec"
+    const reason_value = document.getElementById("reject_reason_4").value
+
+    if (status === "Rejected" && !reason_value) {
+        alert("Vui lòng chọn lí do Reject");
+        return;
+    }
     startLoading()
     const poData = {
         date: document.getElementById("po_4_date").textContent,
@@ -8794,6 +9000,11 @@ function rejectPO() {
 
 function sendApprovalRequest(status, reason) {
     GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwiE0JdeVF9wdxGDJ5V_fay65dZwUGIw2n1TQuv54uL_eykf_FfhEHANMB-qGpKA9UKDQ/exec"
+    const reason_value = document.getElementById("reject_reason").value
+    if (status === "Rejected" && !reason_value) {
+        alert("Vui lòng chọn lí do Reject");
+        return;
+    }
     startLoading()
     const poData = {
         date: document.getElementById("po_date").textContent,
@@ -8822,7 +9033,7 @@ function sendApprovalRequest(status, reason) {
         info(`PO ${status} thành công!`);
         closeModal_po();
         hide_reject_section()
-        load_approval_ticket()
+        po_1_approval()
     }).catch(error => {
         console.error("Lỗi khi gửi dữ liệu:", error);
         alert("Có lỗi xảy ra! Vui lòng thử lại.");
@@ -8830,10 +9041,18 @@ function sendApprovalRequest(status, reason) {
 }
 
 function hide_reject_section() {
-    document.getElementById("reject_reason").value = ""; // Reset lý do Reject
-        // hide reject section
-    document.getElementById("reject_reason_section").style.display = "none";
-}
+    const rejectSection = document.getElementById("reject_reason_section");
+    if (rejectSection) {
+      rejectSection.style.display = "none";
+    }
+  
+    // Optional: reset lại dropdown nếu muốn
+    const rejectSelect = document.getElementById("reject_reason");
+    if (rejectSelect) {
+      rejectSelect.value = "";
+    }
+  }
+  
 
 // Gắn sự kiện cho nút Approve và Reject
 document.getElementById("po_approve").addEventListener("click", approvePO);
@@ -8879,6 +9098,8 @@ async function get_po_need_to_release() {
             document.getElementById("po_creator_po_release").value = po_need_to_release_list[index][3];
             document.getElementById("vendor_po_release").value = po_need_to_release_list[index][2];
             document.getElementById("total_value_po_release").value = po_need_to_release_list[index][6].toLocaleString('en-US');
+            document.getElementById("remain_pay_po_release").value = po_need_to_release_list[index][6].toLocaleString('en-US');
+            document.getElementById("pre_pay_po_release").value = 0;
             
         });
     });
@@ -9687,7 +9908,8 @@ function clearPOReceivingForm() {
 
 async function get_po_need_to_final_payment() {
     startLoading()
-    await load_po_need_to_final_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
+    await Promise.all([load_po_need_to_final_payment(),load_vendor_pr()]);
+    // await load_po_need_to_final_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
     endLoading()
 
     const tableBody = document.querySelector("#final_payment_table tbody");
@@ -9716,6 +9938,10 @@ async function get_po_need_to_final_payment() {
         link.addEventListener("click", function (event) {
             event.preventDefault(); // Ngăn mở link
             const index = this.getAttribute("data-index");
+            const vendorName = po_need_to_final_payment_list[index][6];
+            const found_phone = vendor_pr_data.find(row => row[0] === vendorName);
+            const phoneNumber = found_phone ? found_phone[3] : "";
+
             console.log("Dữ liệu hàng:", po_need_to_final_payment_list[index]);
             document.getElementById("po_final_payment").value = po_need_to_final_payment_list[index][2];
             document.getElementById("pr_final_payment").value = po_need_to_final_payment_list[index][3];
@@ -9726,7 +9952,7 @@ async function get_po_need_to_final_payment() {
             document.getElementById("remain_pay_final_payment").value = po_need_to_final_payment_list[index][9].toLocaleString('en-US');
             document.getElementById("vendor_final_payment").value = po_need_to_final_payment_list[index][6];
             document.getElementById("vendor_addr_final_payment").value = po_need_to_final_payment_list[index][13];
-            document.getElementById("vendor_phone_final_payment").value = po_need_to_final_payment_list[index][14];
+            document.getElementById("vendor_phone_final_payment").value = phoneNumber;
             document.getElementById("vendor_bank_name_final_payment").value = po_need_to_final_payment_list[index][15];
             document.getElementById("vendor_bank_acc_final_payment").value = po_need_to_final_payment_list[index][16];
             document.getElementById("payment_date_final_payment").value = po_need_to_final_payment_list[index][18];
