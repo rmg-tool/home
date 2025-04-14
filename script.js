@@ -885,18 +885,6 @@ function hideModalExportPO() {
     document.getElementById('po_export_modal').style.display = 'none';
 }
 
-
-// async function load_detail_po() {
-//     return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
-//         .then(res => res.json())
-//         .then(data => {
-//             const columnsToRemove = new Set([10, 11, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57]);
-//             detail_po_data = data.content.map(row =>
-//                 row.filter((_, index) => !columnsToRemove.has(index))
-//             );
-//         });
-// }
-
 let poExportData = [];
 
 async function load_detail_po() {
@@ -949,7 +937,7 @@ function filterAndExportPO() {
     });
 
     const header = [
-        "Ngày tạo PO", "Thời gian tạo PO", "PO #", "PR #", "Khách hàng",
+        "Ngày tạo PO", "Thời gian tạo PO", "PO #", "PR #", "Nhà cung cấp",
         "Người tạo PO", "Người tạo PR", "Người Approve", "Link xem PDF PO",
         "Link xem files đính kèm", "Tổng giá trị PO", "Ngày approve PO",
         "Thời gian approve PO", "Approve / Reject", "Lý do reject", "Loại vật tư",
@@ -8710,81 +8698,6 @@ function calculateTotalPricePO() {
     // Hiển thị tổng giá trị
     document.getElementById("po_total_price").innerText = `Tổng giá trị: ${total.toLocaleString('en-US')}`;
 }
-
-
-// function getTablePOData() {
-//     let table = document.getElementById("po_materialTable");
-//     let tbody = table.getElementsByTagName("tbody")[0];
-//     let rows = tbody.getElementsByTagName("tr");
-//     let tableData = [];
-    
-//     // Lặp qua từng hàng trong bảng
-//     for (let i = 0; i < rows.length; i++) {
-//         let cells = rows[i].getElementsByTagName("td");
-//         let rowData = {};
-        
-//         // Lấy dữ liệu từng cột trong hàng
-//         for (let j = 0; j < cells.length; j++) {
-//             let cell = cells[j];
-//             let value = "";
-            
-//             // Kiểm tra nếu ô chứa input
-//             let input = cell.querySelector("input");
-//             if (input) {
-//                 value = input.value.trim();
-//             } else {
-//                 // Kiểm tra nếu ô chứa select
-//                 let select = cell.querySelector("select");
-//                 if (select) {
-//                     value = select.value.trim();
-//                 } else {
-//                     // Lấy giá trị văn bản thông thường
-//                     value = cell.innerText.trim();
-//                 }
-//             }
-            
-//             // Chuyển đổi các cột số từ định dạng có dấu phẩy thành số
-//             if ([7, 8, 9, 10, 11, 13].includes(j)) {
-//                 value = parseFloat(value.replace(/,/g, '')) || 0;
-//             }
-            
-//             rowData[`col_${j}`] = value;
-//         }
-        
-//         // Thêm dữ liệu từ extraData vào từng hàng
-//         rowData["po_po_label"] = document.getElementById("po_po_label").innerText.trim();
-//         rowData["po_wh_label"] = document.getElementById("po_wh_label").innerText.trim();
-//         rowData["po_expect_delivery_date"] = document.getElementById("po_expect_delivery_date").value.trim();
-//         rowData["po_payment_date"] = document.getElementById("po_payment_date").value.trim();
-//         rowData["po_company_input"] = document.getElementById("po_company_input").value.trim();
-//         rowData["po_address_input"] = document.getElementById("po_address_input").value.trim();
-//         rowData["po_tax_input"] = document.getElementById("po_tax_input").value.trim();
-//         rowData["po_bank_add_input"] = document.getElementById("po_bank_add_input").value.trim();
-//         rowData["po_bank_acc_input"] = document.getElementById("po_bank_acc_input").value.trim();
-//         rowData["po_bank_name_input"] = document.getElementById("po_bank_name_input").value.trim();
-//         rowData["po_swift_input"] = document.getElementById("po_swift_input").value.trim();
-//         rowData["po_delivery_address_input"] = document.getElementById("po_delivery_address_input").value.trim();
-//         rowData["po_delivery_to_input"] = document.getElementById("po_delivery_to_input").value.trim();
-//         rowData["po_atts_input"] = document.getElementById("po_atts_input").value.trim();
-//         rowData["po_phone_input"] = document.getElementById("po_phone_input").value.trim();
-//         rowData["po_ship_via_input"] = document.getElementById("po_ship_via_input").value.trim();
-//         rowData["po_delivery_terms_input"] = document.getElementById("po_delivery_terms_input").value.trim();
-//         rowData["po_payment_terms_input"] = document.getElementById("po_payment_terms_input").value.trim();
-//         rowData["po_lead_time_input"] = document.getElementById("po_lead_time_input").value.trim();
-//         rowData["po_warranty_input"] = document.getElementById("po_warranty_input").value.trim();
-//         rowData["po_ship_value_input"] = document.getElementById("po_ship_value_input").value.trim();
-//         rowData['wh_and_dept'] = "RMG-PO-" + document.getElementById("po_po_label").innerText.trim().split("-")[1] + "-" + sessionStorage.getItem("dept");
-//         rowData['pr_creator'] = document.getElementById("po_pr_operator_label").textContent
-//         rowData['sheet_id'] = document.getElementById("po_sheet_id_label").textContent
-//         rowData['po_creator'] = sessionStorage.getItem("fullname")
-//         rowData['po_approver'] = sessionStorage.getItem("po_approver")
-        
-        
-//         tableData.push(rowData);
-//     }
-    
-//     return tableData;
-// }
 
 function getTablePOData() {
     let table = document.getElementById("po_materialTable");
