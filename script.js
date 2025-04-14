@@ -7907,6 +7907,12 @@ function openModal_po_3(row) {
 
 
 // Đóng modal
+function closeModal_po_2() {
+    document.getElementById("modal_po_2").style.display = "none";
+    hide_reject_section_2()
+}
+
+// Đóng modal
 function closeModal_po_3() {
     document.getElementById("modal_po_3").style.display = "none";
     hide_reject_section_3()
