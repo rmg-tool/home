@@ -8521,7 +8521,7 @@ async function click_pr_to_po(row) {
                     let select = document.createElement("select");
                     select.style.width = "150px";
                     select.style.border = "1px solid #ccc";
-                    ["0%","8%", "10%"].forEach(optionValue => {
+                    ["0%", "5%", "8%", "10%"].forEach(optionValue => {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
@@ -8541,7 +8541,7 @@ async function click_pr_to_po(row) {
                     // Tạo dropdown cho % Thuế GTGT
                     let select = document.createElement("select");
                     select.style.width = "150px";
-                    ["VND","USD","JPY","SGD","RMB"].forEach(optionValue => {
+                    ["VND","USD","JPY","SGD","RMB", "EUR"].forEach(optionValue => {
                         let option = document.createElement("option");
                         // option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
