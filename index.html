@@ -148,7 +148,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 4.13.12.8/h4>
+                <h4>Version 4.16.12.46/h4>
 
                 
 
@@ -190,6 +190,16 @@
                 <div class="form-row">
                     <label >Mã vật tư</label>
                     <label id="sku_id_nhap"></label>
+                </div>
+
+                <div class="form-row">
+                    <label >Đơn vị</label>
+                    <label id="unit_nhap"></label>
+                </div>
+
+                <div class="form-row">
+                    <label for="rmg_po_nhap">RMG's PO#</label>
+                    <input type="text" id="rmg_po_nhap" placeholder="Nhập mã PO RMG">
                 </div>
                 
                 <div class="form-row">
@@ -292,6 +302,11 @@
                 </div>
 
                 <div class="form-row">
+                    <label >Đơn vị</label>
+                    <label id="unit_xuat"></label>
+                </div>
+
+                <div class="form-row">
                     <label >Xuất cho đơn giá</label>
                     <label id="price_at_xuat"></label>
                 </div>
@@ -345,6 +360,11 @@
                 <div class="form-row">
                     <label for="sku_id_mml">Mã vật tư</label>
                     <input type="text" id="sku_id_mml" placeholder="Nhập Mã vật tư">
+                </div>
+
+                <div class="form-row">
+                    <label for="mb_code_mml">Mã nhà SX</label>
+                    <input type="text" id="mb_code_mml" placeholder="Nhập Mã NSX">
                 </div>
 
                 <div class="form-row">
@@ -2583,8 +2603,6 @@
                   </div>
                   
             </div>
-
-            
 
         <!-- Modal -->
         <div id="filterModal" class="modal" style="display: none;">
