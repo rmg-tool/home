@@ -497,6 +497,7 @@ function handleModalSelection_nhap(selectedOption) {
     
     document.getElementById("sku_name_nhap").textContent = sku_name_nhap
     document.getElementById("sku_id_nhap").textContent = part_number_nhap
+    document.getElementById("unit_nhap").textContent = unit_nhap; // Gán lựa chọn vào ô nhập liệu
 
     const found_vendor = mml_data.filter(u => u[0] === type_nhap);
     const vendor_list = found_vendor.map(row => `${row[5]} | ${row[6]}`);
@@ -547,6 +548,7 @@ function submit_nhap() {
     const material_type = document.getElementById("material-type").value;
     const storageInput = document.getElementById("storage-location");
     const inputValue = storageInput.value;
+    const rmgPO = document.getElementById("rmg_po_nhap").value;
     
     const found_loc = location_data.find(u => u[0] === inputValue);
     console.table(found_loc)
@@ -617,6 +619,7 @@ function submit_nhap() {
         stock_in_table.append("price", unit_price);
         stock_in_table.append("amount", amount_nhao_cr);
         stock_in_table.append("unit", unit_nhap);
+        stock_in_table.append("rmg_po", rmgPO);
 
         fetch('https://script.google.com/macros/s/AKfycbwu7OABpx4V_QzVuKt113RnWkhAtG09aQ9N1vYrTs7mxcWbQrqtnSb-ISm-CJgyjci8/exec', {
             method: 'POST',
@@ -652,9 +655,11 @@ function reset_nhap() {
     document.getElementById("expiry-date").value = ""
     document.getElementById("unit-price").value = ""
     document.getElementById("material-type").value = ""
+    document.getElementById("rmg_po_nhap").value = ""
 
     document.getElementById("sku_name_nhap").textContent = ""
     document.getElementById("sku_id_nhap").textContent = ""
+    document.getElementById("unit_nhap").textContent = "" // Gán lựa chọn vào ô nhập liệu
 
     const selectElement = document.getElementById("supplier-code");
 
@@ -1688,6 +1693,7 @@ function clear_label_xuat() {
     document.getElementById("sku_id_xuat").textContent = ""
     document.getElementById("cur_onhand").textContent = ""
     document.getElementById("price_at_xuat").textContent = ""
+    document.getElementById("unit_xuat").textContent = ""
 }
 
 function reset_xuat() {
@@ -1837,6 +1843,7 @@ function handleModalSelection_nhap2(selectedOption) {
 
     document.getElementById("sku_name_xuat").textContent = sku_name_xuat;
     document.getElementById("sku_id_xuat").textContent = sku_id_xuat;
+    document.getElementById("unit_xuat").textContent = unit_xuat;
     closeModal();
 
     var found_table_xuat = onhand_data
@@ -2079,6 +2086,7 @@ function reset_mml() {
     document.getElementById("material-type_mml").value = "";
     document.getElementById("sku_name_mml").value = "";
     document.getElementById("sku_id_mml").value = "";
+    document.getElementById("mb_code_mml").value = "";
     document.getElementById("price_mml").value = "";
     document.getElementById("supplier_id_mml").value = "";
     document.getElementById("supplier_name_mml").value = "";
@@ -2124,6 +2132,7 @@ function submit_mml() {
     const supplier_id = document.getElementById("supplier_id_mml").value
     const supplier_name = document.getElementById("supplier_name_mml").value
     const unit = document.getElementById("unit_mml").value
+    const mb_code = document.getElementById("mb_code_mml").value
 
     if (type === "") {
         alert("Bạn chưa nhập loại vật tư")
@@ -2184,6 +2193,7 @@ function submit_mml() {
         mml_table.append("supplier_name", supplier_name.toUpperCase());
         mml_table.append("unit", unit);
         mml_table.append("operator", sessionStorage.getItem("fullname"));
+        mml_table.append("mb_code", mb_code.toUpperCase());
 
         fetch('https://script.google.com/macros/s/AKfycbzCyWkpU08SF2hMz2i6k2TwMmukhYoJ2BdK1-oOqBqyHyvKE_yJNT-q_MSQw_Qut7DT-w/exec', {
             method: 'POST',
@@ -2212,6 +2222,7 @@ async function show_onhand() {
         { title: "Mã chi nhánh", formatter: (cell) => cell.getData()[0] },
         { title: "Loại vật tư", formatter: (cell) => cell.getData()[1] },
         { title: "Mã vật tư", formatter: (cell) => cell.getData()[2] },
+        { title: "Description / SKU", formatter: (cell) => cell.getData()[11] },
         { title: "Location", formatter: (cell) => cell.getData()[3] },
         { title: "Ngày hết hạn", formatter: (cell) => cell.getData()[4] },
         { title: "Ngày nhập", formatter: (cell) => cell.getData()[5] },
@@ -2220,10 +2231,11 @@ async function show_onhand() {
         { title: "Tồn đầu", formatter: (cell) => cell.getData()[8] },
         { title: "Xuất", formatter: (cell) => cell.getData()[9] },
         { title: "Tồn cuối", formatter: (cell) => cell.getData()[10] },
-        { title: "Description / SKU", formatter: (cell) => cell.getData()[11] },
         { title: "Đơn giá", formatter: (cell) => cell.getData()[12] },
         { title: "Thành tiền", formatter: (cell) => cell.getData()[13] },
         { title: "Đơn vị", formatter: (cell) => cell.getData()[14] },
+        { title: "Mã nhà cung cấp", formatter: (cell) => cell.getData()[17] },
+        { title: "Tên nhà cung cấp", formatter: (cell) => cell.getData()[18] },
     ];
 
 
@@ -2315,6 +2327,7 @@ document.getElementById("closeModal3").addEventListener("click", function() {
 });
 
 document.getElementById("applyFilter").addEventListener("click", async function() {
+    startLoading()
     warning("Đang xuất dữ liệu")
     await load_xuat()
     // Lấy giá trị từ các input trong modal
@@ -2363,6 +2376,8 @@ document.getElementById("applyFilter").addEventListener("click", async function(
     // Xuất file
     XLSX.writeFile(workbook, filename);
 
+    endLoading()
+
     // Ẩn modal
     document.getElementById("filterModal").style.display = "none";
     document.getElementById("dateFrom").value = "";
@@ -2371,6 +2386,7 @@ document.getElementById("applyFilter").addEventListener("click", async function(
 
 
 document.getElementById("applyFilter2").addEventListener("click", async function() {
+    startLoading()
     warning("Đang xuất dữ liệu")
     await load_nhap()
     // Lấy giá trị từ các input trong modal
@@ -2419,6 +2435,8 @@ document.getElementById("applyFilter2").addEventListener("click", async function
     // Xuất file
     XLSX.writeFile(workbook, filename);
 
+    endLoading()
+
     // Ẩn modal
     document.getElementById("filterModal2").style.display = "none";
     document.getElementById("dateFrom2").value = "";
@@ -2426,6 +2444,7 @@ document.getElementById("applyFilter2").addEventListener("click", async function
 });
 
 document.getElementById("applyFilter3").addEventListener("click", async function() {
+    startLoading()
     warning("Đang xuất dữ liệu")
     await load_onhand()
     // Lấy giá trị từ các input trong modal
@@ -2442,7 +2461,17 @@ document.getElementById("applyFilter3").addEventListener("click", async function
         return isSelectMatch;
     });
 
-    const exportData = [headerRow, ...filteredData];
+    // const exportData = [headerRow, ...filteredData];
+    const exportData = [headerRow, ...filteredData].map(row => {
+        if (!Array.isArray(row) || row.length <= 11) return row; // kiểm tra an toàn
+      
+        const newRow = [...row];
+        const [col11] = newRow.splice(11, 1); // lấy ra phần tử ở index 11
+        newRow.splice(3, 0, col11);           // chèn vào vị trí index 3
+      
+        return newRow;
+      });
+      
 
 
     // Tạo và xuất file Excel với dữ liệu đã lọc
@@ -2458,6 +2487,8 @@ document.getElementById("applyFilter3").addEventListener("click", async function
 
     // Xuất file
     XLSX.writeFile(workbook, filename);
+
+    endLoading()
 
     // Ẩn modal
     document.getElementById("filterModal3").style.display = "none";
