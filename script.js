@@ -3091,16 +3091,18 @@ async function submitForm_survey() {
 
 async function get_survey_need_to_process() {
     startLoading()
-    await Promise.all([load_crm(), load_survey()]);
+    await Promise.all([load_crm(), load_survey(),load_cancel()]);
 
+    const crm_cancel_list = [...new Set(cancel_data.map(row => row[3]))];
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(survey_data.map(row => row[6]));
 
     const newArray = crm_data
         .filter(row => !crmColumn.has(row[7]) && row[10] !== "Bypass"); // Lọc ra các giá trị không tồn tại trong mfgColumn
 
+    const filtered = newArray.filter(row => !crm_cancel_list.includes(row[7]));
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
+    const tableData = filtered.map(row => [
         row[7],
         row[6], // Cột thứ 10
         row[5], // Cột thứ 5
@@ -3462,8 +3464,8 @@ let bomDraftCrmSelect = document.getElementById("bomDraftDropdown");
 async function get_design_need_to_process() {
     crmList = []
     startLoading()
-    await Promise.all([load_survey(), load_design(), load_design_approval()]);
-
+    await Promise.all([load_survey(), load_design(), load_design_approval(), load_cancel()]);
+    const crm_cancel_list = [...new Set(cancel_data.map(row => row[3]))];
 
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(design_data.map(row => row[6]));
@@ -3528,16 +3530,18 @@ async function get_design_need_to_process() {
         return true;
     });
 
+    const filtered = newArray.filter(row => !crm_cancel_list.includes(row[6]));
+    const filtered2 = reprocess.filter(row => !crm_cancel_list.includes(row[6]));
     
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
+    const tableData = filtered.map(row => [
         row[6], // Cột thứ 10
         row[5], // Cột thứ 5
         row[0], // Cột thứ 1
     ]);
 
-    const tableData2 = reprocess.map(row => [
+    const tableData2 = filtered2.map(row => [
         row[6], // Cột thứ 10
         row[13], // Cột thứ 5
         row[0], // Cột thứ 1
@@ -4149,8 +4153,8 @@ async function submitForm_quotation() {
 
 async function get_quotation_need_to_process() {
     startLoading()
-    await Promise.all([load_design_approval(), load_quotation(), load_quotation_approval()]);
-
+    await Promise.all([load_design_approval(), load_quotation(), load_quotation_approval(),load_cancel()]); // Run both fetch calls in parallel
+    const crm_cancel_list = [...new Set(cancel_data.map(row => row[3]))];
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(quotation_data.map(row => row[6]));
 
@@ -4217,15 +4221,17 @@ async function get_quotation_need_to_process() {
         return true;
     });
 
+    const filtered = newArray.filter(row => !crm_cancel_list.includes(row[6]));
+    const filtered2 = reprocess.filter(row => !crm_cancel_list.includes(row[6]));
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
+    const tableData = filtered.map(row => [
         row[6], // Cột thứ 10
         row[9], // Cột thứ 5
         row[0], // Cột thứ 1
     ]);
 
-    const tableData2 = reprocess.map(row => [
+    const tableData2 = filtered2.map(row => [
         row[6], // Cột thứ 10
         row[8], // Cột thứ 5
         row[0], // Cột thứ 1
@@ -4765,16 +4771,17 @@ async function submitForm_order() {
 
 async function get_order_need_to_process() {
     startLoading()
-    await Promise.all([load_quotation_approval(), load_order(), load_crm()]);
-
+    await Promise.all([load_quotation_approval(), load_order(), load_crm(),load_cancel()]);
+    const crm_cancel_list = [...new Set(cancel_data.map(row => row[3]))];
     // Lấy giá trị từ cột thứ 4 của mfg_data
     const crmColumn = new Set(order_data.map(row => row[3]));
 
     const newArray = quotation_approval_data
         .filter(row => !crmColumn.has(row[5]) && row[10] === "BÁO GIÁ ĐÃ DUYỆT")
 
+    const filtered = newArray.filter(row => !crm_cancel_list.includes(row[5]));
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
+    const tableData = filtered.map(row => [
         row[5], // Cột thứ 10
         row[6], // Cột thứ 5
         row[0], // Cột thứ 1
@@ -5728,7 +5735,7 @@ submitBtn.addEventListener("click", async () => {
             status_cancel = "BÁO GIÁ BỊ CANCEL"
             break
         case "order":
-            crm_no = document.getElementById("orderCrmNumber").value;
+            crm_no = document.getElementById("orderQuotationNumber").value;
             if (crm_no === "") {
                 alert("Bạn chưa nhập CRM#")
                 return
@@ -5772,6 +5779,24 @@ submitBtn.addEventListener("click", async () => {
     reset_design()
     reset_quotation()
     reset_order()
+
+    switch (active_frame) {
+        case "survey":
+            get_survey_need_to_process()
+            break
+        case "design":
+            get_design_need_to_process()
+            break
+        case "quotation":
+            get_quotation_need_to_process()
+            break
+        case "order":
+            get_order_need_to_process()
+            break
+        default:
+            alert("Không tìm thấy frame nào đang hiển thị!");
+            return
+    }
 });
 
 function resetModal() {
@@ -7273,6 +7298,11 @@ function addItem_pr() {
     let price = parseFloat(document.getElementById("pr_price").value) || 0;
     let quantity = parseFloat(document.getElementById("pr_quantity").value) || 0;
     let total = price * quantity;
+
+    if (name === "") {
+        alert("Bạn chưa chọn vật tư từ gợi ý hệ thống")
+        return
+    }
 
     if (type === "") {
         alert("Vui lòng chọn loại vật tư")
@@ -8865,7 +8895,6 @@ function clearPOModal() {
     document.getElementById("po_bank_acc_input").value = "";
     document.getElementById("po_bank_name_input").value = "";
     document.getElementById("po_swift_input").value = "";
-    document.getElementById("po_delivery_address_input").value = "";
     document.getElementById("po_delivery_to_input").value = "";
     document.getElementById("po_atts_input").value = "";
     document.getElementById("po_phone_input").value = "";
