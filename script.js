@@ -807,7 +807,23 @@ async function updateAndLoadPO() {
 }
   
 
-let prExportData = [];
+let poInfo_data = [];
+
+async function load_po_info() {
+    return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
+        .then(res => res.json())
+        .then(data => {
+            const columnsToRemove = new Set([10, 11, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57]);
+            poInfo_data = data.content.map(row =>
+                row.filter((_, index) => !columnsToRemove.has(index))
+            );
+
+            poInfo_data.shift(); // Bỏ header gốc nếu có
+        }
+
+    );
+}
+
 
 async function load_detail_pr() {
     return fetch('https://script.google.com/macros/s/AKfycbx7AbFWNtkEmz6kh13TNSNZDDVdYZaUCufmzUTmjaScj2eHxEzQrBBE_wFyxftorg4FqA/exec')
@@ -857,6 +873,16 @@ function filterAndExportPR() {
         const matchBranch = branch === '' || row[6] === branch;
         const matchOperator = operator === '' || row[3] === operator;
         return matchDate && matchBranch && matchOperator;
+    });
+
+    filtered.forEach(row => {
+        [18].forEach(i => {
+          if (row[i]) {
+            const date = new Date(row[i]);
+            date.setHours(date.getHours() + 7); // cộng 7 giờ
+            row[i] = date.toISOString().slice(0, 10); // lấy YYYY-MM-DD
+          }
+        });
     });
 
     const header = [
@@ -934,12 +960,24 @@ function filterAndExportPO() {
     const branch = document.getElementById('po_export_modal_branch').value;
     const operator = document.getElementById('po_export_modal_operator').value;
 
+
     const filtered = poExportData.filter(row => {
         const matchDate = date === '' || (row[0] && row[0].startsWith(date));
         const matchOperator = operator === '' || row[5] === operator;
         const matchBranch = branch === '' || row[row.length - 1] === branch;
         return matchDate && matchOperator && matchBranch;
-    });
+      });
+      
+      // 👉 Sửa định dạng ngày
+      filtered.forEach(row => {
+        [29, 30].forEach(i => {
+          if (row[i]) {
+            const date = new Date(row[i]);
+            date.setHours(date.getHours() + 7); // cộng thêm 7h
+            row[i] = date.toISOString().slice(0, 10); // lấy YYYY-MM-DD
+          }
+        });
+      });      
 
     const header = [
         "Ngày tạo PO", "Thời gian tạo PO", "PO #", "PR #", "Nhà cung cấp",
@@ -1355,7 +1393,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 po_3_approval:user[34] === "x",
                 po_4_approval:user[35] === "x",
                 export_pr:user[36] === "x",
-                export_po:user[37] === "x"
+                export_po:user[37] === "x",
+                pr_po_summary:user[38] === "x"
             };
 
             // Ghi log quyền để kiểm tra
@@ -1671,6 +1710,11 @@ async function showFrame(id) {
                 activeFrame.classList.add('active');
                 active_frame = id;
                 po_4_approval()
+                console.log("Access granted to frame:", id);
+            } if (id === "pr_po_summary") {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                get_pr_po_summary()
                 console.log("Access granted to frame:", id);
             } else {
                 activeFrame.classList.add('active');
@@ -7413,7 +7457,7 @@ function clearItem_pr() {
 }
 
 
-function send_pr() {
+async function send_pr() {
     const pr_purpose = document.getElementById("purpose_pr").value;
     if (pr_purpose === "") {
         alert("Vui lòng chọn mục đích mua hàng")
@@ -7466,13 +7510,14 @@ function send_pr() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
     })
-    .then(() => info("Dữ liệu đã được gửi thành công!"))
+    .then(() => updateBeforeExport())
     .catch(console.log("Lỗi khi gửi dữ liệu:"))
     .finally(() => {
         endLoading()
         clearItem_pr();
         clearPrModalContent();
         hideModal_pr();
+        info("Dữ liệu đã được gửi thành công!")
     });
 }
 
@@ -8442,9 +8487,54 @@ async function load_pr_to_po() {
         });
 }
 
+// function add_po_to_po_table(data) {
+//     const tableBody = document.querySelector("#poTable tbody");
+//     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
+
+//     data.forEach(row => {
+//         let newRow = document.createElement("tr");
+
+//         row.forEach((cell, index) => {
+//             let newCell = document.createElement("td");
+
+//             // Nếu là cột PR# (giả sử PR# nằm ở cột thứ 2)
+//             if (index === 2) {
+//                 let link = document.createElement("a");
+//                 link.href = "#"; // Không điều hướng trang
+//                 link.textContent = cell;
+//                 link.style.color = "blue";
+//                 link.style.cursor = "pointer";
+
+//                 // Khi click, in ra giá trị của cả dòng
+//                 link.addEventListener("click", function () {
+//                     console.log(row); // In ra giá trị của cả dòng
+//                     click_pr_to_po(row);
+//                 });
+
+//                 newCell.appendChild(link);
+//             } 
+//             // Nếu là cột Spreadsheet_id, hiển thị dạng link Google Sheets
+//             else if (index === 8) {
+//                 let link = document.createElement("a");
+//                 link.href = `https://docs.google.com/spreadsheets/d/${cell}`;
+//                 link.target = "_blank";
+//                 link.textContent = "Xem thông tin PR";
+//                 newCell.appendChild(link);
+//             } 
+//             else {
+//                 newCell.textContent = cell;
+//             }
+
+//             newRow.appendChild(newCell);
+//         });
+
+//         tableBody.appendChild(newRow);
+//     });
+// }
+
 function add_po_to_po_table(data) {
     const tableBody = document.querySelector("#poTable tbody");
-    tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
+    tableBody.innerHTML = "";
 
     data.forEach(row => {
         let newRow = document.createElement("tr");
@@ -8452,28 +8542,33 @@ function add_po_to_po_table(data) {
         row.forEach((cell, index) => {
             let newCell = document.createElement("td");
 
-            // Nếu là cột PR# (giả sử PR# nằm ở cột thứ 2)
             if (index === 2) {
                 let link = document.createElement("a");
-                link.href = "#"; // Không điều hướng trang
+                link.href = "#";
                 link.textContent = cell;
                 link.style.color = "blue";
                 link.style.cursor = "pointer";
 
-                // Khi click, in ra giá trị của cả dòng
                 link.addEventListener("click", function () {
-                    console.log(row); // In ra giá trị của cả dòng
+                    console.log(row);
                     click_pr_to_po(row);
                 });
 
                 newCell.appendChild(link);
             } 
-            // Nếu là cột Spreadsheet_id, hiển thị dạng link Google Sheets
             else if (index === 8) {
                 let link = document.createElement("a");
-                link.href = `https://docs.google.com/spreadsheets/d/${cell}`;
-                link.target = "_blank";
-                link.textContent = cell;
+                link.href = "#";
+                link.textContent = "Xem thông tin PR";
+                link.style.color = "green";
+                link.style.cursor = "pointer";
+
+                link.addEventListener("click", async function () {
+                    window.selectedPoRow = row; // Lưu row hiện tại
+                    const prData = await getPrInfo(cell); // cell chính là spreadsheetId
+                    showPrInfoModal(prData); // Gọi hàm hiển thị modal
+                });
+
                 newCell.appendChild(link);
             } 
             else {
@@ -8486,6 +8581,136 @@ function add_po_to_po_table(data) {
         tableBody.appendChild(newRow);
     });
 }
+
+function showPrInfoModal(data) {
+    const modal = document.getElementById("prInfoModal");
+    const modalTableBody = modal.querySelector("#modalTable tbody");
+    modalTableBody.innerHTML = "";
+
+    // Header (bỏ cột file đính kèm đầu tiên ở index 12)
+    const headers = [
+        "STT", "Loại vật tư", "Tên vật tư", "Mã vật tư", "Thông số kỹ thuật", "Đơn vị",
+        "Tên khách hàng", "Số PO của khách hàng", "Ngày cần có hàng", "Đơn giá", "Số lượng", "Tổng tiền",
+        "PR #", "Người yêu cầu", "Bộ phận", "Chi nhánh", "Mục đích mua hàng", "Người approve", "File đính kèm"
+    ];
+
+    const headerRow = document.createElement("tr");
+    headers.forEach(headerText => {
+        const th = document.createElement("th");
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+    modalTableBody.appendChild(headerRow);
+
+    data.forEach(row => {
+        const tr = document.createElement("tr");
+
+        let values;
+        if (Array.isArray(row)) {
+            values = row.filter((_, i) => i !== 12); // bỏ index 12 nếu là mảng
+        } else {
+            const entries = Object.entries(row);
+            entries.splice(12, 1); // bỏ phần tử thứ 13
+            values = entries.map(entry => entry[1]); // lấy giá trị
+        }
+        // Xóa cột cuối 
+        values.pop(); // Bỏ cột cuối cùng (cột file đính kèm)
+        values.forEach((value, i) => {
+            const td = document.createElement("td");
+
+            // Nếu là cột cuối cùng => hiển thị button mở link
+            if (i === 18) {
+                const button = document.createElement("button");
+                button.textContent = "Xem file";
+                button.style.padding = "5px 10px";
+                button.style.cursor = "pointer";
+                button.onclick = () => window.open(value, "_blank");
+                td.appendChild(button);
+            } else if (i === 8) {
+                if (value) {
+                    const date = new Date(value);
+                    date.setHours(date.getHours() + 7); // cộng thêm 7h
+                    td.textContent = date.toISOString().slice(0, 10); // lấy YYYY-MM-DD
+                } else {
+                    td.textContent = "";
+                }
+            } else if (i === 9 || i === 10 || i === 11) {
+                td.textContent = typeof value === "number"
+                ? value.toLocaleString("en-US")
+                : value || "";
+            } else {
+                td.textContent = value;
+            }
+
+            tr.appendChild(td);
+        });
+
+        modalTableBody.appendChild(tr);
+    });
+
+    modal.style.display = "block";
+}
+
+document.getElementById("processPrInfo").addEventListener("click", () => {
+    if (window.selectedPoRow) {
+        click_pr_to_po(window.selectedPoRow);
+        closePrInfoModal(); // Ẩn modal nếu muốn
+    } else {
+        alert("Không có dữ liệu PR được chọn.");
+    }
+});
+
+
+async function getPrInfo(spreadsheetId) {
+    startLoading()
+    const url = `https://script.google.com/macros/s/AKfycbyxF9X6esF4wRz4mYwaQ5A96KBgmIZ6O2abtev54sRvojuORZG3fDLi7jD5faVshocdPg/exec?spreadsheet_id=${spreadsheetId}`; // Thay thế bằng URL thực tế
+
+    try {
+        let response = await fetch(url);
+        let data = await response.json(); // Chuyển dữ liệu JSON
+        console.log(data); // Hiển thị dữ liệu trong console
+        return data
+    } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu:", error);
+    } finally {
+        endLoading()
+    }
+}
+
+function showModalWithData(values) {
+    const modalBody = document.querySelector('#modalTable tbody');
+    modalBody.innerHTML = '';
+  
+    values.forEach(row => {
+      const tr = document.createElement('tr');
+      row.forEach(cell => {
+        const td = document.createElement('td');
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      modalBody.appendChild(tr);
+    });
+  
+    document.getElementById('prInfoModal').style.display = 'block';
+  }
+
+  function attachSheetLinks() {
+    document.querySelectorAll('.view-pr').forEach(link => {
+      link.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const sheetId = link.dataset.sheetId;
+        const data = await getPrInfo(sheetId);
+        if (data && data.length > 0) {
+          showModalWithData(data);
+        }
+      });
+    });
+  }
+  
+
+function closePrInfoModal() {
+    document.getElementById('prInfoModal').style.display = 'none';
+  }
 
 
 async function click_pr_to_po(row) {
@@ -8513,6 +8738,7 @@ async function click_pr_to_po(row) {
         }
         console.log(data.content)
         const filteredData = data.content.filter(row => row[20] !== "Done"); // Bỏ dòng header
+        document.getElementById("po_availability_materials_date").value = filteredData[1][8].slice(0, 10); // Ngày cần có hàng
         const data_pr = filteredData.map((row, index) => [
             row[0],      // Loại vật tư
             row[1],      // Tên vật tư
@@ -8535,6 +8761,7 @@ async function click_pr_to_po(row) {
 
         const tableBody = document.querySelector("#po_materialTable tbody");
         tableBody.innerHTML = "";
+        
 
         data_pr.forEach(row => {
             let newRow = document.createElement("tr");
@@ -8886,6 +9113,7 @@ function clearPOModal() {
     document.getElementById("po_sheet_id_label").innerText = "";
     
     // Clear input fields
+    document.getElementById("po_availability_materials_date").value = "";
     document.getElementById("po_expect_delivery_date").value = "";
     document.getElementById("po_payment_date").value = "";
     document.getElementById("po_company_input").value = "";
@@ -9041,7 +9269,7 @@ document.getElementById("po_reject").addEventListener("click", rejectPO);
 
 async function get_po_need_to_release() {
     startLoading()
-    await Promise.all([load_purchase_order(), load_po_need_to_release()]); 
+    await Promise.all([load_po_info(),load_purchase_order(), load_po_need_to_release()]); 
     endLoading()
 
     const tableBody = document.querySelector("#po_release_table tbody");
@@ -9079,6 +9307,15 @@ async function get_po_need_to_release() {
             document.getElementById("total_value_po_release").value = po_need_to_release_list[index][6].toLocaleString('en-US');
             document.getElementById("remain_pay_po_release").value = po_need_to_release_list[index][6].toLocaleString('en-US');
             document.getElementById("pre_pay_po_release").value = 0;
+
+            const found_delivery_date = poInfo_data.find(row => row[2] === po_need_to_release_list[index][0]);
+            const delivery_date = found_delivery_date ? found_delivery_date[29] : ""; // Ngày cần có hàng
+            // cần +7 giờ, vì VN là GMT +7
+            const date2 = new Date(delivery_date);
+            date2.setHours(date2.getHours() + 7); // Cộng thêm 7 giờ
+
+            const formattedDate = date2.toISOString().slice(0, 10); // Định dạng lại thành YYYY-MM-DD
+            document.getElementById("expect_recv_date_po_release").value = formattedDate; // Ngày cần có hàng
             
         });
     });
@@ -10160,3 +10397,79 @@ function startLoading() {
     buttons.forEach(btn => btn.disabled = false);
   }
   
+// PR PO Summary
+let pr_po_summary_data = [];
+
+async function get_pr_po_summary() {
+    startLoading()
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxRhGOmuECC6RnO43JVvXkCOEHiUpCVBaKTXXeny1YHSBYqqlW-cooYm1AT-yusKyej-w/exec");
+    pr_po_summary_data = await res.json();
+    PurRenderTable(pr_po_summary_data);
+    populateBranches(pr_po_summary_data);
+    endLoading()
+}
+
+function PurRenderTable(data) {
+    const table = document.getElementById("data-table-summary");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='9'>Không có dữ liệu</td></tr>";
+    return;
+    }
+
+    // Render header
+    const headers = Object.keys(data[0]);
+    const headerRow = document.createElement("tr");
+    headers.forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Render body
+    data.forEach(row => {
+    const tr = document.createElement("tr");
+    headers.forEach(k => {
+        const td = document.createElement("td");
+        td.textContent = row[k];
+        tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+    });
+}
+
+function populateBranches(data) {
+    const select = document.getElementById("pur-filter-branch");
+    const branches = Array.from(new Set(data.map(d => d["Chi nhánh"]))).sort();
+    branches.forEach(b => {
+    const option = document.createElement("option");
+    option.value = b;
+    option.textContent = b;
+    select.appendChild(option);
+    });
+}
+
+function applyFilters_pur_summary() {
+    const poFilter = document.getElementById("filter-po").value.toLowerCase();
+    const prFilter = document.getElementById("filter-pr").value.toLowerCase();
+    const branchFilter = document.getElementById("pur-filter-branch").value;
+
+    const filtered = pr_po_summary_data.filter(row => {
+    const poMatch = row["PO"].toLowerCase().includes(poFilter);
+    const prMatch = row["PR"].toLowerCase().includes(prFilter);
+    const branchMatch = !branchFilter || row["Chi nhánh"] === branchFilter;
+    return poMatch && prMatch && branchMatch;
+    });
+
+    PurRenderTable(filtered);
+}
+
+document.getElementById("filter-po").addEventListener("input", applyFilters_pur_summary);
+document.getElementById("filter-pr").addEventListener("input", applyFilters_pur_summary);
+document.getElementById("pur-filter-branch").addEventListener("change", applyFilters_pur_summary);
