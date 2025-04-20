@@ -101,6 +101,7 @@
                         <li onclick="showFrame('pur_pre_payment')">Pre-Payment</li>
                         <li onclick="showFrame('pur_po_receiving')">PO Receiving</li>
                         <li onclick="showFrame('pur_final_payment')">Final Payment</li>
+                        <li onclick="showFrame('pr_po_summary')">PR / PO Status</li>
                     </ul>
                     
                 </li>
@@ -148,7 +149,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 4.16.12.46/h4>
+                <h4>Version 4.20.21.46/h4>
 
                 
 
@@ -1900,6 +1901,16 @@
                         <!-- Dữ liệu sẽ được chèn vào đây -->
                     </tbody>
                 </table>
+                <!-- Modal show thông tin PR trước khi làm PO -->
+                <div id="prInfoModal" class="modal">
+                    <div class="modal-content">
+                      <!-- <span class="close" onclick="closePrInfoModal()">&times;</span> -->
+                      <h3>Thông tin PR</h3>
+                      <table id="modalTable" border="1"><tbody></tbody></table>
+                      <button id="processPrInfo">Tạo PO</button>
+                      <button id="closePrInfo" onclick="closePrInfoModal()">Đóng</button>
+                    </div>
+                  </div>
 
                 <!-- Modal when click into PR# -->
                 <div class="bom-modal" id="po-modal">
@@ -1917,6 +1928,11 @@
                             <div class="form-row">
                                 <label>Chi nhánh</label>
                                 <label id="po_wh_label"></label>  
+                            </div>
+
+                            <div class="form-row">
+                                <label>Ngày cần có vật tư</label>
+                                <input type="text" id="po_availability_materials_date" readonly>
                             </div>
 
                             <div class="form-row">
@@ -2049,7 +2065,11 @@
                                 <option value="159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam">
                                   159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam
                                 </option>
+                                <option value="Waterfront, Nhà 6 Đường 8, Vĩnh Niệm, Lê  Chân, Hải Phòng">
+                                  Waterfront, Nhà 6 Đường 8, Vĩnh Niệm, Lê  Chân, Hải Phòng
+                                </option>
                               </select>
+
                               
                         </div>
 
@@ -2167,8 +2187,8 @@
                         </div>
 
                         <div class="form-row">
-                            <label>Ngày nhận hàng dự kiến</label>
-                            <input id="expect_recv_date_po_release" type="date">
+                            <label>Ngày cần có hàng</label>
+                            <input id="expect_recv_date_po_release" type="text" readonly>
                         </div>
                         
                         <div class="form-row">
@@ -2534,6 +2554,42 @@
                 </div>
 
              </div>
+            <!-- ############ -->
+
+            <!-- PR PO Summary -->
+            <div id="pr_po_summary" class="frame">
+                
+                <h1>Tổng hợp PR-PO</h1>
+                <button class="refresh-btn" onclick="po_3_approval()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+
+                <div class="frame3">
+
+                    <div class="form-row">
+                        <label>PO#:</label>
+                        <input type="text" id="filter-po" placeholder="Nhập PO#">
+                    </div>
+                    <div class="form-row">
+                        <label>PR#:</label>
+                        <input type="text" id="filter-pr" placeholder="Nhập PR#">
+                    </div>
+                
+                    <div class="form-row">
+                        <label>Chi nhánh:</label>
+                        <select id="pur-filter-branch">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>  
+                </div>
+                <div style="height: 500px; overflow: auto;">
+                    <table id="data-table-summary">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- ############ -->
 
             <div id="transaction_xuat" class="frame">
