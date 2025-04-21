@@ -8684,6 +8684,7 @@ function showPrInfoInNewTab(data, row) {
             </thead>
             <tbody>
     `;
+    // delete last column
 
     data.forEach((row, idx) => {
         let values = Array.isArray(row) ? row.filter((_, i) => i !== 12) : Object.values(row).filter((_, i) => i !== 12);
@@ -8707,6 +8708,10 @@ function showPrInfoInNewTab(data, row) {
                 html += `<td><button onclick="window.open('${val}', '_blank')">Xem file</button></td>`;
             } else {
                 html += `<td>${val}</td>`;
+            }
+
+            if (i === 19) {
+                html += `<td></td>`;
             }
         });
         html += `</tr>`;
