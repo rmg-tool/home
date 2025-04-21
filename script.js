@@ -8566,7 +8566,7 @@ function add_po_to_po_table(data) {
                 link.addEventListener("click", async function () {
                     window.selectedPoRow = row; // Lưu row hiện tại
                     const prData = await getPrInfo(cell); // cell chính là spreadsheetId
-                    showPrInfoModal(prData); // Gọi hàm hiển thị modal
+                    showPrInfoInNewTab(prData, row); // Gọi hàm hiển thị modal
                 });
 
                 newCell.appendChild(link);
@@ -8649,6 +8649,74 @@ function showPrInfoModal(data) {
     });
 
     modal.style.display = "block";
+}
+
+function showPrInfoInNewTab(data, row) {
+    const headers = [
+        "STT", "Loại vật tư", "Tên vật tư", "Mã vật tư", "Thông số kỹ thuật", "Đơn vị",
+        "Tên khách hàng", "Số PO của khách hàng", "Ngày cần có hàng", "Đơn giá", "Số lượng", "Tổng tiền",
+        "PR #", "Người yêu cầu", "Bộ phận", "Chi nhánh", "Mục đích mua hàng", "Người approve", "File đính kèm"
+    ];
+
+    const title = row[2]; // Lấy tên PO từ dòng đã chọn
+
+    let html = `
+    <html>
+    <head>
+        <title>${title}</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; background: #f8f9fa; }
+            table { width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; }
+            th { background-color: #009688; color: white; padding: 12px; text-align: left; font-weight: bold; border-bottom: 2px solid #ddd; white-space: nowrap; }
+            td { padding: 12px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+            tr:nth-child(even):not(:first-child) { background-color: #f9f9f9; }
+            tr:hover { background-color: #f1f1f1; cursor: default; }
+            button { padding: 10px 20px; margin: 10px 10px 0 0; font-size: 14px; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s ease; background: #28a745; color: white; }
+            button:hover { background-color: #218838; }
+        </style>
+    </head>
+    <body>
+        <h2>${title}</h2>
+        <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+    `;
+
+    data.forEach((row, idx) => {
+        let values = Array.isArray(row) ? row.filter((_, i) => i !== 12) : Object.values(row).filter((_, i) => i !== 12);
+        const fileLink = Array.isArray(row) ? row[18] : Object.values(row)[18];
+
+        html += `<tr>`;
+        values.forEach((val, i) => {
+            if (i === 8) {
+                if (val) {
+                    const date = new Date(val);
+                    date.setHours(date.getHours() + 7);
+                    val = date.toISOString().slice(0, 10);
+                } else {
+                    val = "";
+                }
+            } else if (i === 9 || i === 10 || i === 11) {
+                val = typeof val === "number" ? val.toLocaleString("en-US") : val || "";
+            }
+
+            if (i === 18) {
+                html += `<td><button onclick="window.open('${val}', '_blank')">Xem file</button></td>`;
+            } else {
+                html += `<td>${val}</td>`;
+            }
+        });
+        html += `</tr>`;
+    });
+
+    html += `</tbody></table></div></body></html>`;
+
+    const newTab = window.open();
+    newTab.document.write(html);
+    newTab.document.close();
 }
 
 document.getElementById("processPrInfo").addEventListener("click", () => {
