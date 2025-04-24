@@ -101,6 +101,7 @@
                         <li onclick="showFrame('pur_pre_payment')">Pre-Payment</li>
                         <li onclick="showFrame('pur_po_receiving')">PO Receiving</li>
                         <li onclick="showFrame('pur_final_payment')">Final Payment</li>
+                        <li onclick="showFrame('pur_po_complete')">Final Payment</li>
                         <li onclick="showFrame('pr_po_summary')">PR / PO Status</li>
                     </ul>
                     
@@ -401,7 +402,6 @@
                         <option value="Tấm">Tấm</option>
                         <option value="Túi">Túi</option>
                         <option value="M3">M3</option>
-                        <option value="Viên">Viên</option>
                     </select>
                 </div>
 
@@ -2443,6 +2443,135 @@
                         <div class="form-row">
                             <label>PO#</label>
                             <input id="po_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PO</label>
+                            <input id="po_creator_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Người tạo PR</label>
+                            <input id="pr_creator_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tổng giá trị PO</label>
+                            <input id="total_value_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí cần thanh toán trước</label>
+                            <input id="pre_pay_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Chi phí còn lại sẽ thanh toán</label>
+                            <input id="remain_pay_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nhà cung cấp</label>
+                            <input id="vendor_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Địa chỉ</label>
+                            <input id="vendor_addr_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số điện thoại</label>
+                            <input id="vendor_phone_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Tên ngân hàng</label>
+                            <input id="vendor_bank_name_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số tài khoản</label>
+                            <input id="vendor_bank_acc_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày thanh toán</label>
+                            <input id="payment_date_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Ngày nhận hàng dự kiến</label>
+                            <input id="expect_recv_date_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Nội dung PO-RECEIVING</label>
+                            <input id="content_release_final_payment" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Xem Files đính kèm</label>
+                            <div id="files_final_payment"></div> <!-- Chuyển từ button sang div -->
+                        </div>
+                        
+                        
+                        <div class="form-row">
+                            <label>Nội dung</label>
+                            <textarea id="content_final_payment"></textarea>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <input type="file" name="file" id="fileUpload_final_payment" onchange="LoadFile_final_payment(event)" required multiple><br><br>
+            
+                            <input type="hidden" id="fileData_final_payment" name="fileData_final_payment">
+                            <input type="hidden" id="mimeType_final_payment" name="mimeType_final_payment">
+                            <input type="hidden" id="fileName_final_payment" name="fileName_final_payment">
+                        </div>
+            
+                        <div id="button_group_final_payment">
+                            <button id="submitButton_final_payment" class="submit-btn">ĐÃ THANH TOÁN</button>
+                        </div>
+                    </div>
+
+                    <div id="div2" class="right-frame">
+                        <h1>Danh sách chờ xử lý</h1>
+
+                        <div id="table-container_final_payment" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
+                            <table id="final_payment_table">
+                                <thead>
+                                    <tr>
+                                        <th>PO#</th>
+                                        <th>PR#</th>
+                                        <th>Vendor</th>
+                                        <th>Ngày thanh toán</th>
+                                        <th>Số tiền còn lại</th>
+                                        <th>Người tạo PO</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+             </div>
+            <!-- ############ -->
+
+            <!-- PO COMPLETE -->
+            <div id="pur_final_payment" class="frame">
+                <div class="frame2">
+                    <div id="div1" class="left-frame">
+                        <h1>PO COMPLETE</h1>
+
+                        <div class="form-row">
+                            <label>PR#</label>
+                            <input id="pr_po_complete" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>PO#</label>
+                            <input id="po_po_complete" type="text" readonly>
                         </div>
 
                         <div class="form-row">
