@@ -6140,6 +6140,25 @@ function updateArrayWithSum(array1, array2) {
     return array1;
 }
 
+function updateArrayWithSum_create_pr(array1, array2) {
+    const wh = document.getElementById("warehouse_pr").value
+    // Duyệt qua từng dòng của array1
+    array1.forEach(row1 => {
+        let key = row1[2]; // Cột thứ 2 của array1 (index 1)
+        
+        // Lọc các dòng trong array2 có cột thứ 2 khớp với key
+        let filteredRows = array2.filter(row2 => row2[2] === key && row2[0] === wh);
+        
+        // Tính tổng của cột thứ 10 (index 9) trong array2
+        let total = filteredRows.reduce((sum, row) => sum + (row[10] || 0), 0);
+        
+        // Gán tổng vào array1, ví dụ: cột thứ 10 (index 9) của array1
+        row1[10] = total;
+    });
+
+    return array1;
+}
+
 function showSecondaryOptions_bom(selectedItem) {
     console.log(selectedItem)
     const wh_value = document.getElementById("bom-wh").textContent
@@ -7124,7 +7143,7 @@ async function showModal_pr() {
     document.getElementById('pr-modal').classList.add('show');
     document.getElementById("pr_dept").value = sessionStorage.getItem("dept");
     startLoading()
-    await Promise.all([load_mml(), load_vendor()]);
+    await Promise.all([load_mml(), load_vendor(), load_onhand()]);
     endLoading()
 }
 
@@ -7215,9 +7234,47 @@ function showSearchResults_pr_type(displayList, fullData) {
     });
 }
 
+// function showSecondaryOptions_pr_type(selectedItem) {
+//     // Filter based on selected item and availability
+//     const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]);
+//     const modal = document.getElementById("secondaryModal_pr_type");
+//     const modalOptions = document.getElementById("modalOptions_pr_type");
+//     modalOptions.innerHTML = ''; // Clear old content
+
+//     console.log(filteredResults)
+
+//     // Use a Set to keep track of unique options
+//     const uniqueOptions = new Set();
+
+//     filteredResults.forEach(option => {
+//         const optionKey = `${option[1]} | ${option[2]}`
+
+//         if (!uniqueOptions.has(optionKey)) {
+//             uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
+
+//             const optionDiv = document.createElement("div");
+//             optionDiv.classList.add("modal-option");
+
+//             // Set the text content using the unique ID and description
+//             optionDiv.textContent = optionKey;
+
+//             optionDiv.addEventListener("click", () => {
+//                 handleModalSelection_pr_type(option); // Call function when user selects an option
+//                 modal.style.display = 'none';
+//             });
+
+//             modalOptions.appendChild(optionDiv);
+//         }
+//     });
+
+//     // Display the modal
+//     modal.style.display = 'flex';
+// }
+
 function showSecondaryOptions_pr_type(selectedItem) {
     // Filter based on selected item and availability
-    const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]);
+    const filteredResults2 = mml_data.filter(item => item[0] === selectedItem[0]);
+    const filteredResults = updateArrayWithSum_create_pr(filteredResults2, onhand_data)
     const modal = document.getElementById("secondaryModal_pr_type");
     const modalOptions = document.getElementById("modalOptions_pr_type");
     modalOptions.innerHTML = ''; // Clear old content
@@ -7228,7 +7285,7 @@ function showSecondaryOptions_pr_type(selectedItem) {
     const uniqueOptions = new Set();
 
     filteredResults.forEach(option => {
-        const optionKey = `${option[1]} | ${option[2]}`
+        const optionKey = `${option[1]} | ${option[2]} | Tồn: ${option[10]}`; // Create a unique key based on ID and description
 
         if (!uniqueOptions.has(optionKey)) {
             uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
@@ -7251,6 +7308,7 @@ function showSecondaryOptions_pr_type(selectedItem) {
     // Display the modal
     modal.style.display = 'flex';
 }
+
 
 function handleModalSelection_pr_type(selectedOption) {
     console.log("Người dùng đã chọn:", selectedOption);
@@ -8882,7 +8940,7 @@ async function click_pr_to_po(row) {
                     let select = document.createElement("select");
                     select.style.width = "150px";
                     select.style.border = "1px solid #ccc";
-                    ["0%", "5%", "8%", "10%"].forEach(optionValue => {
+                    ["0%", "3%","5%", "8%", "10%"].forEach(optionValue => {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
