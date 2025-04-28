@@ -150,7 +150,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h4>Version 4.20.21.46/h4>
+                <h4>Version 4.28.21.46/h4>
 
                 
 
@@ -1462,7 +1462,8 @@
                             <label>Tổng giá trị PO</label>
                             <label id="po_total"></label><br>
                 
-                            <button id="po_pdf_view">Xem PDF</button>
+                            <!-- <button id="po_pdf_view">Xem PDF</button> -->
+                            <button id="po_1_pdf_view_new_tab">Xem chi tiết PO</button>
                             <button id="po_fils_view">Xem Files Upload</button>
                         </div>
                 
@@ -1540,7 +1541,8 @@
                             <label>Tổng giá trị PO</label>
                             <label id="po_2_total"></label><br>
                 
-                            <button id="po_2_pdf_view">Xem PDF</button>
+                            <!-- <button id="po_2_pdf_view">Xem PDF</button> -->
+                            <button id="po_2_pdf_view_new_tab">Xem chi tiết PO</button>
                             <button id="po_2_fils_view">Xem Files Upload</button>
                         </div>
                 
@@ -1558,7 +1560,7 @@
                                 <option value="Chính sách và quy trình">Chính sách và quy trình</option>
                             </select>  
                         </div>
-                
+
                         <div style="margin-top: 50px; text-align: center;">
                             <button id="po_2_approve">Approve</button>
                             <button id="po_2_reject">Reject</button>
@@ -1618,7 +1620,8 @@
                             <label>Tổng giá trị PO</label>
                             <label id="po_3_total"></label><br>
 
-                            <button id="po_3_pdf_view">Xem PDF</button>
+                            <!-- <button id="po_3_pdf_view">Xem PDF</button> -->
+                            <button id="po_3_pdf_view_new_tab">Xem chi tiết PO</button>
                             <button id="po_3_fils_view">Xem Files Upload</button>
                         </div>
 
@@ -1695,7 +1698,8 @@
                             <label>Tổng giá trị PO</label>
                             <label id="po_4_total"></label><br>
                 
-                            <button id="po_4_pdf_view">Xem PDF</button>
+                            <!-- <button id="po_4_pdf_view">Xem PDF</button> -->
+                            <button id="po_4_pdf_view_new_tab">Xem chi tiết PO</button>
                             <button id="po_4_fils_view">Xem Files Upload</button>
                         </div>
                 
@@ -2391,6 +2395,8 @@
                             <label>Nội dung</label>
                             <textarea id="content_po_receiving"></textarea>
                         </div>
+
+                        <button id="view_po_detail_at_receiving"> Xem chi tiết PO</button>
 
                         <div style="text-align: center; margin-top: 30px;">
                             <input type="file" name="file" id="fileUpload_po_receiving" onchange="LoadFile_po_receiving(event)" required multiple><br><br>
