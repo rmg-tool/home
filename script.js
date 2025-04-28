@@ -7336,12 +7336,15 @@ function handleModalSelection_pr_type(selectedOption) {
     pr_sku_name = selectedOption[1];
     pr_sku_id = selectedOption[2];
     pr_unit = selectedOption[3];
+    pr_unit_price = selectedOption[4];
 
     console.log(pr_sku_name, pr_sku_id, pr_unit)
     // Gán giá trị vào các ô nhập liệu
     document.getElementById("pr_name").value = pr_sku_name;
     document.getElementById("pr_code").value = pr_sku_id;
     document.getElementById("pr_unit").value = pr_unit;
+    document.getElementById("pr_unit_price").value = pr_unit_price.toLocaleString("em-US");
+
 
     document.getElementById("pr_specs").focus();
     
@@ -7521,6 +7524,7 @@ function clearItem_pr() {
     document.getElementById("pr_code").value = "";
     document.getElementById("pr_specs").value = "";
     document.getElementById("pr_unit").value = "";
+    document.getElementById("pr_unit_price").value = "";
     document.getElementById("pr-vendor").value = "";
     document.getElementById("pr_po").value = "";
     document.getElementById("pr_date").value = "";
@@ -10729,6 +10733,7 @@ async function get_pr_po_summary() {
     pr_po_summary_data = await res.json();
     PurRenderTable(pr_po_summary_data);
     populateBranches(pr_po_summary_data);
+    populateCreators(pr_po_summary_data);
     endLoading()
 }
 
@@ -10741,29 +10746,27 @@ function PurRenderTable(data) {
     tbody.innerHTML = "";
 
     if (data.length === 0) {
-    tbody.innerHTML = "<tr><td colspan='9'>Không có dữ liệu</td></tr>";
-    return;
+        tbody.innerHTML = "<tr><td colspan='9'>Không có dữ liệu</td></tr>";
+        return;
     }
 
-    // Render header
     const headers = Object.keys(data[0]);
     const headerRow = document.createElement("tr");
     headers.forEach(h => {
-    const th = document.createElement("th");
-    th.textContent = h;
-    headerRow.appendChild(th);
+        const th = document.createElement("th");
+        th.textContent = h;
+        headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
 
-    // Render body
     data.forEach(row => {
-    const tr = document.createElement("tr");
-    headers.forEach(k => {
-        const td = document.createElement("td");
-        td.textContent = row[k];
-        tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
+        const tr = document.createElement("tr");
+        headers.forEach(k => {
+            const td = document.createElement("td");
+            td.textContent = row[k];
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
     });
 }
 
@@ -10771,28 +10774,87 @@ function populateBranches(data) {
     const select = document.getElementById("pur-filter-branch");
     const branches = Array.from(new Set(data.map(d => d["Chi nhánh"]))).sort();
     branches.forEach(b => {
-    const option = document.createElement("option");
-    option.value = b;
-    option.textContent = b;
-    select.appendChild(option);
+        const option = document.createElement("option");
+        option.value = b;
+        option.textContent = b;
+        select.appendChild(option);
+    });
+}
+
+function populateCreators(data) {
+    const creatorPOSelect = document.getElementById("filter-creator-po");
+    const creatorPRSelect = document.getElementById("filter-creator-pr");
+
+    const creatorPO = Array.from(new Set(data.map(d => d["Người tạo PO"])) ).sort();
+    const creatorPR = Array.from(new Set(data.map(d => d["Người tạo PR"])) ).sort();
+
+    creatorPO.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        creatorPOSelect.appendChild(option);
+    });
+
+    creatorPR.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        creatorPRSelect.appendChild(option);
     });
 }
 
 function applyFilters_pur_summary() {
-    const poFilter = document.getElementById("filter-po").value.toLowerCase();
-    const prFilter = document.getElementById("filter-pr").value.toLowerCase();
+    const prDateFrom = document.getElementById("filter-pr-date-from").value;
+    const prDateTo = document.getElementById("filter-pr-date-to").value;
+    const poDateFrom = document.getElementById("filter-po-date-from").value;
+    const poDateTo = document.getElementById("filter-po-date-to").value;
+    const creatorPO = document.getElementById("filter-creator-po").value;
+    const creatorPR = document.getElementById("filter-creator-pr").value;
     const branchFilter = document.getElementById("pur-filter-branch").value;
 
     const filtered = pr_po_summary_data.filter(row => {
-    const poMatch = row["PO"].toLowerCase().includes(poFilter);
-    const prMatch = row["PR"].toLowerCase().includes(prFilter);
-    const branchMatch = !branchFilter || row["Chi nhánh"] === branchFilter;
-    return poMatch && prMatch && branchMatch;
+        const prDate = addHours(new Date(row["Ngày tạo PR"]), 7);
+        const poDate = addHours(new Date(row["Ngày tạo PO"]), 7);
+        const fromPrDate = prDateFrom ? new Date(prDateFrom) : null;
+        const toPrDate = prDateTo ? new Date(prDateTo) : null;
+        const fromPoDate = poDateFrom ? new Date(poDateFrom) : null;
+        const toPoDate = poDateTo ? new Date(poDateTo) : null;
+
+        const matchPrDate = (!fromPrDate || prDate >= fromPrDate) && (!toPrDate || prDate <= toPrDate);
+        const matchPoDate = (!fromPoDate || poDate >= fromPoDate) && (!toPoDate || poDate <= toPoDate);
+        const matchCreatorPO = !creatorPO || row["Người tạo PO"] === creatorPO;
+        const matchCreatorPR = !creatorPR || row["Người tạo PR"] === creatorPR;
+        const branchMatch = !branchFilter || row["Chi nhánh"] === branchFilter;
+
+        return matchPrDate && matchPoDate && matchCreatorPO && matchCreatorPR && branchMatch;
     });
 
     PurRenderTable(filtered);
 }
 
-document.getElementById("filter-po").addEventListener("input", applyFilters_pur_summary);
-document.getElementById("filter-pr").addEventListener("input", applyFilters_pur_summary);
+// Hàm cộng giờ cho 1 đối tượng Date
+function addHours(date, hours) {
+    const newDate = new Date(date);
+    newDate.setHours(newDate.getHours() + hours);
+    return newDate;
+}
+
+function clearFilters_pur_summary() {
+    document.getElementById("filter-pr-date-from").value = "";
+    document.getElementById("filter-pr-date-to").value = "";
+    document.getElementById("filter-po-date-from").value = "";
+    document.getElementById("filter-po-date-to").value = "";
+    document.getElementById("filter-creator-po").value = "";
+    document.getElementById("filter-creator-pr").value = "";
+    document.getElementById("pur-filter-branch").value = "";
+    applyFilters_pur_summary();
+}
+
+
+document.getElementById("filter-pr-date-from").addEventListener("change", applyFilters_pur_summary);
+document.getElementById("filter-pr-date-to").addEventListener("change", applyFilters_pur_summary);
+document.getElementById("filter-po-date-from").addEventListener("change", applyFilters_pur_summary);
+document.getElementById("filter-po-date-to").addEventListener("change", applyFilters_pur_summary);
+document.getElementById("filter-creator-po").addEventListener("change", applyFilters_pur_summary);
+document.getElementById("filter-creator-pr").addEventListener("change", applyFilters_pur_summary);
 document.getElementById("pur-filter-branch").addEventListener("change", applyFilters_pur_summary);
