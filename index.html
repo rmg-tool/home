@@ -150,7 +150,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-04-28 16:05:00</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-04-29 03:00 AM</h3>
 
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
@@ -1863,6 +1863,7 @@
                                     <div class="bom-input-group"><label>Tên vật tư:</label> <input type="text" id="pr_name" disabled></div>
                                     <div class="bom-input-group"><label>Mã vật tư:</label> <input type="text" id="pr_code" disabled></div>
                                     <div class="bom-input-group"><label>Đơn vị:</label> <input type="text" id="pr_unit" disabled></div>
+                                    <div class="bom-input-group"><label>Đơn giá:</label> <input type="text" id="pr_unit_price" disabled></div>
 
                                 </div>
                                 
@@ -2569,7 +2570,7 @@
             <!-- ############ -->
 
             <!-- PO COMPLETE -->
-            <div id="pur_final_payment" class="frame">
+            <!-- <div id="pur_final_payment" class="frame">
                 <div class="frame2">
                     <div id="div1" class="left-frame">
                         <h1>PO COMPLETE</h1>
@@ -2651,7 +2652,7 @@
 
                         <div class="form-row">
                             <label>Xem Files đính kèm</label>
-                            <div id="files_final_payment"></div> <!-- Chuyển từ button sang div -->
+                            <div id="files_final_payment"></div> 
                         </div>
                         
                         
@@ -2694,35 +2695,56 @@
                     </div>
                 </div>
 
-             </div>
+             </div> -->
             <!-- ############ -->
 
             <!-- PR PO Summary -->
             <div id="pr_po_summary" class="frame">
-                
-                <h1>Tổng hợp PR-PO</h1>
+                <h1>Tình trạng PR-PO</h1>
                 <button class="refresh-btn" onclick="po_3_approval()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
 
+                <button class="refresh-btn" onclick="clearFilters_pur_summary()" style="margin-left: 20px; background-color: red;">
+                    <i class="fas fa-eraser"></i> Clear Filter
+                </button>
+                
+
                 <div class="frame3">
+                    <div class="form-row">
+                        <label>Ngày tạo PR (Từ - Đến):</label>
+                        <input type="date" id="filter-pr-date-from">
+                        <input type="date" id="filter-pr-date-to">
+                    </div>
 
                     <div class="form-row">
-                        <label>PO#:</label>
-                        <input type="text" id="filter-po" placeholder="Nhập PO#">
+                        <label>Ngày tạo PO (Từ - Đến):</label>
+                        <input type="date" id="filter-po-date-from">
+                        <input type="date" id="filter-po-date-to">
                     </div>
+
                     <div class="form-row">
-                        <label>PR#:</label>
-                        <input type="text" id="filter-pr" placeholder="Nhập PR#">
+                        <label>Người tạo PO:</label>
+                        <select id="filter-creator-po">
+                            <option value="">Tất cả</option>
+                        </select>
                     </div>
-                
+
+                    <div class="form-row">
+                        <label>Người tạo PR:</label>
+                        <select id="filter-creator-pr">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </div>
+
                     <div class="form-row">
                         <label>Chi nhánh:</label>
                         <select id="pur-filter-branch">
                             <option value="">Tất cả</option>
                         </select>
-                    </div>  
+                    </div>
                 </div>
+
                 <div style="height: 500px; overflow: auto;">
                     <table id="data-table-summary">
                         <thead></thead>
@@ -2731,7 +2753,7 @@
                 </div>
             </div>
 
-            <!-- ############ -->
+            <!-- ############## -->
 
             <div id="transaction_xuat" class="frame">
                 <h1>Transaction Xuất</h1>
