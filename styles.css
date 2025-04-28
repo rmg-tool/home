@@ -4851,3 +4851,7 @@ textarea[disabled] {
     width: 800px;
     margin-top: 50px;
 }
+
+.frame3 .form-row label {
+    width: 300px !important;
+}
