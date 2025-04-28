@@ -10187,7 +10187,8 @@ async function get_po_need_to_po_receiving() {
     startLoading()
     await Promise.all([
         load_po_need_to_receiving(),
-        load_detail_po_to_approve()
+        load_detail_po_to_approve(),
+        load_po_info()
     ]);
     // await load_po_need_to_receiving() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
     endLoading()
@@ -10196,6 +10197,20 @@ async function get_po_need_to_po_receiving() {
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
 
     // po_need_to_po_receiving_list.shift()
+    // Bổ sung cột Delivery Date (index 29 bên poInfo_data) cho mỗi dòng
+    po_need_to_receiving_list.forEach(row => {
+        const found = poInfo_data.find(infoRow => infoRow[2] === row[2]);
+        if (found && found[29]) {
+            const date = new Date(found[29]);
+            date.setHours(date.getHours() + 7); // Cộng 7 giờ
+            const formattedDate = date.toISOString().slice(0, 10); // Format lại
+            row.push(formattedDate);
+        } else {
+            row.push(""); // Nếu không có ngày thì để rỗng
+        }
+    });
+    
+    // console.log(po_need_to_receiving_list)
 
     po_need_to_receiving_list.forEach((rowData, rowIndex) => {
         const row = document.createElement("tr");
@@ -10204,6 +10219,7 @@ async function get_po_need_to_po_receiving() {
         row.innerHTML = `
             <td><a href="#" class="po-link" data-index="${rowIndex}">${rowData[2]}</a></td>
             <td>${rowData[3]}</td>
+            <td>${rowData[19]}</td>
             <td>${rowData[6]}</td>
             <td>${rowData[4]}</td>
             <td>${rowData[5]}</td>
@@ -10223,6 +10239,19 @@ async function get_po_need_to_po_receiving() {
             document.getElementById("pr_po_receiving").value = po_need_to_receiving_list[index][3];
             document.getElementById("total_value_po_receiving").value = po_need_to_receiving_list[index][7].toLocaleString('en-US');
             document.getElementById("content_pre_pay_po_receiving").value = po_need_to_receiving_list[index][11];
+
+            // Get ngày cần có hàng tại PO Receiving
+
+            // const found_delivery_date = poInfo_data.find(row => row[2] === po_need_to_receiving_list[index][2]);
+            // const delivery_date = found_delivery_date ? found_delivery_date[29] : ""; // Ngày cần có hàng
+            // // cần +7 giờ, vì VN là GMT +7
+            // const date2 = new Date(delivery_date);
+            // date2.setHours(date2.getHours() + 7); // Cộng thêm 7 giờ
+
+            // const formattedDate = date2.toISOString().slice(0, 10); // Định dạng lại thành YYYY-MM-DD
+            // document.getElementById("expect_recv_date_po_receiving").value = formattedDate; // Ngày cần có hàng
+
+            // Filter Data để xem chi tiêt PO
             
             const filteredData = detail_po_to_approve_data.filter(r => r[0] == po_need_to_receiving_list[index][2]);
             console.log(filteredData)
@@ -10403,6 +10432,7 @@ function clearPOReceivingForm() {
     document.getElementById("total_value_po_receiving").value = "";
     document.getElementById("content_pre_pay_po_receiving").value = "";
     document.getElementById("content_po_receiving").value = "";
+
 
     // Xóa file upload
     document.getElementById("fileUpload_po_receiving").value = "";
