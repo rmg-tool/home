@@ -7892,16 +7892,16 @@ function openModal_po(row) {
     document.getElementById("po_total").textContent = row[11];
 
     // Cập nhật link PDF
-    // const poPdfViewBtn = document.getElementById("po_pdf_view");
-    // if (row[8]) {
-    //     poPdfViewBtn.style.display = "block";
-    //     poPdfViewBtn.setAttribute("data-url", row[8]); // Lưu link PDF
-    //     poPdfViewBtn.onclick = function() {
-    //         window.open(row[8], "_blank");
-    //     };
-    // } else {
-    //     poPdfViewBtn.style.display = "none";
-    // }
+    const poPdfViewBtn = document.getElementById("po_pdf_view");
+    if (row[8]) {
+        poPdfViewBtn.style.display = "none";
+        poPdfViewBtn.setAttribute("data-url", row[8]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[8], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
 
     // Cập nhật link Files
     const poFilesViewBtn = document.getElementById("po_fils_view");
@@ -8003,16 +8003,16 @@ function openModal_po_2(row) {
     document.getElementById("po_2_total").textContent = row[11].toLocaleString("en-US");
 
     // Cập nhật link PDF
-    // const poPdfViewBtn = document.getElementById("po_2_pdf_view");
-    // if (row[7]) {
-    //     poPdfViewBtn.style.display = "block";
-    //     poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
-    //     poPdfViewBtn.onclick = function() {
-    //         window.open(row[7], "_blank");
-    //     };
-    // } else {
-    //     poPdfViewBtn.style.display = "none";
-    // }
+    const poPdfViewBtn = document.getElementById("po_2_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "none";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
 
     // Cập nhật link Files
     const poFilesViewBtn = document.getElementById("po_2_fils_view");
@@ -8193,16 +8193,16 @@ function openModal_po_3(row) {
     document.getElementById("po_3_total").textContent = row[11].toLocaleString("en-US");
 
     // Cập nhật link PDF
-    // const poPdfViewBtn = document.getElementById("po_3_pdf_view");
-    // if (row[7]) {
-    //     poPdfViewBtn.style.display = "block";
-    //     poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
-    //     poPdfViewBtn.onclick = function() {
-    //         window.open(row[7], "_blank");
-    //     };
-    // } else {
-    //     poPdfViewBtn.style.display = "none";
-    // }
+    const poPdfViewBtn = document.getElementById("po_3_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "none";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
 
     // Cập nhật link Files
     const poFilesViewBtn = document.getElementById("po_3_fils_view");
@@ -8389,16 +8389,16 @@ function openModal_po_4(row) {
     document.getElementById("po_4_total").textContent = row[11].toLocaleString("en-US");
 
     // Cập nhật link PDF
-    // const poPdfViewBtn = document.getElementById("po_4_pdf_view");
-    // if (row[7]) {
-    //     poPdfViewBtn.style.display = "block";
-    //     poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
-    //     poPdfViewBtn.onclick = function() {
-    //         window.open(row[7], "_blank");
-    //     };
-    // } else {
-    //     poPdfViewBtn.style.display = "none";
-    // }
+    const poPdfViewBtn = document.getElementById("po_4_pdf_view");
+    if (row[7]) {
+        poPdfViewBtn.style.display = "none";
+        poPdfViewBtn.setAttribute("data-url", row[7]); // Lưu link PDF
+        poPdfViewBtn.onclick = function() {
+            window.open(row[7], "_blank");
+        };
+    } else {
+        poPdfViewBtn.style.display = "none";
+    }
 
     // Cập nhật link Files
     const poFilesViewBtn = document.getElementById("po_4_fils_view");
