@@ -781,6 +781,73 @@ let detail_pr_data = [];
 let detail_po_to_approve_data = [];
 let detail_po_raw = []
 
+let pct_validation = []
+let unit_validation = []
+let address_validation = []
+
+async function load_data_validation() {
+    return fetch('https://script.google.com/macros/s/AKfycbyXec03ZIr3NgBmMqIEoa_CxItmq0bwQjT-tHhhHPdRQKwO2aVR7NInXwrKzf8P702xAw/exec')
+        .then(res => res.json())
+        .then(data => {
+            const data_validation = data.content;
+            // % VAT
+            pct_validation = data_validation.map(row => row[0])
+            pct_validation = data_validation.map(row => row[0]).filter(p => p !== '');
+
+            // Đơn vị MML
+            unit_validation = data_validation.map(row => row[1])
+            unit_validation = data_validation.map(row => row[1]).filter(u => u !== '');
+            apply_unit_validation()
+
+            // Địa chỉ giao hàng
+            address_validation = data_validation.map(row => row[2])
+            address_validation = data_validation.map(row => row[2]).filter(a => a !== '');
+            apply_address_validation()
+
+            console.log("Đã load data validation thành công")
+        });
+}
+
+function apply_unit_validation() {
+    const select = document.getElementById("unit_mml");
+    select.innerHTML = ""; // Xóa các option cũ
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "-- Chọn đơn vị --";
+    emptyOption.disabled = true;
+    emptyOption.selected = true;
+    select.appendChild(emptyOption);
+
+
+    unit_validation.forEach(unit => {
+        const option = document.createElement("option");
+        option.value = unit;
+        option.textContent = unit;
+        select.appendChild(option);
+    });
+}
+
+function apply_address_validation() {
+    const select = document.getElementById("po_delivery_to_input");
+    select.innerHTML = ""; // Xóa các option cũ
+
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "-- Chọn địa chỉ --";
+    emptyOption.disabled = true;
+    emptyOption.selected = true;
+    select.appendChild(emptyOption);
+
+
+    address_validation.forEach(unit => {
+        const option = document.createElement("option");
+        option.value = unit;
+        option.textContent = unit;
+        select.appendChild(option);
+    });
+}
+
 // 16, 19, 4, 42, 43, 23, 24, 25, 20
 async function load_detail_po_to_approve() {
     return fetch('https://script.google.com/macros/s/AKfycbwFycsxNE17ZAt6YP4o9UpYZWG-uaeEQOpt1uwymnFb25R3ikmcwKje3Gmjal3DmKvQyg/exec')
@@ -1349,7 +1416,12 @@ async function load_xuat() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
+    // await load_user(); // Tải dữ liệu người dùng trước khi cho phép đăng nhập
+    // promiss all
+    await Promise.all([
+        load_user(),
+        load_data_validation()
+    ]);
 
     const loginForm = document.getElementById("login-form");
     const usernameInput = document.getElementById("username");
@@ -8784,11 +8856,101 @@ function add_po_to_po_table(data) {
             }
 
             newRow.appendChild(newCell);
+
         });
 
+        // Thêm cột Action với nút Cancel
+        let actionCell = document.createElement("td");
+        let cancelButton = document.createElement("button");
+        cancelButton.textContent = "Cancel";
+        cancelButton.style.backgroundColor = "red";
+        cancelButton.style.color = "white";
+        cancelButton.style.cursor = "pointer";
+
+        cancelButton.addEventListener("click", function () {
+            window.selectedPoRow = row; // Lưu row hiện tại
+            document.getElementById("cancelPoId").value = row[2]; // Gán giá trị PO ID
+            document.getElementById("cancelPoReason").value = ""; // Reset lý do
+            document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+            document.getElementById("cancelPoReason").focus(); // Đặt con trỏ vào ô nhập lý do
+        });
+
+        actionCell.appendChild(cancelButton);
+        newRow.appendChild(actionCell);
         tableBody.appendChild(newRow);
     });
 }
+
+async function confirmCancelPO() {
+    const poId = document.getElementById("cancelPoId").value;
+    const reason = document.getElementById("cancelPoReason").value;
+
+    if (!reason.trim()) {
+        alert("Vui lòng nhập lý do hủy.");
+        return;
+    }
+
+    console.log("PO bị hủy:", poId);
+    console.log("Lý do:", reason);
+
+    const payload = {
+        poId: poId,
+        reason: reason,
+        operator: sessionStorage.getItem("fullname"),
+        module: active_frame
+    };
+    
+    startLoading()
+
+    await fetch("https://script.google.com/macros/s/AKfycbzspCiRFj7__GhaZbHNoXIGkpn-Zpd1O-R0vjhks9ndc1wyYGyqMQnjYBI0UkELQAYC/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    }).then(() => {
+        info("Hủy PO thành công!");
+        document.getElementById("cancelModal").style.display = "none";
+    }).catch(err => {
+        console.error("Lỗi gửi yêu cầu hủy:", err);
+        alert("Gửi yêu cầu hủy thất bại.");
+    });
+
+    // Ẩn modal
+    // load_pr_to_po()
+    switch (active_frame) {
+        case "pur_po":
+            load_pr_to_po()
+            break
+        case "pur_po_release":
+            get_po_need_to_release()
+            break
+        case "pur_pre_payment":
+            get_po_need_to_pre_payment()
+            break
+        case "pur_po_receiving":
+            get_po_need_to_po_receiving()
+            break
+        case "pur_final_payment":
+            get_po_need_to_final_payment()
+            break
+        default:
+            alert("Không tìm thấy frame nào đang hiển thị!");
+            return
+    }
+    closeCancelPO()
+}
+
+function closeCancelPO() {
+    document.getElementById("cancelPoId").value = ""; // Reset giá trị PO ID
+    document.getElementById("cancelPoReason").value = ""; // Reset lý do
+    // Ẩn modal
+    document.getElementById("cancelPOModal").style.display = "none";
+    // endLoading()
+    
+}
+
 
 function showPrInfoModal(data) {
     const modal = document.getElementById("prInfoModal");
@@ -9090,7 +9252,7 @@ async function click_pr_to_po(row) {
                     let select = document.createElement("select");
                     select.style.width = "150px";
                     select.style.border = "1px solid #ccc";
-                    ["0%", "3%","5%", "8%", "10%"].forEach(optionValue => {
+                    pct_validation.forEach(optionValue => {
                         let option = document.createElement("option");
                         option.value = optionValue.replace("%", ""); // Lưu giá trị 8 hoặc 10
                         option.textContent = optionValue;
@@ -9570,7 +9732,20 @@ async function get_po_need_to_release() {
             <td>${rowData[5]}</td>
             <td>${rowData[6]}</td>
             <td><button class="view-pdf-btn" data-link="${rowData[7]}">Xem PDF</button></td>
+            <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
         `;
+        // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
+        document.querySelectorAll(".cancel-po-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const rowData = JSON.parse(this.getAttribute("data-row"));
+                window.selectedPoRow = rowData;
+                document.getElementById("cancelPoId").value = rowData[0]; // PO ID
+                document.getElementById("cancelPoReason").value = "";
+                document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+                document.getElementById("cancelPoReason").focus();
+            });
+        });
+        
 
         tableBody.appendChild(row);
     });
@@ -9935,8 +10110,12 @@ function clearForm() {
 
 async function get_po_need_to_pre_payment() {
     startLoading()
-    await load_po_need_to_pre_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
+    // await load_po_need_to_pre_payment() 
+    await Promise.all([load_po_need_to_pre_payment(), load_po_info()]); 
     endLoading()
+
+    const currency_unit = poInfo_data.map(row => [row[2], row[20]]);
+    console.log(currency_unit)
 
     const tableBody = document.querySelector("#pre_payment_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -9955,8 +10134,8 @@ async function get_po_need_to_pre_payment() {
             <td>${rowData[7].toLocaleString('en-US')}</td>
             <td>${rowData[4]}</td>
             <td><button class="view-pdf-btn" data-link="${rowData[12]}">Xem Files Upload</button></td>
+            <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
         `;
-
         tableBody.appendChild(row);
     });
 
@@ -9982,8 +10161,24 @@ async function get_po_need_to_pre_payment() {
             document.getElementById("pr_creator_pre_payment").value = po_need_to_pre_payment_list[index][17];
             document.getElementById("payment_date_pre_payment").value = po_need_to_pre_payment_list[index][18];
 
+            currency_value = currency_unit.find(row => row[0] === po_need_to_pre_payment_list[index][2]);
+            document.getElementById("currency_unit_pre_payment").value = currency_value[1]; // Đơn vị tiền tệ
+
         });
     });
+
+    // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
+    document.querySelectorAll(".cancel-po-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const rowData = JSON.parse(this.getAttribute("data-row"));
+            window.selectedPoRow = rowData;
+            document.getElementById("cancelPoId").value = rowData[2]; // PO ID
+            document.getElementById("cancelPoReason").value = "";
+            document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+            document.getElementById("cancelPoReason").focus();
+        });
+    });
+
 
     // Xử lý sự kiện click của nút "Xem PDF"
     document.querySelectorAll(".view-pdf-btn").forEach(button => {
@@ -10175,6 +10370,7 @@ function clearPrePaymentForm() {
     document.getElementById("content_release_pre_payment").value = "";
     document.getElementById("content_pre_payment").value = "";
     document.getElementById("payment_date_pre_payment").value = "";
+    document.getElementById("currency_unit_pre_payment").value = ""; // Đơn vị tiền tệ
 
     // Xóa file upload
     document.getElementById("fileUpload_pre_payment").value = "";
@@ -10228,9 +10424,22 @@ async function get_po_need_to_po_receiving() {
             <td>${rowData[4]}</td>
             <td>${rowData[5]}</td>
             <td><button class="view-pdf-btn" data-link="${rowData[17]}">Xem Files Upload</button></td>
+            <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
         `;
 
         tableBody.appendChild(row);
+    });
+
+    // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
+    document.querySelectorAll(".cancel-po-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const rowData = JSON.parse(this.getAttribute("data-row"));
+            window.selectedPoRow = rowData;
+            document.getElementById("cancelPoId").value = rowData[2]; // PO ID
+            document.getElementById("cancelPoReason").value = "";
+            document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+            document.getElementById("cancelPoReason").focus();
+        });
     });
 
     // Xử lý sự kiện click vào PO# để log dữ liệu hàng
@@ -10451,9 +10660,12 @@ function clearPOReceivingForm() {
 
 async function get_po_need_to_final_payment() {
     startLoading()
-    await Promise.all([load_po_need_to_final_payment(),load_vendor_pr()]);
+    await Promise.all([load_po_info(),load_po_need_to_final_payment(),load_vendor_pr()]);
+
     // await load_po_need_to_final_payment() //Promise.all([load_purchase_order(), load_po_need_to_release()]); 
     endLoading()
+
+    const currency_unit = poInfo_data.map(row => [row[2], row[20]]);
 
     const tableBody = document.querySelector("#final_payment_table tbody");
     tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
@@ -10471,9 +10683,22 @@ async function get_po_need_to_final_payment() {
             <td>${rowData[18]}</td>
             <td>${rowData[9].toLocaleString('en-US')}</td>
             <td>${rowData[12]}</td>
+            <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
         `;
 
         tableBody.appendChild(row);
+    });
+
+    // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
+    document.querySelectorAll(".cancel-po-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const rowData = JSON.parse(this.getAttribute("data-row"));
+            window.selectedPoRow = rowData;
+            document.getElementById("cancelPoId").value = rowData[2]; // PO ID
+            document.getElementById("cancelPoReason").value = "";
+            document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+            document.getElementById("cancelPoReason").focus();
+        });
     });
 
     // Xử lý sự kiện click vào PO# để log dữ liệu hàng
@@ -10501,6 +10726,10 @@ async function get_po_need_to_final_payment() {
             document.getElementById("payment_date_final_payment").value = po_need_to_final_payment_list[index][18];
             document.getElementById("expect_recv_date_final_payment").value = po_need_to_final_payment_list[index][10];
             document.getElementById("content_release_final_payment").value = po_need_to_final_payment_list[index][11];
+
+            currency_value = currency_unit.find(row => row[0] === po_need_to_final_payment_list[index][2]);
+            document.getElementById("currency_unit_final_payment").value = currency_value[1]; // Đơn vị tiền tệ
+
             // document.getElementById("files_final_payment").value = po_need_to_final_payment_list[index][17];
             //button to view file po_need_to_receiving_list[index][17];
             const linkValue = po_need_to_final_payment_list[index][17];
@@ -10616,6 +10845,7 @@ function clearFinalPaymentForm() {
     document.getElementById("vendor_bank_acc_final_payment").value = "";
     document.getElementById("expect_recv_date_final_payment").value = "";
     document.getElementById("content_release_final_payment").value = "";
+    document.getElementById("currency_unit_final_payment").value = "";
     document.getElementById("payment_date_final_payment").value = "";
     document.getElementById("files_final_payment").value = ""; // Reset file input
     document.getElementById("fileData_final_payment").value = "";
