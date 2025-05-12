@@ -101,7 +101,7 @@
                         <li onclick="showFrame('pur_pre_payment')">Pre-Payment</li>
                         <li onclick="showFrame('pur_po_receiving')">PO Receiving</li>
                         <li onclick="showFrame('pur_final_payment')">Final Payment</li>
-                        <li onclick="showFrame('pur_po_complete')">Final Payment</li>
+                        <!-- <li onclick="showFrame('pur_po_complete')">Final Payment</li> -->
                         <li onclick="showFrame('pr_po_summary')">PR / PO Status</li>
                     </ul>
                     
@@ -150,8 +150,33 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-07 03:00 AM</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-13 03:00 AM</h3>
 
+                <!-- <h1>📌 RELEASE NOTE</h1>
+
+                <ul class="tool-list">
+                    <li class="tool-item">
+                    <div class="tool-title">1. Add-Picking WMS</div>
+                    <div class="tool-desc">Cho phép đi pick nhiều đơn cùng 1 lúc</div>
+                    <span class="badge-new">NEW</span>
+                    </li>
+
+                    <li class="tool-item">
+                    <div class="tool-title">2. Add-Picking Manual</div>
+                    <div class="tool-desc">Giả lập Count, đi pick các SKU thiếu, tương tự Tool 1</div>
+                    </li>
+
+                    <li class="tool-item">
+                    <div class="tool-title">3. Record Surplus</div>
+                    <div class="tool-desc">Quản lý hàng dư</div>
+                    <span class="badge-new">NEW</span>
+                    </li>
+
+                    <li class="tool-item">
+                    <div class="tool-title">4. Record Troubleshoot</div>
+                    <div class="tool-desc">Tool hỗ trợ báo lỗi vận hành Outbound</div>
+                    </li>
+                </ul> -->
                 <!-- Thêm hình ảnh -->
                 <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
             </div>
@@ -1967,44 +1992,47 @@
                         </div>
                         <div class="pr_frame_2">
                             <div class="bom-input-group">
-                                <label>Company</label>
-                                <input id="po_company_input" type="text">
+                                <label>Company (Có gợi ý)</label>
+                                <input id="po_company_input" type="text" placeholder="Nhập tên công ty">
                                 <div id="dropdown_po_vendor" class="dropdown"></div>
                             </div>
-                            <div class="bom-row">
-                                <div class="bom-left">
-                                    <div class="form-row">
+                            <!-- <div class="bom-row"> -->
+                                <!-- <div class="bom-left"> -->
+                                <div class="square-frame">
+                                    <div class="frame-title">Thông tin Supplier</div>
+                                    <div class="form-row-po">
                                         <label>Address</label>
                                         <input id="po_address_input" type="text" disabled>
                                     </div>
                                 
-                                    <div class="form-row">
+                                    <div class="form-row-po">
                                         <label>Tax Code</label>
                                         <input id="po_tax_input" type="text" disabled>
                                     </div>
                                 
-                                    <div class="form-row">
-                                        <label>Bank Address</label>
+                                    <div class="form-row-po">
+                                        <label>Bank Acc Name</label>
                                         <input id="po_bank_add_input" type="text" disabled>
                                     </div>
-                                </div>
-                                <div class="bom-right">
-                                    <div class="form-row">
+                                <!-- </div> -->
+                                <!-- <div class="bom-right"> -->
+                                    <div class="form-row-po">
                                         <label>Bank Account</label>
                                         <input id="po_bank_acc_input" type="text" disabled>
                                     </div>
                                 
-                                    <div class="form-row">
+                                    <div class="form-row-po">
                                         <label>Bank Name</label>
                                         <input id="po_bank_name_input" type="text" disabled>
                                     </div>
                                 
-                                    <div class="form-row">
+                                    <div class="form-row-po">
                                         <label>Swift Code</label>
                                         <input id="po_swift_input" type="text" disabled>
                                     </div>
-                                </div>  
-                            </div>
+                                </div>
+                                <!-- </div>   -->
+                            <!-- </div> -->
                         </div>
 
                         <div class="bom-frame-title">
@@ -2048,35 +2076,13 @@
                             <div class="form-row">
                                 <label style="width: 150px !important;">Delivery Address</label>
                                 <input id="po_delivery_address_input" type="text" value="RMG VIETNAM CO., LTD" readonly>
-
                             </div>
                         </div>
 
                         <div class="form-row">
                             <label style="width: 150px !important;">Delivery To</label>
                             <!-- <input id="po_delivery_to_input" type="text"> -->
-                            <select id="po_delivery_to_input">
-                                <!-- <option value="267A Nguyễn Xiển, phường Trường Thạnh, Tp. Thủ Đức, Tp.HCM, Việt Nam">
-                                  267A Nguyễn Xiển, phường Trường Thạnh, Tp. Thủ Đức, Tp.HCM, Việt Nam
-                                </option>
-                                <option value="Lô E18, Đường số 10, Cụm Công nghiệp Hải Sơn Đức Hòa Đông, Xã Đức Hòa Đông, Huyện Đức Hòa, Tỉnh Long An, Việt Nam">
-                                  Lô E18, Đường số 10, Cụm Công nghiệp Hải Sơn Đức Hòa Đông, Xã Đức Hòa Đông, Huyện Đức Hòa, Tỉnh Long An, Việt Nam
-                                </option>
-                                <option value="Đường số 2, KCN Quảng Phú, P.Quảng Phú, TP. Quảng Ngãi, Quang Ngãi, Việt Nam">
-                                  Đường số 2, KCN Quảng Phú, P.Quảng Phú, TP. Quảng Ngãi, Quang Ngãi, Việt Nam
-                                </option>
-                                <option value="Đường TS 5, khu công nghiệp Tiên Sơn, Phường Tân Hồng, Thành phố Từ Sơn, Bắc Ninh, Việt Nam">
-                                  Đường TS 5, khu công nghiệp Tiên Sơn, Phường Tân Hồng, Thành phố Từ Sơn, Bắc Ninh, Việt Nam
-                                </option>
-                                <option value="159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam">
-                                  159/59 Trần Văn Đang, Phường 11, Quận 3, Tp.HCM, Việt Nam
-                                </option>
-                                <option value="Waterfront, Nhà 6 Đường 8, Vĩnh Niệm, Lê  Chân, Hải Phòng">
-                                  Waterfront, Nhà 6 Đường 8, Vĩnh Niệm, Lê  Chân, Hải Phòng
-                                </option> -->
-                              </select>
-
-                              
+                            <select id="po_delivery_to_input"></select>                              
                         </div>
 
                         <div class="bom-row">
@@ -2124,12 +2130,13 @@
                                     <label>Warranty</label>
                                     <input id="po_warranty_input" type="text">
                                 </div>
-
-                                
                             </div>
                         </div>
 
-                       
+                        <div class="form-row">
+                            <label style="width: 150px !important;">Ghi chú</label>
+                            <textarea id="po_note" type="text" readonly></textarea>                      
+                        </div>
 
                         <div style="text-align: center; margin-top: 30px;">
                             <input type="file" name="file" id="fileUpload_po" onchange="LoadFile_po(event)" required multiple><br><br>
@@ -2716,7 +2723,7 @@
             <!-- PR PO Summary -->
             <div id="pr_po_summary" class="frame">
                 <h1>Tình trạng PR-PO</h1>
-                <button class="refresh-btn" onclick="po_3_approval()">
+                <button class="refresh-btn" onclick="get_pr_po_summary()">
                     <i class="fas fa-sync-alt"></i> Refresh
                 </button>
 
