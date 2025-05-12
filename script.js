@@ -9401,6 +9401,10 @@ function showSearchResults_po_vendor(displayList, fullData) {
             document.getElementById("po_warranty_input").value = fullData[originalIndex][9];
             document.getElementById("po_lead_time_input").value = fullData[originalIndex][8];
             document.getElementById("po_payment_terms_input").value = fullData[originalIndex][7];
+            document.getElementById("po_address_input").value = fullData[originalIndex][2];
+            document.getElementById("po_bank_add_input").value = fullData[originalIndex][5];
+            document.getElementById("po_swift_input").value = fullData[originalIndex][13];
+            document.getElementById("po_note").value = fullData[originalIndex][10];
         });
 
         dropdown.appendChild(dropdownItem);
@@ -9575,6 +9579,7 @@ function clearPOModal() {
     document.getElementById("po_lead_time_input").value = "";
     document.getElementById("po_warranty_input").value = "";
     document.getElementById("po_ship_value_input").value = "";
+    document.getElementById("po_note").value = "";
     
     // Clear file inputs
     document.getElementById("fileUpload_po").value = "";
@@ -10680,7 +10685,7 @@ async function get_po_need_to_final_payment() {
             <td><a href="#" class="po-link" data-index="${rowIndex}">${rowData[2]}</a></td>
             <td>${rowData[3]}</td>
             <td>${rowData[6]}</td>
-            <td>${rowData[18]}</td>
+            <td>${new Date(new Date(rowData[18]).getTime() + 7 * 60 * 60 * 1000).toISOString().split('T')[0]}</td>
             <td>${rowData[9].toLocaleString('en-US')}</td>
             <td>${rowData[12]}</td>
             <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
@@ -10958,6 +10963,21 @@ function startLoading() {
 let pr_po_summary_data = [];
 
 async function get_pr_po_summary() {
+    const select_operator = document.getElementById("filter-creator-po");
+    while (select_operator.options.length > 1) {
+        select_operator.remove(1);
+    }
+
+    const select_pr_creator = document.getElementById("filter-creator-pr");
+    while (select_pr_creator.options.length > 1) {
+        select_pr_creator.remove(1);
+    }
+
+    const select_branch = document.getElementById("pur-filter-branch");
+    while (select_branch.options.length > 1) {
+        select_branch.remove(1);
+    }
+
     startLoading()
     const res = await fetch("https://script.google.com/macros/s/AKfycbxRhGOmuECC6RnO43JVvXkCOEHiUpCVBaKTXXeny1YHSBYqqlW-cooYm1AT-yusKyej-w/exec");
     pr_po_summary_data = await res.json();
