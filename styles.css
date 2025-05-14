@@ -5005,3 +5005,52 @@ tool-list {
   resize: vertical;    /* Cho phép co giãn theo chiều dọc */
   height: 100px;
 }
+
+#excelModal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+#excelModal th {
+  background-color: #00796B; /* màu gần với #009688 nhưng dịu hơn trong modal */
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+  white-space: nowrap;
+}
+
+#excelModal td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+#excelModal tr:nth-child(even):not(:first-child) {
+  background-color: #fdfdfd;
+}
+
+#excelModal tr:hover {
+  background-color: #f5f5f5;
+  cursor: default;
+}
+
+#excelModal button {
+  padding: 10px 20px;
+  margin: 10px 10px 0 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background: #007bff;
+  color: white;
+}
+
+#excelModal button:hover {
+  background-color: #0069d9;
+}
