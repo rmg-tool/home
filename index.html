@@ -150,7 +150,7 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-13 03:00 AM</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-15 03:00 AM</h3>
 
                 <!-- <h1>📌 RELEASE NOTE</h1>
 
@@ -1811,7 +1811,10 @@
                         </div>
 
                         <div class="pr_frame_2">
-                            <button class="show-modal-button" onclick="openModal_pr_add_item()">Thêm vật tư</button>
+                            <button class="show-modal-button" onclick="openModal_pr_add_item()" style="background-color: #354f52;">Thêm vật tư</button>
+                            <button onclick="document.getElementById('file-upload').click()" class="show-modal-button" style="background-color: #2f3e46;">PR File Upload</button>
+                            <input type="file" id="file-upload" accept=".xlsx" style="display: none;">
+
                             <div style="overflow-x: auto;"> <!-- Thêm overflow-x để có cuộn ngang -->
                                 <table class="bom-table" id="pr-item-table">
                                     <thead>
@@ -1835,6 +1838,14 @@
                                     </thead>
                                     <tbody></tbody>
                                 </table>
+
+                                <!-- Modal để hiển thị bảng dữ liệu -->
+                                <div id="excelModal" style="display:none; position:fixed; top:10%; left:10%; width:80%; height:80%; background:white; border:1px solid #ccc; padding:20px; overflow:auto;">
+                                <h3>Preview Dữ liệu Excel</h3>
+                                <div id="excel-table-container"></div>
+                                <button class="show-modal-button" style="background-color: #2f3e46;" onclick="closeExcelModal()">Đóng</button>
+                                <button class="show-modal-button" style="background-color: #335c67;" onclick="insertExcelToMainTable()">Mass Upload</button>
+                                </div>
                             </div>
 
                             <div id="pr_modal_add_item" class="modal">
@@ -1904,7 +1915,7 @@
 
                 </div>
 
-                <button style="padding: 10px 30px; font-size: 20px; font-weight: bold; margin-top: 20px; " onclick="showModal_pr()">Create New PR</button>
+                <button class="show-modal-button" style="background-color: #335c67;" onclick="showModal_pr()">Create New PR</button>
             </div>
              <!-- ########################### -->
 
