@@ -7258,6 +7258,249 @@ function closeModal_pr_add_item() {
     document.getElementById("pr_modal_add_item").style.display = "none";
 }
 
+// Mass Upload PR
+function handleExcelUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    if (json.length < 2) return alert("File không hợp lệ hoặc trống.");
+
+    const headers = json[0].slice(1); // Bỏ STT
+    const rows = json.slice(1);
+
+    let html = '<table border="1" cellpadding="5" cellspacing="0"><thead><tr>';
+    html += `<th>STT</th>`;
+    headers.forEach(header => html += `<th>${header}</th>`);
+    html += `<th>Tổng tiền</th><th>Action</th><th>Kết quả kiểm tra</th>`;
+    html += '</tr></thead><tbody>';
+
+    rows.forEach((row, index) => {
+      const values = row.slice(1); // Bỏ STT
+      const donGia = parseFloat(values[8] || 0);
+      const soLuong = parseFloat(values[9] || 0);
+      const tongTien = donGia * soLuong;
+
+      html += `<tr><td>${index + 1}</td>`;
+      for (let i = 0; i < headers.length; i++) {
+        html += `<td>${values[i] || ""}</td>`;
+      }
+      html += `<td>${tongTien.toLocaleString("en-US")}</td>`;
+      html += `<td><button onclick="this.closest('tr').remove(); updateMainTableSTT()" style="background-color: red;">Xóa</button></td>`;
+      html += `<td></td></tr>`; // Kết quả kiểm tra sẽ được ghi ở đây
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('excel-table-container').innerHTML = html;
+
+    document.getElementById('excel-table-container').innerHTML = html;
+    document.getElementById('excelModal').style.display = 'block'; // Hiển thị modal
+
+
+    // Kiểm tra dữ liệu
+    validateTableDataFromDOM(mml_data);
+  };
+
+  reader.readAsArrayBuffer(file);
+  event.target.value = ""; // cho phép chọn lại cùng 1 file
+}
+
+document.getElementById("file-upload").addEventListener("change", handleExcelUpload);
+
+// Insert data from Excel to table pr
+function insertExcelToMainTable() {
+  const previewRows = document.querySelectorAll("#excel-table-container table tbody tr");
+  const mainTableBody = document.querySelector("#pr-item-table tbody");
+
+  // Kiểm tra tất cả dòng có PASS không
+  let allPass = true;
+  previewRows.forEach(row => {
+    const statusCell = row.querySelector("td:last-child span");
+    if (!statusCell || statusCell.innerText.trim() !== "PASS") {
+      allPass = false;
+    }
+  });
+
+  if (!allPass) {
+    alert("Các vật tư chưa đủ điều kiện để thêm vào bảng chính. Vui lòng kiểm tra lại.");
+    return;
+  }
+
+  // Nếu tất cả PASS, tiến hành thêm dòng vào bảng chính
+  previewRows.forEach(row => {
+    const cells = row.querySelectorAll("td");
+    const tr = document.createElement("tr");
+
+    for (let i = 0; i <= 10; i++) {
+      const td = document.createElement("td");
+      td.textContent = cells[i]?.innerText || "";
+      tr.appendChild(td);
+    }
+
+    const donGia = parseFloat(cells[9]?.innerText.replace(/,/g, "") || 0);
+    const soLuong = parseFloat(cells[10]?.innerText.replace(/,/g, "") || 0);
+    const tongTien = donGia * soLuong;
+
+    // Tổng tiền
+    const tdTongTien = document.createElement("td");
+    tdTongTien.textContent = tongTien.toLocaleString("en-US");
+    tr.appendChild(tdTongTien);
+
+    // Danh sách File (rỗng)
+    const tdDanhSachFile = document.createElement("td");
+    tdDanhSachFile.innerHTML = ""; // có thể thêm placeholder nếu muốn
+    tr.appendChild(tdDanhSachFile);
+
+    // File Data (rỗng, JSON trống)
+    const tdFileData = document.createElement("td");
+    tdFileData.innerHTML = `<input type="hidden" class="fileDataJSON" value='[]'>`;
+    tr.appendChild(tdFileData);
+
+    // Nút Xóa
+    const tdAction = document.createElement("td");
+    tdAction.innerHTML = `<button class="btn-delete bom-clear" onclick="this.closest('tr').remove(); updateMainTableSTT()">Xóa</button>`;
+    tr.appendChild(tdAction);
+
+
+    mainTableBody.appendChild(tr);
+  });
+
+  // Đóng modal
+  closeExcelModal();
+  updateMainTableSTT();
+
+}
+
+function updateMainTableSTT() {
+  const rows = document.querySelectorAll("#pr-item-table tbody tr");
+  rows.forEach((tr, index) => {
+    const sttCell = tr.querySelector("td");
+    if (sttCell) {
+      sttCell.textContent = index + 1;
+    }
+  });
+}
+
+
+function validateTableDataFromDOM(mml_data) {
+  const rows = document.querySelectorAll("#excel-table-container table tbody tr");
+  rows.forEach((tr, index) => {
+    const cells = tr.querySelectorAll("td");
+    const stt = index + 1;
+
+    const loaiVatTu = cells[1]?.innerText.trim();
+    const tenVatTu = cells[2]?.innerText.trim();
+    const maVatTu = cells[3]?.innerText.trim();
+    const thongSo = cells[4]?.innerText.trim(); // có thể bỏ qua
+    const donVi = cells[5]?.innerText.trim();
+    const tenKhachHang = cells[6]?.innerText.trim();
+    const soPO = cells[7]?.innerText.trim();
+    const ngayCan = cells[8]?.innerText.trim();
+    const donGia = cells[9]?.innerText.trim();
+    const soLuong = cells[10]?.innerText.trim();
+
+    let status = "PASS";
+    const rowErrors = [];
+
+    if (!loaiVatTu || !tenVatTu || !maVatTu || !donVi || !tenKhachHang || !soPO || !ngayCan || !donGia || !soLuong) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 2: Thiếu dữ liệu");
+    }
+
+    const tenVatTuExists = mml_data.some(item => item[1] === tenVatTu);
+    if (!tenVatTuExists) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 3: Tên vật tư chưa tồn tại");
+    }
+
+    const maVatTuExists = mml_data.some(item => item[2] === maVatTu);
+    if (!maVatTuExists) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 4: Mã vật tư chưa tồn tại");
+    }
+
+    const maTenMatch = mml_data.some(item => item[1] === tenVatTu && item[2] === maVatTu);
+    if (!maTenMatch) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 5: Mã và tên vật tư không khớp");
+    }
+
+    const donViExists = mml_data.some(item => item[3] === donVi);
+    if (!donViExists) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 6: Đơn vị chưa tồn tại");
+    }
+
+    const donViMatch = mml_data.some(item => item[1] === tenVatTu && item[3] === donVi);
+    if (!donViMatch) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 7: Đơn vị không khớp với vật tư");
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(ngayCan)) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 8: Ngày sai định dạng");
+    }
+
+    if (isNaN(donGia) || isNaN(soLuong)) {
+      status = "FAIL";
+      rowErrors.push("Lỗi 9: Đơn giá hoặc số lượng không hợp lệ");
+    }
+
+    // Lỗi 10: Loại vật tư chưa tồn tại
+    const loaiVatTuExists = mml_data.some(item => item[0] === loaiVatTu);
+    if (!loaiVatTuExists) {
+    status = "FAIL";
+    rowErrors.push("Lỗi 10: Loại vật tư chưa tồn tại");
+    }
+
+    // Lỗi 11: Loại vật tư không khớp với mã vật tư / tên vật tư
+    const loaiVatTuMatch = mml_data.some(item =>
+    item[0] === loaiVatTu &&
+    item[1] === tenVatTu &&
+    item[2] === maVatTu
+    );
+    if (!loaiVatTuMatch) {
+    status = "FAIL";
+    rowErrors.push("Lỗi 11: Loại vật tư không khớp với mã hoặc tên vật tư");
+    }
+
+    // Lỗi 12: Tên khách hàng không đúng hoặc không khớp với vật tư
+    const tenKhachHangMatch = mml_data.some(item =>
+    item[6] === tenKhachHang && item[1] === tenVatTu
+    );
+    if (!tenKhachHangMatch) {
+    status = "FAIL";
+    rowErrors.push("Lỗi 12: Tên khách hàng không đúng hoặc không khớp với vật tư");
+    }
+
+    // Ghi kết quả vào ô cuối cùng
+    const resultCell = cells[cells.length - 1];
+    resultCell.innerHTML = `<span style="color:${status === 'PASS' ? 'green' : 'red'}">${status}</span><br>${rowErrors.join("<br>")}`;
+
+    if (status === "FAIL") {
+        tr.style.backgroundColor = "#f4d35e"; // nền đỏ nhạt
+        tr.style.borderLeft = "4px solid red";
+    } else {
+        tr.style.backgroundColor = ""; // reset nếu dòng PASS
+        tr.style.borderLeft = "";
+    }
+
+  });
+}
+
+function closeExcelModal() {
+  document.getElementById('excelModal').style.display = 'none';
+  document.getElementById('excel-table-container').innerHTML = ""; // xóa bảng cũ
+}
+
 //add item pr type
 //add item pr type
 
