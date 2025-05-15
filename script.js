@@ -9968,7 +9968,7 @@ async function get_po_need_to_release() {
 
     po_need_to_release_list.forEach((rowData, rowIndex) => {
         const row = document.createElement("tr");
-        console.log(row)
+        
 
         // Thêm các ô dữ liệu vào hàng
         row.innerHTML = `
@@ -9982,19 +9982,6 @@ async function get_po_need_to_release() {
             <td><button class="view-pdf-btn" data-link="${rowData[7]}">Xem PDF</button></td>
             <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
         `;
-        // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
-        document.querySelectorAll(".cancel-po-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                const rowData = JSON.parse(this.getAttribute("data-row"));
-                window.selectedPoRow = rowData;
-                document.getElementById("cancelPoId").value = rowData[0]; // PO ID
-                document.getElementById("cancelPoReason").value = "";
-                document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
-                document.getElementById("cancelPoReason").focus();
-            });
-        });
-        
-
         tableBody.appendChild(row);
     });
 
@@ -10029,6 +10016,19 @@ async function get_po_need_to_release() {
         button.addEventListener("click", function (event) {
             event.stopPropagation(); // Ngăn việc kích hoạt sự kiện click của hàng
             window.open(this.getAttribute("data-link"), "_blank");
+        });
+    });
+
+    // <td><button class="cancel-po-btn" data-row='${JSON.stringify(rowData)}'>Cancel</button></td>
+    document.querySelectorAll(".cancel-po-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const rowData = JSON.parse(this.getAttribute("data-row"));
+            console.log(rowData)
+            window.selectedPoRow = rowData;
+            document.getElementById("cancelPoId").value = rowData[0]; // PO ID
+            document.getElementById("cancelPoReason").value = "";
+            document.getElementById("cancelPOModal").style.display = "block"; // Hiện modal
+            document.getElementById("cancelPoReason").focus();
         });
     });
 }
