@@ -7473,13 +7473,20 @@ function validateTableDataFromDOM(mml_data) {
     }
 
     // Lỗi 12: Tên khách hàng không đúng hoặc không khớp với vật tư
-    const tenKhachHangMatch = mml_data.some(item =>
-    item[6] === tenKhachHang && item[1] === tenVatTu
-    );
-    if (!tenKhachHangMatch) {
+    // const tenKhachHangMatch = mml_data.some(item =>
+    // item[6] === tenKhachHang && item[1] === tenVatTu
+    // );
+    // if (!tenKhachHangMatch) {
+    // status = "FAIL";
+    // rowErrors.push("Lỗi 12: Tên khách hàng không đúng hoặc không khớp với vật tư");
+    // }
+    const tenKhachHangExists = customer_data.some(cust => cust[0] === tenKhachHang);
+
+    if (!tenKhachHangExists) {
     status = "FAIL";
-    rowErrors.push("Lỗi 12: Tên khách hàng không đúng hoặc không khớp với vật tư");
+    rowErrors.push("Lỗi 12: Tên khách hàng không đúng");
     }
+
 
     // Ghi kết quả vào ô cuối cùng
     const resultCell = cells[cells.length - 1];
