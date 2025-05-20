@@ -101,7 +101,7 @@
                         <li onclick="showFrame('pur_pre_payment')">Pre-Payment</li>
                         <li onclick="showFrame('pur_po_receiving')">PO Receiving</li>
                         <li onclick="showFrame('pur_final_payment')">Final Payment</li>
-                        <!-- <li onclick="showFrame('pur_po_complete')">Final Payment</li> -->
+                        <li onclick="showFrame('pur_po_complete')">PO Complete</li>
                         <li onclick="showFrame('pr_po_summary')">PR / PO Status</li>
                     </ul>
                     
@@ -150,35 +150,47 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-15 03:00 AM</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-21 03:00 AM</h3>
 
-                <!-- <h1>📌 RELEASE NOTE</h1>
+                <div style="width: 600px; margin-top: 50px; max-height: 600px; overflow-y: auto;">
+                    <h1>📌 RELEASE NOTE</h1>
 
-                <ul class="tool-list">
-                    <li class="tool-item">
-                    <div class="tool-title">1. Add-Picking WMS</div>
-                    <div class="tool-desc">Cho phép đi pick nhiều đơn cùng 1 lúc</div>
-                    <span class="badge-new">NEW</span>
-                    </li>
+                    <ul class="tool-list">
+                        <li class="tool-item">
+                        <div class="tool-title">21-05-2025 | Thêm Module PO Complete</div>
+                        <div class="tool-desc">Cập nhật lại PO chính thức của khách hàng mà lúc tạo PR chưa có</div>
+                        <span class="badge-new">NEW</span>
+                        </li>
 
-                    <li class="tool-item">
-                    <div class="tool-title">2. Add-Picking Manual</div>
-                    <div class="tool-desc">Giả lập Count, đi pick các SKU thiếu, tương tự Tool 1</div>
-                    </li>
+                        <li class="tool-item">
+                        <div class="tool-title">15-05-2025 | PDF PO Format</div>
+                        <div class="tool-desc">Thêm chữ ký và con dấu công ty khi tạo Purchase Order, chỉ khi Giảm đốc Approve mới hiển thị mộc và link tải PDF mới xuất hiện</div>
+                        </li>
 
-                    <li class="tool-item">
-                    <div class="tool-title">3. Record Surplus</div>
-                    <div class="tool-desc">Quản lý hàng dư</div>
-                    <span class="badge-new">NEW</span>
-                    </li>
+                        <li class="tool-item">
+                        <div class="tool-title">15-05-2025 | Thêm module PR / PO Status</div>
+                        <div class="tool-desc">Theo dõi trạng thái của PR / PO đang ở bước nào và next step</div>
+                        </li>
 
-                    <li class="tool-item">
-                    <div class="tool-title">4. Record Troubleshoot</div>
-                    <div class="tool-desc">Tool hỗ trợ báo lỗi vận hành Outbound</div>
-                    </li>
-                </ul> -->
+                        <li class="tool-item">
+                        <div class="tool-title">15-05-2025 | Thêm cột ngày nhận hàng</div>
+                        <div class="tool-desc">Thêm cột ngày nhận hàng ở danh sách chờ xử lý ở module PO RECEIVING</div>
+                        </li>
+
+                        <li class="tool-item">
+                        <div class="tool-title">15-05-2025 | CANCEL PO</div>
+                        <div class="tool-desc">System không hiển thị các PR, PO đa bị cancel khỏi danh sách chờ xử lý của PURCHASING MANAGEMENT</div>
+                        </li>
+
+                        <li class="tool-item">
+                        <div class="tool-title">15-05-2025 | Thêm trường data "Đơn giá / Đơn vị" kéo từ MML</div>
+                        <div class="tool-desc">Thêm trường data "Đơn giá / Đơn vị" kéo từ MML khi làm PR</div>
+                        </li>
+
+                    </ul>
+                </div>
                 <!-- Thêm hình ảnh -->
-                <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/>
+                <!-- <img src="material/rmg_doanket.jpg" alt="RMG Technologies" style="width:100%;"/> -->
             </div>
             
                 
@@ -2603,7 +2615,7 @@
             <!-- ############ -->
 
             <!-- PO COMPLETE -->
-            <!-- <div id="pur_final_payment" class="frame">
+            <div id="pur_po_complete" class="frame">
                 <div class="frame2">
                     <div id="div1" class="left-frame">
                         <h1>PO COMPLETE</h1>
@@ -2620,105 +2632,79 @@
 
                         <div class="form-row">
                             <label>Người tạo PO</label>
-                            <input id="po_creator_final_payment" type="text" readonly>
+                            <input id="po_creator_po_complete" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Người tạo PR</label>
-                            <input id="pr_creator_final_payment" type="text" readonly>
+                            <input id="pr_creator_po_complete" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Tổng giá trị PO</label>
-                            <input id="total_value_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Chi phí cần thanh toán trước</label>
-                            <input id="pre_pay_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Chi phí còn lại sẽ thanh toán</label>
-                            <input id="remain_pay_final_payment" type="text" readonly>
+                            <input id="total_value_po_complete" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Nhà cung cấp</label>
-                            <input id="vendor_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Địa chỉ</label>
-                            <input id="vendor_addr_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Số điện thoại</label>
-                            <input id="vendor_phone_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Tên ngân hàng</label>
-                            <input id="vendor_bank_name_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Số tài khoản</label>
-                            <input id="vendor_bank_acc_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
-                            <label>Ngày thanh toán</label>
-                            <input id="payment_date_final_payment" type="text" readonly>
+                            <input id="vendor_po_complete" type="text" readonly>
                         </div>
 
                         <div class="form-row">
                             <label>Ngày nhận hàng dự kiến</label>
-                            <input id="expect_recv_date_final_payment" type="text" readonly>
+                            <input id="expect_recv_date_po_complete" type="text" readonly>
                         </div>
 
-                        <div class="form-row">
-                            <label>Nội dung PO-RECEIVING</label>
-                            <input id="content_release_final_payment" type="text" readonly>
-                        </div>
-
-                        <div class="form-row">
+                        <!-- <div class="form-row">
                             <label>Xem Files đính kèm</label>
-                            <div id="files_final_payment"></div> 
+                            <div id="files_po_complete"></div> 
+                        </div> -->
+
+                        <div class="form-row">
+                            <label>Tên KH khi tạo PR</label>
+                            <input id="customer_name_po_complete" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Số PO của KH khi tạo PR</label>
+                            <input id="po_number_po_complete" type="text" readonly>
+                        </div>
+
+                        <div class="form-row">
+                            <label>Cập nhật số PO chính thức của KH</label>
+                            <input id="official_po_complete" type="text" style="background-color: lightyellow;">
                         </div>
                         
                         
                         <div class="form-row">
                             <label>Nội dung</label>
-                            <textarea id="content_final_payment"></textarea>
+                            <textarea id="content_po_complete"></textarea>
                         </div>
 
                         <div style="text-align: center; margin-top: 30px;">
-                            <input type="file" name="file" id="fileUpload_final_payment" onchange="LoadFile_final_payment(event)" required multiple><br><br>
+                            <input type="file" name="file" id="fileUpload_po_complete" onchange="LoadFile_po_complete(event)" required multiple><br><br>
             
-                            <input type="hidden" id="fileData_final_payment" name="fileData_final_payment">
-                            <input type="hidden" id="mimeType_final_payment" name="mimeType_final_payment">
-                            <input type="hidden" id="fileName_final_payment" name="fileName_final_payment">
+                            <input type="hidden" id="fileData_po_complete" name="fileData_po_complete">
+                            <input type="hidden" id="mimeType_po_complete" name="mimeType_po_complete">
+                            <input type="hidden" id="fileName_po_complete" name="fileName_po_complete">
                         </div>
             
-                        <div id="button_group_final_payment">
-                            <button id="submitButton_final_payment" class="submit-btn">ĐÃ THANH TOÁN</button>
+                        <div id="button_group_po_complete">
+                            <button id="submitButton_po_complete" class="submit-btn">PO COMPLETED</button>
                         </div>
                     </div>
 
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
-                        <div id="table-container_final_payment" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
-                            <table id="final_payment_table">
+                        <div id="table-container_po_complete" style="overflow: auto; width: 100%; max-height: 700px; border: 1px solid #ccc;">
+                            <table id="po_complete_table">
                                 <thead>
                                     <tr>
                                         <th>PO#</th>
                                         <th>PR#</th>
                                         <th>Vendor</th>
                                         <th>Ngày thanh toán</th>
-                                        <th>Số tiền còn lại</th>
                                         <th>Người tạo PO</th>
                                     </tr>
                                 </thead>
@@ -2728,7 +2714,7 @@
                     </div>
                 </div>
 
-             </div> -->
+             </div>
             <!-- ############ -->
 
             <!-- PR PO Summary -->
