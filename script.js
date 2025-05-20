@@ -772,6 +772,7 @@ let po_data_raw = []
 let po_need_to_pre_payment_list = []
 let po_need_to_receiving_list = []
 let po_need_to_final_payment_list = []
+let po_need_to_complete_list = []
 
 let po_approval_2_list = []
 let po_approval_3_list = []
@@ -899,6 +900,21 @@ async function load_po_info() {
             );
 
             poInfo_data.shift(); // Bỏ header gốc nếu có
+        }
+
+    );
+}
+
+let prInfo_data = [];
+async function load_pr_info() {
+    return fetch('https://script.google.com/macros/s/AKfycbx7AbFWNtkEmz6kh13TNSNZDDVdYZaUCufmzUTmjaScj2eHxEzQrBBE_wFyxftorg4FqA/exec')
+        .then(res => res.json())
+        .then(data => {
+            prInfo_data = data.content.map(row =>
+                row.filter((_, index) => index !== 8 && (index < 23 || index > 30))
+            );
+
+            prInfo_data.shift();
         }
 
     );
@@ -1164,6 +1180,16 @@ async function load_po_need_to_final_payment() {
             po_need_to_final_payment_list = data.content;
 
             console.log("Dữ liệu PO Final Payment đã tải xong.", po_need_to_final_payment_list);
+        });
+}
+
+async function load_po_need_to_complete() {
+    return fetch('https://script.google.com/macros/s/AKfycbwyAlb1u5wgMzp-m4BAjnl6vnkAzEZiRYfCI64zJuKOmH4dp6vnH7HGphX1SqnlXcs/exec')
+        .then(res => res.json())
+        .then(data => {
+            po_need_to_complete_list = data.content;
+
+            console.log("Dữ liệu PO Complete đã tải xong.", po_need_to_final_payment_list);
         });
 }
 
@@ -1484,7 +1510,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 po_4_approval:user[35] === "x",
                 export_pr:user[36] === "x",
                 export_po:user[37] === "x",
-                pr_po_summary:user[38] === "x"
+                pr_po_summary:user[38] === "x",
+                pur_po_complete:user[39] === "x"
             };
 
             // Ghi log quyền để kiểm tra
@@ -1765,6 +1792,11 @@ async function showFrame(id) {
                 activeFrame.classList.add('active');
                 active_frame = id;
                 get_po_need_to_final_payment()
+                console.log("Access granted to frame:", id);
+            } else if (id === 'pur_po_complete') {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                get_po_need_to_complete()
                 console.log("Access granted to frame:", id);
             } else if (id === 'bom_approval') {
                 activeFrame.classList.add('active');
@@ -7509,7 +7541,6 @@ function closeExcelModal() {
 }
 
 //add item pr type
-//add item pr type
 
 // Gán sự kiện input với debounce để giảm số lần tìm kiếm
 document.getElementById("pr-type").addEventListener("input", debounce(handleMaterialTypeInput_pr_type, 400));
@@ -7573,43 +7604,6 @@ function showSearchResults_pr_type(displayList, fullData) {
         dropdown.appendChild(dropdownItem);
     });
 }
-
-// function showSecondaryOptions_pr_type(selectedItem) {
-//     // Filter based on selected item and availability
-//     const filteredResults = mml_data.filter(item => item[0] === selectedItem[0]);
-//     const modal = document.getElementById("secondaryModal_pr_type");
-//     const modalOptions = document.getElementById("modalOptions_pr_type");
-//     modalOptions.innerHTML = ''; // Clear old content
-
-//     console.log(filteredResults)
-
-//     // Use a Set to keep track of unique options
-//     const uniqueOptions = new Set();
-
-//     filteredResults.forEach(option => {
-//         const optionKey = `${option[1]} | ${option[2]}`
-
-//         if (!uniqueOptions.has(optionKey)) {
-//             uniqueOptions.add(optionKey); // Add to the Set to ensure uniqueness
-
-//             const optionDiv = document.createElement("div");
-//             optionDiv.classList.add("modal-option");
-
-//             // Set the text content using the unique ID and description
-//             optionDiv.textContent = optionKey;
-
-//             optionDiv.addEventListener("click", () => {
-//                 handleModalSelection_pr_type(option); // Call function when user selects an option
-//                 modal.style.display = 'none';
-//             });
-
-//             modalOptions.appendChild(optionDiv);
-//         }
-//     });
-
-//     // Display the modal
-//     modal.style.display = 'flex';
-// }
 
 function showSecondaryOptions_pr_type(selectedItem) {
     // Filter based on selected item and availability
@@ -11196,6 +11190,250 @@ document.getElementById("submitButton_final_payment").addEventListener("click", 
         clearFinalPaymentForm()
     }
 });
+
+// PO Complete
+
+async function get_po_need_to_complete() {
+    startLoading()
+    await Promise.all([load_pr_info(),load_po_need_to_complete()]);
+    endLoading()
+
+    const tableBody = document.querySelector("#po_complete_table tbody");
+    tableBody.innerHTML = ""; // Xóa dữ liệu cũ trước khi thêm mới
+
+    // po_need_to_po_receiving_list.shift()
+
+    po_need_to_complete_list.forEach((rowData, rowIndex) => {
+        const row = document.createElement("tr");
+
+        // Thêm các ô dữ liệu vào hàng
+        row.innerHTML = `
+            <td><a href="#" class="po-link" data-index="${rowIndex}">${rowData[2]}</a></td>
+            <td>${rowData[3]}</td>
+            <td>${rowData[6]}</td>
+            <td>${new Date(new Date(rowData[18]).getTime() + 7 * 60 * 60 * 1000).toISOString().split('T')[0]}</td>
+            <td>${rowData[4]}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+
+
+    // Xử lý sự kiện click vào PO# để log dữ liệu hàng
+    document.querySelectorAll(".po-link").forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault(); // Ngăn mở link
+            const index = this.getAttribute("data-index");
+            const vendorName = po_need_to_complete_list[index][6];
+            const found_phone = vendor_pr_data.find(row => row[0] === vendorName);
+            const phoneNumber = found_phone ? found_phone[3] : "";
+
+            console.log("Dữ liệu hàng:", po_need_to_complete_list[index]);
+            document.getElementById("po_po_complete").value = po_need_to_complete_list[index][2];
+            document.getElementById("pr_po_complete").value = po_need_to_complete_list[index][3];
+            document.getElementById("po_creator_po_complete").value = po_need_to_complete_list[index][4];
+            document.getElementById("pr_creator_po_complete").value = po_need_to_complete_list[index][5];
+            document.getElementById("total_value_po_complete").value = po_need_to_complete_list[index][7].toLocaleString('en-US');
+            document.getElementById("vendor_po_complete").value = po_need_to_complete_list[index][6];
+            document.getElementById("expect_recv_date_po_complete").value = po_need_to_complete_list[index][10];
+
+            const found_customer = prInfo_data.filter(item => item[2] === po_need_to_complete_list[index][3])
+            console.log(found_customer)
+
+
+            if (found_customer.length === 0) {
+                alert("Không tìm thấy thông tin Khách hàng")
+            }
+
+            document.getElementById("customer_name_po_complete").value = found_customer[0][16];
+            document.getElementById("po_number_po_complete").value = found_customer[0][17];
+
+
+            // document.getElementById("files_po_complete").value = po_need_to_complete_list[index][17];
+            //button to view file po_need_to_receiving_list[index][17];
+            // const linkValue = po_need_to_complete_list[index][17];
+            // const button = document.createElement("button");
+            // button.textContent = "View File";
+            // button.onclick = () => {
+            //     if (linkValue) {
+            //         window.open(linkValue, "_blank");
+            //     } else {
+            //         alert("No file link available.");
+            //     }
+            // };
+            // const container = document.getElementById("files_po_complete");
+            // container.innerHTML = ""; // Clear any existing content
+            // container.appendChild(button);
+            
+
+        });
+    });
+}
+
+
+var filesProcessed_po_complete = false;
+
+function LoadFile_po_complete(event) {
+    var files = event.target.files;
+
+    // Giới hạn số lượng tệp
+    if (files.length > 3) {
+    alert('Bạn chỉ được chọn tối đa 3 tệp.');
+    event.target.value = ''; // Reset input file
+    return;
+    }
+
+    var fileDataArray = [];
+    var mimeTypeArray = [];
+    var fileNameArray = [];
+
+    var totalFiles = files.length;
+    var filesRead = 0;
+    var totalSize = 0;
+
+    // Disable submit button while files are being processed
+    // document.getElementById('submitButton_delivery').disabled = true;
+
+    for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+
+    // Kiểm tra kích thước tệp
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+        alert('Tệp "' + file.name + '" vượt quá 10MB.');
+        event.target.value = ''; // Reset input file
+        filesProcessed_po_complete = false;
+        // document.getElementById('submitButton_delivery').disabled = true;
+        return;
+    }
+
+    totalSize += file.size;
+
+    (function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        var fileData = e.target.result.split(',')[1];
+        fileDataArray.push(fileData);
+        mimeTypeArray.push(file.type);
+        fileNameArray.push(file.name);
+
+        filesRead++;
+        if (filesRead === totalFiles) {
+            // All files processed
+            document.getElementById('fileData_po_complete').value = JSON.stringify(fileDataArray);
+            document.getElementById('mimeType_po_complete').value = JSON.stringify(mimeTypeArray);
+            document.getElementById('fileName_po_complete').value = JSON.stringify(fileNameArray);
+
+            filesProcessed_po_complete = true;
+            // Enable submit button
+            // document.getElementById('submitButton_delivery').disabled = false;
+        }
+        };
+        reader.readAsDataURL(file);
+    })(file);
+    }
+}
+
+document.getElementById("submitButton_po_complete").addEventListener("click", async function () {
+    const content = document.getElementById("content_po_complete").value.trim();
+    const files = document.getElementById("fileUpload_po_complete").files;
+  
+    if (!content) {
+      alert("Vui lòng nhập nội dung.");
+      return;
+    }
+    
+    startLoading()
+    const poValue = document.getElementById("po_po_complete").value
+    console.log(poValue)
+    const foundPO = po_need_to_complete_list.find(row => row[2] === poValue);
+    
+    // 📝 Thu thập dữ liệu từ form
+    let formData = {
+        po: foundPO[2],
+        pr: foundPO[3],
+        po_creator: foundPO[4],
+        pr_creator: foundPO[5],
+        vendor_name: foundPO[6],
+        povalue: document.getElementById("total_value_po_complete").value,
+        expected_date: foundPO[10],
+        customer_name: document.getElementById("customer_name_po_complete").value,
+        customer_po: document.getElementById("po_number_po_complete").value,
+        official_po: document.getElementById("official_po_complete").value,
+        content: document.getElementById("content_po_complete").value,
+        operator: sessionStorage.getItem("fullname"),
+        files: [] // Chứa danh sách file upload
+    };
+
+    // 📂 Xử lý file upload (chuyển file thành base64)
+    let fileInput = document.getElementById("fileUpload_po_complete");
+    if (fileInput.files.length > 0) {
+        for (let file of fileInput.files) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            await new Promise(resolve => {
+                reader.onload = function () {
+                    let base64 = reader.result.split(",")[1]; // Lấy phần base64 sau dấu ","
+                    formData.files.push({
+                        fileName: file.name,
+                        mimeType: file.type,
+                        fileData: base64
+                    });
+                    resolve();
+                };
+            });
+        }
+    }
+
+    // 📤 Gửi dữ liệu lên Google Apps Script
+    const url = "https://script.google.com/macros/s/AKfycbzVEvHhHNngVVKhv9HK5X4Ce7-1yDmNLOO-ZnEdakBcqsmC8mKsLVeGWm8nnhzgn54dvg/exec"; // Thay bằng URL thực tế
+    try {
+        let response = await fetch(url, {
+            method: "POST",
+            mode: 'no-cors',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        });
+
+        let result = await response.json();
+        if (result.status === "success") {
+            info("Dữ liệu đã gửi thành công! URL thư mục: " + result.folderUrl);
+        } else {
+            console.log("Lỗi: " + result.message);
+        }
+    } catch (error) {
+        console.log("Lỗi khi gửi dữ liệu: " + error.message);
+    } finally {
+        info("Gửi dữ liệu thành công")
+        get_po_need_to_complete()
+        clearPoCompleteForm()
+    }
+});
+
+function clearPoCompleteForm() {
+    document.getElementById("pr_po_complete").value = "";
+    document.getElementById("po_po_complete").value = "";
+    document.getElementById("po_creator_po_complete").value = "";
+    document.getElementById("pr_creator_po_complete").value = "";
+    document.getElementById("total_value_po_complete").value = "";
+
+    document.getElementById("customer_name_po_complete").value = "";
+    document.getElementById("po_number_po_complete").value = "";
+    
+    document.getElementById("vendor_po_complete").value = "";
+    document.getElementById("official_po_complete").value = "";
+    
+    document.getElementById("expect_recv_date_po_complete").value = "";
+    
+    document.getElementById("fileData_po_complete").value = "";
+    document.getElementById("mimeType_po_complete").value = "";
+    document.getElementById("fileName_po_complete").value = "";
+    document.getElementById("fileUpload_po_complete").value = ""; // Reset file input
+    document.getElementById("content_po_complete").value = "";
+    
+}
+
+
+//////////////////////////////////////
 
 function startLoading() {
     document.getElementById("loadingIndicator").style.display = "block";
