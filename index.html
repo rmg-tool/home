@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 
 </head>
 <body>
@@ -116,7 +118,7 @@
                         <i class="fa-solid fa-chevron-down arrow"></i>
         
                     <ul class="submenu" id="approval_list">
-                        <li onclick="showFrame('bom_approval')">Bom</li>
+                        <li onclick="showFrame('bom_approval')">BOM</li>
                         <li onclick="showFrame('quotation_approval')">Quotation</li>
                         <li onclick="showFrame('pr_approval')">Purchase Request</li>
                         <li onclick="showFrame('po_1_approval')">PO Level 1</li>
@@ -137,6 +139,7 @@
                         <li onclick="showFrame('transaction_nhap')">Nhập</li>
                         <li onclick="showFrame('transaction_xuat')">Xuất</li>
                         <li onclick="showFrame('export_pr')">Xuất PR / PO</li>
+                        <li onclick="showFrame('export_crm')">Xuất CRM</li>
                         <!-- <li onclick="showFrame('export_po')">Xuất PO</li> -->
                     </ul>
                 </li>
@@ -150,16 +153,82 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-21 03:00 AM</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-31</h3>
 
-                <div style="width: 600px; margin-top: 50px; max-height: 600px; overflow-y: auto;">
+                <div style="width: 800px; margin-top: 50px; max-height: 600px; overflow-y: auto;">
                     <h1>📌 RELEASE NOTE</h1>
 
                     <ul class="tool-list">
                         <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - MFG / PUR</div>
+                            <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - MFG / PUR</div>
+                            <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - Delivery</div>
+                            <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - Delivery</div>
+                            <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - Payment</div>
+                            <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - Payment</div>
+                            <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">26-05-2025 | Hiển thị khung nhập Li do hủy khi bấm Reject trong module BOM Approval</div>
+                            <div class="tool-desc">Hiển thị khung nhập lí do hủy khi bấm Reject, Không cho Reject khi chưa nhập lí do</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">26-05-2025 | Chỉnh sửa hiển thị giá tiền có dấu phân cách trong module BOM Approval</div>
+                            <div class="tool-desc">Hiển thị tiền theo định dạng VN , ví dụ 1.000.000 thay vì 1000000</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">25-05-2025 | Thêm chức năng MML Mass Upload</div>
+                            <div class="tool-desc">Mass Upload các vật tư mới và kiểm tra các điều kiện theo yêu cầu</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                        <div class="tool-title">25-05-2025 | Thêm chức năng BOM Mass Upload</div>
+                        <div class="tool-desc">Có thể Mass Upload các vật tư khi tạo BOM và kiểm tra các điều kiện theo yêu cầu</div>
+                        <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                        <div class="tool-title">25-05-2025 | Thêm các trường mới khi xuất PR, PO</div>
+                        <div class="tool-desc">Thêm các cột theo request mới</div>
+                        <span class="badge-new">NEW</span>
+                        </li>
+                        
+                        <li class="tool-item">
                         <div class="tool-title">21-05-2025 | Thêm Module PO Complete</div>
                         <div class="tool-desc">Cập nhật lại PO chính thức của khách hàng mà lúc tạo PR chưa có</div>
-                        <span class="badge-new">NEW</span>
+                        <!-- <span class="badge-new">NEW</span> -->
                         </li>
 
                         <li class="tool-item">
@@ -443,6 +512,19 @@
                 <div id="button_group_mml">
                     <button class="submit-btn" onclick="submit_mml()">Submit</button>
                     <button class="reset-btn" onclick="reset_mml()">Reset</button>
+                </div>
+
+                <button onclick="document.getElementById('file-upload-mml').click()" class="submit-btn" style="background-color: #2f3e46;">MML File Upload</button>
+                <input type="file" id="file-upload-mml" accept=".xlsx" style="display: none;">
+
+                <!-- Modal hiển thị dữ liệu -->
+                <div id="mass-upload-mml-modal" class="modal-mass-mml">
+                    <div class="modal-content">
+                        <!-- <span class="close" onclick="closeMMLModal()">&times;</span> -->
+                        <div id="mass-upload-mml-table-container"></div>
+                        <button id="mass-upload-mml-button" onclick="confirmMassUploadMML()">Mass Upload</button>
+                        <button id="mass-upload-mml-close-button" onclick="closeMMLModal()">Đóng</button>
+                    </div>
                 </div>
             </div>
 
@@ -809,6 +891,14 @@
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
+                        <div style="margin-bottom: 10px;">
+                            <select id="searchBranchMfg" onchange="filterTable_mfg()">
+                                <option value="">-- Tất cả chi nhánh --</option>
+                            </select>
+                            <input type="text" id="searchCustomerMfg" placeholder="Nhập mã khách hàng" oninput="filterTable_mfg()">
+                        </div>
+
+
                         <div id="table-container_mfg" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
                             <!-- Table will be dynamically generated and added here -->
                         </div>
@@ -816,7 +906,6 @@
                     </div>
                 </div>
             </div>
-            
 
             <div id="delivery" class="frame">
                 <div class="frame2">
@@ -881,6 +970,14 @@
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
 
+                        <div style="margin-bottom: 10px;">
+                            <select id="searchBranchDelivery" onchange="filterTable_delivery()">
+                                <option value="">-- Tất cả chi nhánh --</option>
+                            </select>
+                            <input type="text" id="searchCustomerDelivery" placeholder="Nhập mã khách hàng" oninput="filterTable_delivery()">
+                        </div>
+
+
                         <div id="table-container_delivery" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
                             <!-- Table will be dynamically generated and added here -->
                         </div>
@@ -936,6 +1033,16 @@
 
                     <div id="div2" class="right-frame">
                         <h1>Danh sách chờ xử lý</h1>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <select id="searchBranch" onchange="filterTable_payment()">
+                                <option value="">-- Tất cả chi nhánh --</option>
+                                <!-- Option sẽ được thêm bằng JS -->
+                            </select>
+                            <input type="text" id="searchCustomer" placeholder="Nhập mã khách hàng" oninput="filterTable_payment()">
+                        </div>
+
+
 
                         <div id="table-container_payment" style="overflow: auto; width: 100%; max-height: 400px; border: 1px solid #ccc;">
                             <!-- Table will be dynamically generated and added here -->
@@ -959,8 +1066,8 @@
                 </div>
                 <p style="display: none;" id="getBomLoading">Đang lấy dữ liệu ...</p>
 
-                <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 25px;" onclick="showModal_bom()">Tạo BOM mới</button>
-                <button style="font-size: 20px; padding: 5px; width: 200px; height: 50px;font-weight: bold;margin-top: 50px; margin-left: 15px;" onclick="showModal_bom_draft()">Load BOM tạm</button>
+                <button class="show-modal-button" style="background-color: #2f3e46;" onclick="showModal_bom()">Tạo BOM mới</button>
+                <button class="show-modal-button" style="background-color: #2f3e46;" onclick="showModal_bom_draft()">Load BOM tạm</button>
 
                 <h2 style="margin-top: 20px; margin-bottom: 10px;">Lọc BOM đã tạo</h2>
                 <!-- Bộ lọc -->
@@ -982,8 +1089,14 @@
                     </label>
                 </div>
 
-                <button id="clear-bom-link-filter" onclick="clear_filter()">Clear Filter</button>
-                <button onclick="displayTableData()">Refresh</button>
+                <button class="show-modal-button" style="background-color: #2f3e46;" id="clear-bom-link-filter" onclick="clear_filter()">
+                    <i class="fas fa-filter-circle-xmark"></i> Clear Filter
+                </button>
+
+                <button class="show-modal-button" style="background-color: green;" onclick="displayTableData()">
+                    <i class="fas fa-arrows-rotate"></i> Refresh
+                </button>
+
 
                 <!-- fd -->
                 <div class="scrollable-frame">
@@ -1050,7 +1163,9 @@
                       <!-- Table Frame 2 -->
                       <div class="bom-frame">
                         <div class="bom-frame-title">Danh mục vật tư</div>
-                        <button class="show-modal-button" onclick="showAddItemModal()">Thêm vật tư</button>
+                        <button class="show-modal-button" style="background-color: #2f3e46;" onclick="showAddItemModal()">Thêm vật tư</button>
+                        <button onclick="document.getElementById('file-upload-bom').click()" class="show-modal-button" style="background-color: #2f3e46;">BOM File Upload</button>
+                        <input type="file" id="file-upload-bom" accept=".xlsx" style="display: none;">
                         <div style="overflow-x: auto;"> <!-- Thêm overflow-x để có cuộn ngang -->
                             <table class="bom-table" id="bom-item-table">
                                 <thead>
@@ -1074,6 +1189,20 @@
                         </div>
                         <label class="bom-total-row" id="bom-total-price" style="font-size: 30px; font-weight: bold;">Tổng giá trị: -</label>
                       </div>
+
+                      <!-- Modal BOM Mass Upload -->
+
+                      <div id="mass-upload-modal" class="bom-modal" style="display: none;">
+                        <div class="bom-modal-content" style="width: 100%;">
+                            <h2>Xem trước dữ liệu từ Excel</h2>
+                            <div id="mass-upload-table-container" style="max-height: 400px; overflow: auto;"></div>
+                            <div style="margin-top: 10px;">
+                            <button onclick="confirmMassUpload()">Xác nhận thêm hàng loạt</button>
+                            <button onclick="document.getElementById('mass-upload-modal').style.display = 'none'">Đóng</button>
+                            </div>
+                        </div>
+                      </div>
+
                 
                       <!-- Add Item Modal -->
                       <div class="bom-modal" id="add-item-modal">
@@ -1323,6 +1452,16 @@
                         <label>Link Reference:</label>
                         <label id="link_show2"></label>
                     </div>
+
+                    <div id="rejectReasonContainer" style="display: none; margin-top: 10px;">
+                        <label for="rejectReason">Lý do từ chối:</label>
+                        <textarea id="rejectReason" rows="3" style="width: 100%;"></textarea>
+                        <div style="margin-top: 10px;">
+                            <button class="action-btn reject-btn" onclick="confirmReject()">Xác nhận từ chối</button>
+                            <button class="action-btn" onclick="cancelReject()">Hủy</button>
+                        </div>
+                    </div>
+
                 
                     <div style="margin-top: 20px; text-align: center;">
                         <button class="action-btn approve-btn" onclick="approveDesign()">Approve</button>
@@ -2840,6 +2979,13 @@
                     </div>
                   </div>
                   
+            </div>
+
+            <div id="export_crm" class="frame">
+                <h1>Xuất CRM</h1>
+
+                <button class="show-modal-button" style="background-color: #335c67;" onclick="exportCrmToExcel()">Xuất Excel</button>
+
             </div>
 
         <!-- Modal -->
