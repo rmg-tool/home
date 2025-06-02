@@ -786,6 +786,37 @@ let pct_validation = []
 let unit_validation = []
 let address_validation = []
 
+let crm_export_data = []
+
+async function load_export_crm() {
+    return fetch('https://script.google.com/macros/s/AKfycbxmckplqohDfC26TlYw4EUXhdrFygmCysTd7-czcglPOdYi9HQcnhSMqpuTZelcnWoO/exec')
+        .then(res => res.json())
+        .then(data => {
+            crm_export_data = data.content;
+            console.log("Dữ liệu danh sách CRM cần Export đã tải xong.");
+            // add_po_need_to_approve()
+        });
+}
+
+async function exportCrmToExcel() {
+    startLoading()
+    await load_export_crm()
+    endLoading()
+    if (crm_export_data.length === 0) {
+        alert("Chưa có dữ liệu để xuất.");
+        return;
+    }
+
+    // crm_export_data là dạng mảng 2 chiều, ví dụ:
+    // [["Tên", "Tuổi"], ["An", 30], ["Bình", 25]]
+    const worksheet = XLSX.utils.aoa_to_sheet(crm_export_data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "CRM Data");
+
+    XLSX.writeFile(workbook, "crm_export.xlsx");
+}
+
+
 async function load_data_validation() {
     return fetch('https://script.google.com/macros/s/AKfycbyXec03ZIr3NgBmMqIEoa_CxItmq0bwQjT-tHhhHPdRQKwO2aVR7NInXwrKzf8P702xAw/exec')
         .then(res => res.json())
@@ -920,18 +951,44 @@ async function load_pr_info() {
     );
 }
 
+let prExportExtendedData = []
+async function load_pr_extended() {
+    return fetch('https://script.google.com/macros/s/AKfycbyhNj4sbeX-ECxf7mdksTFHsKLj7BXX6_dWSbtcPYgcjjT2tWyUMzgVmPfjTWNne0dE/exec')
+        .then(res => res.json())
+        .then(data => {
+            prExportExtendedData = data.content;
+            console.log("Dữ liệu PO Extended tải xong.");
+        });
+}
+
+let prExportData = []
 
 async function load_detail_pr() {
+    await load_pr_extended(); // Gọi dữ liệu mở rộng trước
+
     return fetch('https://script.google.com/macros/s/AKfycbx7AbFWNtkEmz6kh13TNSNZDDVdYZaUCufmzUTmjaScj2eHxEzQrBBE_wFyxftorg4FqA/exec')
         .then(res => res.json())
         .then(data => {
-            prExportData = data.content.map(row =>
+            let rawData = data.content.map(row =>
                 row.filter((_, index) => index !== 8 && (index < 23 || index > 30))
             );
 
-            prExportData.shift();
+            rawData.shift(); // Bỏ header nếu có
 
-            // Lấy giá trị duy nhất cho Operator (cột 3)
+            // Tạo map mở rộng
+            const extendedMap = {};
+            prExportExtendedData.forEach(row => {
+                if (row[0]) extendedMap[row[0]] = row;
+            });
+
+            // Join
+            prExportData = rawData.map(row => {
+                const key = row[2]; // index 2 trong prExportData
+                const ext = extendedMap[key] || [];
+                return [...row, ...ext];
+            });
+
+            // Lọc Operator (cột 3)
             const operators = [...new Set(prExportData.map(row => row[3]).filter(v => v))];
             const operatorSelect = document.getElementById('pr_export_modal_operator');
             operatorSelect.innerHTML = '<option value="">-- Tất cả --</option>';
@@ -942,7 +999,7 @@ async function load_detail_pr() {
                 operatorSelect.appendChild(option);
             });
 
-            // Lấy giá trị duy nhất cho Chi nhánh (cột 6)
+            // Lọc Chi nhánh (cột 6)
             const branches = [...new Set(prExportData.map(row => row[6]).filter(v => v))];
             const branchSelect = document.getElementById('pr_export_modal_branch');
             branchSelect.innerHTML = '<option value="">-- Tất cả --</option>';
@@ -953,7 +1010,6 @@ async function load_detail_pr() {
                 branchSelect.appendChild(option);
             });
 
-            // Mở modal
             document.getElementById('pr_export_modal').style.display = 'block';
         });
 }
@@ -986,7 +1042,7 @@ function filterAndExportPR() {
         'Bộ phận', 'Chi nhánh', 'Mục đích mua hàng', 'Ngày duyệt PR', 'Thời gian duyệt PR',
         'Trạng thái PR', 'Loại vật tư', 'Tên vật tư', 'Mã vật tư', 'Thông số kỹ thuật',
         'Đơn vị', 'Tên khách hàng', 'Số PO của khách hàng', 'Ngày cần có vật tư',
-        'Đơn giá / đơn vị dự kiến', 'Số lượng cần', 'Tổng tiền'
+        'Đơn giá / đơn vị dự kiến', 'Số lượng cần', 'Tổng tiền','PR#','Đơn vị tiền tệ'
     ];    
       
     const exportData = [header, ...filtered];
@@ -1012,20 +1068,62 @@ function hideModalExportPO() {
     document.getElementById('po_export_modal').style.display = 'none';
 }
 
+let poExportExtendedData = [];
+
+async function load_po_extended() {
+    return fetch('https://script.google.com/macros/s/AKfycbxePQz8CdB4raFSmIMkKxR7HTh1pme5RTVdRHJIqgv6Z_nKJ4UVgJv9ywwalGfyCY7x/exec')
+        .then(res => res.json())
+        .then(data => {
+            poExportExtendedData = data.content.map(row => {
+                const rawDate = row[4];
+                const parsedDate = new Date(rawDate);
+
+                if (!isNaN(parsedDate.getTime())) {
+                    parsedDate.setHours(parsedDate.getHours() + 7); // GMT+7
+                    const formatted = parsedDate.toISOString().split('T')[0];
+                    row[4] = formatted;
+                } else {
+                    console.warn("Ngày không hợp lệ:", rawDate);
+                    row[4] = "";
+                }
+
+                return row;
+            });
+
+            console.log("Dữ liệu PO Extended tải xong và đã xử lý thời gian.");
+        });
+}
+
 let poExportData = [];
 
 async function load_detail_po() {
+    // Gọi trước để lấy dữ liệu mở rộng
+    await load_po_extended();
+
     return fetch('https://script.google.com/macros/s/AKfycbxaHFDj1LtFommzR4AUe-_zz7gZzpOsvY83G4uWPi5jKkSXOIAfO0wtJRKc9RNUDn2byw/exec')
         .then(res => res.json())
         .then(data => {
             const columnsToRemove = new Set([10, 11, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42, 53, 54, 55, 56, 57]);
-            poExportData = data.content.map(row =>
+            let rawData = data.content.map(row =>
                 row.filter((_, index) => !columnsToRemove.has(index))
             );
 
-            poExportData.shift(); // Bỏ header gốc nếu có
+            rawData.shift(); // Bỏ header
 
-            // Lấy giá trị duy nhất cho Operator (cột 5)
+            // Tạo map từ poExportExtendedData
+            const extendedMap = {};
+            poExportExtendedData.forEach(row => {
+                if (row[0]) extendedMap[row[0]] = row;
+            });
+
+            // Join data
+            poExportData = rawData.map(row => {
+                const key = row[2]; // index 2
+                const extendedRow = extendedMap[key] || [];
+                return [...row, ...extendedRow];
+            });
+
+            // Lọc unique Operator (cột 5)
             const operators = [...new Set(poExportData.map(row => row[5]).filter(v => v))];
             const operatorSelect = document.getElementById('po_export_modal_operator');
             operatorSelect.innerHTML = '<option value="">-- Tất cả --</option>';
@@ -1036,8 +1134,8 @@ async function load_detail_po() {
                 operatorSelect.appendChild(option);
             });
 
-            // Lấy giá trị duy nhất cho Chi nhánh (cột cuối)
-            const branches = [...new Set(poExportData.map(row => row[row.length - 1]).filter(v => v))];
+            // Lọc unique Chi nhánh (cột cuối)
+            const branches = [...new Set(poExportData.map(row => row[row.length - 8]).filter(v => v))];
             const branchSelect = document.getElementById('po_export_modal_branch');
             branchSelect.innerHTML = '<option value="">-- Tất cả --</option>';
             branches.forEach(br => {
@@ -1051,6 +1149,7 @@ async function load_detail_po() {
         });
 }
 
+
 function filterAndExportPO() {
     const date = document.getElementById('po_export_modal_date').value;
     const branch = document.getElementById('po_export_modal_branch').value;
@@ -1060,7 +1159,7 @@ function filterAndExportPO() {
     const filtered = poExportData.filter(row => {
         const matchDate = date === '' || (row[0] && row[0].startsWith(date));
         const matchOperator = operator === '' || row[5] === operator;
-        const matchBranch = branch === '' || row[row.length - 1] === branch;
+        const matchBranch = branch === '' || row[row.length - 8] === branch;
         return matchDate && matchOperator && matchBranch;
       });
       
@@ -1091,7 +1190,9 @@ function filterAndExportPO() {
         "Ngày giao hàng dự kiến", "Ngày thanh toán dự kiến", "Delivery address",
         "Delivery to", "Attts:", "Phone#", "Ship via", "Delivery terms",
         "Payment terms", "Lead time", "Warranty", "Shipping Value",
-        "Số PO của khách hàng", "Số lượng cần từ PR", "Số tiền từ PR", "Chi nhánh"
+        "Số PO của khách hàng", "Số lượng cần từ PR", "Số tiền từ PR", "Chi nhánh",
+        "PO#","PR#","Bộ phận","Mục đích mua hàng","Ngày giao hàng thực tế","Ngày cần có vật tư",
+        "Ngày ra đơn hàng cho NCC"
     ];
 
     const exportData = [header, ...filtered];
@@ -1511,7 +1612,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 export_pr:user[36] === "x",
                 export_po:user[37] === "x",
                 pr_po_summary:user[38] === "x",
-                pur_po_complete:user[39] === "x"
+                pur_po_complete:user[39] === "x",
+                export_crm:user[40] === "x"
             };
 
             // Ghi log quyền để kiểm tra
@@ -1837,6 +1939,13 @@ async function showFrame(id) {
                 activeFrame.classList.add('active');
                 active_frame = id;
                 get_pr_po_summary()
+                console.log("Access granted to frame:", id);
+            } if (id === "mml") {
+                activeFrame.classList.add('active');
+                active_frame = id;
+                // startLoading()
+                // await load_mml()
+                // endLoading()
                 console.log("Access granted to frame:", id);
             } else {
                 activeFrame.classList.add('active');
@@ -2377,6 +2486,190 @@ function submit_mml() {
     info("Đã thêm vật tư mới thành công")
 }
 
+// Mass Upload MML
+
+document.getElementById('file-upload-mml').addEventListener('change', handleMMLExcelUpload);
+
+let previewMMLUploadData = [];
+
+async function handleMMLExcelUpload(event) {
+  startLoading()
+    await load_mml()
+  endLoading()
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const data = await file.arrayBuffer();
+  const workbook = XLSX.read(data);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+  event.target.value = "";
+
+  const header = rows[0];
+  const content = rows.slice(1);
+
+  const expectedHeaders = [
+    "STT", "Loại vật tư", "Tên vật tư", "Mã vật tư", "Mã nhà SX",
+    "Đơn giá", "Mã nhà cung cấp", "Tên nhà cung cấp", "Đơn vị"
+  ];
+
+  const headerMismatch = expectedHeaders.some((h, i) => h !== header[i]);
+  if (headerMismatch) {
+    alert("Lỗi 1: File upload không đúng cấu trúc chuẩn.");
+    return;
+  }
+
+  previewMMLUploadData = content.map((row, index) => {
+    const [
+      stt, type, name, code, mb_code,
+      price, supplier_id, supplier_name, unit
+    ] = row;
+
+    return {
+      stt: index + 1,
+      type, name, code, mb_code,
+      price, supplier_id, supplier_name, unit
+    };
+  });
+
+  previewMMLUploadData = validateMMLPreviewData(previewMMLUploadData, mml_data);
+  showMMLPreviewTable();
+
+  const hasErrors = previewMMLUploadData.some(item => item.result !== "PASS");
+  const uploadButton = document.getElementById("mass-upload-mml-button");
+  if (uploadButton) {
+    uploadButton.disabled = hasErrors;
+  }
+
+  if (!hasErrors) {
+    document.getElementById("mass-upload-mml-modal").style.display = 'block';
+  }
+}
+
+function validateMMLPreviewData(previewData, mml_data) {
+  return previewData.map((item, index) => {
+    const {
+      stt, type, name, code, mb_code,
+      price, supplier_id, supplier_name, unit
+    } = item;
+
+    const rowErrors = [];
+    let status = "PASS";
+
+    // Lỗi 2: Thiếu dữ liệu (trừ Mã nhà SX)
+    if (!type || !name || !code || !price || !supplier_id || !supplier_name || !unit) {
+      rowErrors.push(`Lỗi 2: Thiếu dữ liệu tại STT${stt}`);
+      status = "FAIL";
+    }
+
+    // Lỗi 3: Tên vật tư đã tồn tại
+    if (mml_data.some(row => row[1] === name)) {
+      rowErrors.push(`Lỗi 3: Tên vật tư đã tồn tại tại STT${stt}`);
+      status = "FAIL";
+    }
+
+    // Lỗi 4: Mã vật tư đã tồn tại
+    if (mml_data.some(row => row[2] === code)) {
+      rowErrors.push(`Lỗi 4: Mã vật tư đã tồn tại tại STT${stt}`);
+      status = "FAIL";
+    }
+
+    // Lỗi 5: Đơn giá có ký tự
+    if (isNaN(price)) {
+      rowErrors.push(`Lỗi 5: Đơn giá có ký tự tại STT${stt}`);
+      status = "FAIL";
+    }
+
+    return {
+      ...item,
+      result: rowErrors.length ? rowErrors.join("\n") : "PASS"
+    };
+  });
+}
+
+function showMMLPreviewTable() {
+  const container = document.getElementById("mass-upload-mml-table-container");
+  container.innerHTML = '';
+
+  const table = document.createElement("table");
+  table.className = "mml-table";
+
+  const headerHTML = `
+    <thead><tr>
+      <th>STT</th><th>Loại vật tư</th><th>Tên vật tư</th><th>Mã vật tư</th>
+      <th>Mã nhà SX</th><th>Đơn giá</th><th>Mã nhà cung cấp</th>
+      <th>Tên nhà cung cấp</th><th>Đơn vị</th><th>Result</th>
+    </tr></thead>`;
+  table.innerHTML = headerHTML;
+
+  const tbody = document.createElement("tbody");
+  previewMMLUploadData.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.stt}</td>
+      <td>${row.type}</td>
+      <td>${row.name}</td>
+      <td>${row.code}</td>
+      <td>${row.mb_code}</td>
+      <td>${row.price}</td>
+      <td>${row.supplier_id}</td>
+      <td>${row.supplier_name}</td>
+      <td>${row.unit}</td>
+      <td style="color: ${row.result === "PASS" ? 'green' : 'red'}; white-space: pre-line;">${row.result}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  container.appendChild(table);
+
+  document.getElementById("mass-upload-mml-modal").style.display = 'block';
+}
+
+async function confirmMassUploadMML() {
+  const validData = previewMMLUploadData.filter(item => item.result === "PASS");
+
+  if (validData.length === 0) {
+    alert("Không có dữ liệu hợp lệ để upload.");
+    return;
+  }
+
+  const payload = validData.map(item => ({
+    type: item.type.toUpperCase(),
+    sku_name: item.name,
+    sku_id: item.code.toUpperCase(),
+    price: item.price,
+    supplier_id: item.supplier_id.toUpperCase(),
+    supplier_name: item.supplier_name.toUpperCase(),
+    unit: item.unit,
+    operator: sessionStorage.getItem("fullname"),
+    mb_code: item.mb_code.toUpperCase()
+  }));
+  startLoading()
+  await fetch('https://script.google.com/macros/s/AKfycbxxNIY7P7h3POgBVjCquDGgaJ-Qly47hoTL_JM1VPXPJP1l5-GLf4qkNFeoU3c219I8/exec', {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(response => response.text())
+    .then(result => {
+      info("Mass upload completed");
+      endLoading()
+      document.getElementById("mass-upload-mml-modal").style.display = 'none';
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function closeMMLModal() {
+  document.getElementById("mass-upload-mml-modal").style.display = 'none';
+}
+
+
+// /////////////////////////
 
 ////*** */ Export data
 /// onhand
@@ -3957,7 +4250,7 @@ function viewDetaildesign(index) {
     document.getElementById("content_show2").textContent = row[8];
 
     document.getElementById("bom_show2").textContent = row[9];
-    document.getElementById("total_price_show2").textContent = row[10];
+    document.getElementById("total_price_show2").textContent = row[10].toLocaleString("en-US");
 
     // Lấy phần tử link_show
     const linkElement = document.getElementById("link_show2");
@@ -3984,6 +4277,27 @@ function viewDetaildesign(index) {
     document.getElementById("detailModal2").style.display = "block";
     document.getElementById("modalBackdrop2").style.display = "block";
 }
+
+function rejectDesign() {
+    // Hiện khung nhập lý do từ chối
+    document.getElementById("rejectReasonContainer").style.display = "block";
+}
+
+function cancelReject() {
+    document.getElementById("rejectReason").value = "";
+    document.getElementById("rejectReasonContainer").style.display = "none";
+}
+
+function confirmReject() {
+    const reason = document.getElementById("rejectReason").value.trim();
+    if (!reason) {
+        alert("Vui lòng nhập lý do từ chối.");
+        return;
+    }
+
+    rejectDesign2()
+}
+
 
 // Hàm đóng modal
 function closeModal2() {
@@ -4012,6 +4326,7 @@ async function approveDesign() {
 
         design_table_approved.append("link", select_design_to_approve[12])
         design_table_approved.append("design_id", select_design_to_approve[13])
+        design_table_approved.append("reason", "")
 
         startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
@@ -4032,9 +4347,11 @@ async function approveDesign() {
 }
 
 // Hàm xử lý khi nhấn Reject
-async function rejectDesign() {
+async function rejectDesign2() {
     try {
         let design_table_rejected = new FormData();
+
+        const reason = document.getElementById("rejectReason").value.trim();
 
         design_table_rejected.append("operator", select_design_to_approve[2])
         design_table_rejected.append("username", select_design_to_approve[3])
@@ -4052,6 +4369,9 @@ async function rejectDesign() {
 
         design_table_rejected.append("link", select_design_to_approve[12])
         design_table_rejected.append("design_id", select_design_to_approve[13])
+        design_table_rejected.append("reason", reason)
+
+        
 
         startLoading()
         await fetch('https://script.google.com/macros/s/AKfycbyVIm0bJDZmWJ8qEHTHXFVcORi4xgWEdX86I1HEjO4I3DR58sA8p_xPfqCjaw5ENbXI/exec', {
@@ -4068,6 +4388,7 @@ async function rejectDesign() {
     load_approval_ticket()
     closeModal2();
     info("Design Ticket Rejected")
+    cancelReject()
     startLoading()
 }
 
@@ -5224,13 +5545,20 @@ async function get_mfg_need_to_process() {
         });
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
-        row[9], // Cột thứ 10
-        row[4], // Cột thứ 5
-        row[0], // Cột thứ 1
-        row[5]?.slice(0, 10), // Cột thứ 6: Chỉ lấy 10 ký tự đầu
-        row[6]  // Cột thứ 7
-    ]);
+    const now = new Date();
+    const tableData = newArray.map(row => {
+        const createdDate = new Date(row[0]);
+        const pendingDay = Math.max(0, Math.floor((now - createdDate) / (1000 * 60 * 60 * 24)));
+        return [
+            row[9],              // Mã khách hàng
+            row[4],              // Mã đơn hàng
+            pendingDay + " day", // Pending day
+            row[0],              // Ngày tạo
+            row[5]?.slice(0, 10),// Ngày giao
+            row[6]               // Mã CRM
+        ];
+    });
+
 
     // Tạo bảng
     const tableContainer = document.getElementById("table-container_mfg");
@@ -5240,7 +5568,8 @@ async function get_mfg_need_to_process() {
     table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
 
     // Tạo tiêu đề bảng
-    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Ngày giao", "Mã CRM"];
+    const headers = ["Mã khách hàng", "Mã đơn hàng", "Pending day", "Ngày tạo", "Ngày giao", "Mã CRM"];
+
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     headers.forEach(header => {
@@ -5270,12 +5599,12 @@ async function get_mfg_need_to_process() {
                 td.style.color = "blue"; // Thêm màu để dễ nhận biết
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
-                    document.getElementById("mfgCrm").value = row[4]
+                    document.getElementById("mfgCrm").value = row[5]
                     document.getElementById("mfgCustomerID").textContent = row[0]
                     document.getElementById("mfgCustomerName").textContent = row[1]
 
                     order_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
-                    const findCrm = order_data.find(item => item[6] === row[4])
+                    const findCrm = order_data.find(item => item[6] === row[5])
                     console.table(findCrm)
                     const operator = findCrm[2]
                     const link = findCrm[8]
@@ -5298,6 +5627,22 @@ async function get_mfg_need_to_process() {
         });
         tbody.appendChild(tr);
     });
+    const uniqueBranches = [...new Set(
+        tableData.map(row => {
+            const crm = row[5] || "";
+            return crm.split("-")[1] || "";
+        }).filter(branch => branch)
+    )].sort();
+
+    const branchDropdown = document.getElementById("searchBranchMfg");
+    branchDropdown.innerHTML = '<option value="">-- Tất cả chi nhánh --</option>';
+    uniqueBranches.forEach(branch => {
+        const option = document.createElement("option");
+        option.value = branch.toLowerCase();
+        option.textContent = branch;
+        branchDropdown.appendChild(option);
+    });
+
     table.appendChild(tbody);
 
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
@@ -5305,6 +5650,23 @@ async function get_mfg_need_to_process() {
     tableContainer.appendChild(table);
     endLoading()
 }
+
+function filterTable_mfg() {
+    const selectedBranch = document.getElementById("searchBranchMfg").value.toLowerCase();
+    const customerInput = document.getElementById("searchCustomerMfg").value.toLowerCase();
+    const rows = document.querySelectorAll("#table-container_mfg table tbody tr");
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const customer = cells[0]?.textContent.toLowerCase() || "";
+        const crm = cells[5]?.textContent.toLowerCase() || "";
+        const branch = crm.split("-")[1] || "";
+
+        const match = customer.includes(customerInput) && (selectedBranch === "" || branch === selectedBranch);
+        row.style.display = match ? "" : "none";
+    });
+}
+
 
 
 ///* DELIVERY ///
@@ -5507,12 +5869,19 @@ async function get_delivery_need_to_process() {
         });
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
-    const tableData = newArray.map(row => [
-        row[4],
-        row[5],
-        row[0],
-        row[3] 
-    ]);
+    const now = new Date();
+    const tableData = newArray.map(row => {
+        const createdDate = new Date(row[0]);
+        const pendingDay = Math.max(0, Math.floor((now - createdDate) / (1000 * 60 * 60 * 24)));
+        return [
+            row[4],              // Mã khách hàng
+            row[5],              // Mã đơn hàng
+            pendingDay + " day", // Pending day
+            row[0],              // Ngày tạo
+            row[3]               // Mã CRM
+        ];
+    });
+
 
     // Tạo bảng
     const tableContainer = document.getElementById("table-container_delivery");
@@ -5522,7 +5891,7 @@ async function get_delivery_need_to_process() {
     table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
 
     // Tạo tiêu đề bảng
-    const headers = ["Mã hhách hàng", "Mã đơn hàng", "Ngày tạo", "Mã CRM"];
+    const headers = ["Mã khách hàng", "Mã đơn hàng", "Pending day", "Ngày tạo", "Mã CRM"];
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     headers.forEach(header => {
@@ -5552,12 +5921,12 @@ async function get_delivery_need_to_process() {
                 td.style.color = "blue"; // Thêm màu để dễ nhận biết
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
-                    document.getElementById("deliveryCrm").value = row[3]
+                    document.getElementById("deliveryCrm").value = row[4]
                     document.getElementById("deliveryCustomerID").textContent = row[0]
                     document.getElementById("deliveryCustomerName").textContent = row[1]
 
                     mfg_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
-                    const findCrm = mfg_data.find(item => item[3] === row[3])
+                    const findCrm = mfg_data.find(item => item[3] === row[4])
                     console.table(findCrm)
                     const operator = findCrm[2]
                     const content = findCrm[6]
@@ -5582,12 +5951,45 @@ async function get_delivery_need_to_process() {
         });
         tbody.appendChild(tr);
     });
+
+    const uniqueBranches = [...new Set(
+        tableData.map(row => {
+            const crm = row[4] || "";
+            return crm.split("-")[1] || "";
+        }).filter(branch => branch)
+    )].sort();
+
+    const branchDropdown = document.getElementById("searchBranchDelivery");
+    branchDropdown.innerHTML = '<option value="">-- Tất cả chi nhánh --</option>';
+    uniqueBranches.forEach(branch => {
+        const option = document.createElement("option");
+        option.value = branch.toLowerCase();
+        option.textContent = branch;
+        branchDropdown.appendChild(option);
+    });
+
     table.appendChild(tbody);
 
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
     tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
     endLoading()
+}
+
+function filterTable_delivery() {
+    const selectedBranch = document.getElementById("searchBranchDelivery").value.toLowerCase();
+    const customerInput = document.getElementById("searchCustomerDelivery").value.toLowerCase();
+    const rows = document.querySelectorAll("#table-container_delivery table tbody tr");
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const customer = cells[0]?.textContent.toLowerCase() || "";
+        const crm = cells[4]?.textContent.toLowerCase() || "";
+        const branch = crm.split("-")[1] || "";
+
+        const match = customer.includes(customerInput) && (selectedBranch === "" || branch === selectedBranch);
+        row.style.display = match ? "" : "none";
+    });
 }
 
 
@@ -5707,24 +6109,25 @@ async function get_payment_need_to_process() {
 
 
     // Lấy dữ liệu cần thiết từ newArray: cột 10, 11, 5, 1, 6 (10 ký tự đầu), 7
+    const now = new Date();
+
     const tableData = newArray.map(row => {
-        // Chuyển giá trị row[7] thành đối tượng Date
         const originalDate = new Date(row[7]);
-        
-        // Cộng thêm 7 giờ
         originalDate.setHours(originalDate.getHours() + 7);
-        
-        // Chuyển đối tượng Date thành chuỗi ISO và lấy 10 ký tự đầu
         const formattedDate = originalDate.toISOString().substring(0, 10);
-    
+
+        const pendingDay = Math.max(0, Math.floor((now - new Date(formattedDate)) / (1000 * 60 * 60 * 24)));
+
         return [
-            row[4],
-            row[5],
-            formattedDate, // Dữ liệu đã được cộng 7 giờ và định dạng
-            row[0],
-            row[3]
+            row[4],                 // Mã khách hàng
+            row[5],                 // Mã đơn hàng
+            pendingDay + " day",    // Cột Pending day
+            formattedDate,          // Ngày thanh toán
+            row[0],                 // Ngày tạo
+            row[3]                  // Mã CRM
         ];
-    });
+    }).sort((a, b) => parseInt(b[2]) - parseInt(a[2])); // sort theo Pending day giảm dần
+
 
     // Tạo bảng
     const tableContainer = document.getElementById("table-container_payment");
@@ -5734,7 +6137,7 @@ async function get_payment_need_to_process() {
     table.style.tableLayout = "auto"; // Tự động điều chỉnh độ rộng
 
     // Tạo tiêu đề bảng
-    const headers = ["Mã hhách hàng", "Mã đơn hàng","Ngày thanh toán", "Ngày tạo", "Mã CRM"];
+    const headers = ["Mã hhách hàng", "Mã đơn hàng","Pending day","Ngày thanh toán", "Ngày tạo", "Mã CRM"];
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
     headers.forEach(header => {
@@ -5764,12 +6167,12 @@ async function get_payment_need_to_process() {
                 td.style.color = "blue"; // Thêm màu để dễ nhận biết
                 td.addEventListener("click", () => {
                     // alert(`Dữ liệu dòng: ${JSON.stringify(row)}`);
-                    document.getElementById("paymentCrm").value = row[4]
+                    document.getElementById("paymentCrm").value = row[5]
                     document.getElementById("paymentCustomerID").textContent = row[0]
                     document.getElementById("paymentCustomerName").textContent = row[1]
 
                     delivery_data.sort((a, b) => new Date(`${b[0]} ${b[1]}`) - new Date(`${a[0]} ${a[1]}`));
-                    const findCrm = delivery_data.find(item => item[3] === row[4])
+                    const findCrm = delivery_data.find(item => item[3] === row[5])
                     console.table(findCrm)
                     const operator = findCrm[2]
                     const content = findCrm[6]
@@ -5794,6 +6197,25 @@ async function get_payment_need_to_process() {
         });
         tbody.appendChild(tr);
     });
+    // Lấy danh sách chi nhánh từ CRM (index 5)
+    const uniqueBranches = [...new Set(
+        tableData.map(row => {
+            const crm = row[5] || "";
+            const branch = crm.split("-")[1] || "";
+            return branch;
+        }).filter(branch => branch)
+    )].sort();
+
+    const branchDropdown = document.getElementById("searchBranch");
+    branchDropdown.innerHTML = '<option value="">-- Tất cả chi nhánh --</option>';
+    uniqueBranches.forEach(branch => {
+        const option = document.createElement("option");
+        option.value = branch.toLowerCase();
+        option.textContent = branch;
+        branchDropdown.appendChild(option);
+    });
+
+
     table.appendChild(tbody);
 
     // Xóa bảng cũ nếu có và thêm bảng mới vào `div`
@@ -5801,6 +6223,24 @@ async function get_payment_need_to_process() {
     tableContainer.appendChild(table);
     endLoading()
 }
+
+function filterTable_payment() {
+    const selectedBranch = document.getElementById("searchBranch").value.toLowerCase();
+    const customerInput = document.getElementById("searchCustomer").value.toLowerCase();
+    const rows = document.querySelectorAll("#table-container_payment table tbody tr");
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll("td");
+        const customer = cells[0]?.textContent.toLowerCase() || "";
+        const crm = cells[5]?.textContent.toLowerCase() || "";
+        const branch = crm.split("-")[1] || "";
+
+        const match = customer.includes(customerInput) && (selectedBranch === "" || branch === selectedBranch);
+        row.style.display = match ? "" : "none";
+    });
+}
+
+
 
 ///* CANCEL ///
 // Get modal elements
@@ -6360,6 +6800,223 @@ function handleModalSelection_bom2(selectedOption) {
     
 }
 
+// BOM Mass Upload
+// BOM Mass Upload
+document.getElementById('file-upload-bom').addEventListener('change', handleBomExcelUpload);
+
+let previewUploadData = [];
+
+async function handleBomExcelUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const wh_value = document.getElementById("bom-wh").textContent.trim();
+    const bom_name = document.getElementById("bom-name").value.trim();
+
+    if (!wh_value) {
+        alert("Bạn chưa chọn mục cần tạo BOM");
+        event.target.value = "";
+        return;
+    }
+
+    if (!bom_name) {
+        alert("Bạn chưa nhập tên BOM");
+        document.getElementById("bom-name").focus();
+        event.target.value = "";
+        return;
+    }
+
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    event.target.value = "";
+
+    const header = rows[0];
+    const content = rows.slice(1);
+
+    const expectedHeaders = [
+        "STT", "Loại vật tư", "Tên vật tư", "Mã vật tư", "Đơn vị",
+        "Số lượng cần", "Số lượng tồn kho hiện có", "Số lượng cần mua thêm",
+        "Giá / Đơn vị (dự kiến)", "Tổng giá"
+    ];
+
+    const headerMismatch = expectedHeaders.some((h, i) => h !== header[i]);
+    if (headerMismatch) {
+        alert("Lỗi 1: File upload không đúng cấu trúc chuẩn.");
+        return;
+    }
+
+    const mml = mml_data.slice(1); // bỏ dòng header nếu có
+
+
+    // Tạo preview data từ file Excel
+    previewUploadData = content.map((row, index) => {
+        const [
+            stt, type, name, code, unit,
+            quantity_needed, , , price
+        ] = row;
+
+        const itemQuantityNeeded = parseFloat(quantity_needed) || 0;
+        const itemPrice = parseFloat(price) || 0;
+
+        const found_onhand = onhand_data.filter(
+            r => r[0] === wh_value && r[2] === code && r[10] >= 0
+        );
+        const stock = found_onhand.reduce((sum, r) => sum + r[10], 0);
+        const needToBuy = Math.max(itemQuantityNeeded - stock, 0);
+        const totalPrice = itemPrice * needToBuy;
+
+        return {
+            stt: index + 1,
+            type, name, code, unit,
+            quantity_needed: itemQuantityNeeded,
+            stock,
+            need_to_buy: needToBuy,
+            price: itemPrice,
+            total: totalPrice
+        };
+    });
+
+    // Kiểm tra lỗi với MML
+    previewUploadData = validateBomPreviewData(previewUploadData, mml);
+    showPreviewTable();
+
+    const hasErrors = previewUploadData.some(item => item.result !== "PASS");
+    const uploadButton = document.getElementById("mass-upload-button");
+    if (uploadButton) {
+        uploadButton.disabled = hasErrors;
+    }
+
+    if (!hasErrors) {
+        alert("Mass upload completed");
+        // Cập nhật danh mục vật tư trong BOM nếu muốn tại đây
+    }
+}
+
+function validateBomPreviewData(previewUploadData, mml_data) {
+    return previewUploadData.map((item, index) => {
+        const {
+            stt, type, name, code, unit, quantity_needed, price
+        } = item;
+
+        const rowErrors = [];
+        let status = "PASS";
+
+        if (!type || !name || !code || !unit || quantity_needed === undefined || price === undefined) {
+            rowErrors.push(`Lỗi 2: Thiếu dữ liệu tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (!mml_data.some(row => row[1] === name)) {
+            rowErrors.push(`Lỗi 3: Tên vật tư chưa tồn tại tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (!mml_data.some(row => row[2] === code)) {
+            rowErrors.push(`Lỗi 4: Mã vật tư chưa tồn tại tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (!mml_data.some(row => row[1] === name && row[2] === code)) {
+            rowErrors.push(`Lỗi 5: Mã vật tư và tên vật tư không đúng tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (!mml_data.some(row => row[3] === unit)) {
+            rowErrors.push(`Lỗi 6: Đơn vị chưa tồn tại tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (isNaN(price) || isNaN(quantity_needed)) {
+            rowErrors.push(`Lỗi 7: Đơn giá hoặc số lượng cần mua có ký tự tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        if (!mml_data.some(row => row[1] === name && row[3] === unit)) {
+            rowErrors.push(`Lỗi 8: Đơn vị không khớp với tên vật tư tại STT${stt}`);
+            status = "FAIL";
+        }
+
+        return {
+            ...item,
+            result: rowErrors.length ? rowErrors.join("\n") : "PASS"
+        };
+    });
+}
+
+function showPreviewTable() {
+    const container = document.getElementById("mass-upload-table-container");
+    container.innerHTML = '';
+
+    const table = document.createElement("table");
+    table.className = "bom-table";
+
+    const headerHTML = `
+        <thead><tr>
+            <th>STT</th><th>Loại vật tư</th><th>Tên vật tư</th><th>Mã vật tư</th>
+            <th>Đơn vị</th><th>Số lượng cần</th><th>Tồn kho</th>
+            <th>Cần mua thêm</th><th>Giá/Đơn vị</th><th>Tổng giá</th><th>Result</th>
+        </tr></thead>`;
+    table.innerHTML = headerHTML;
+
+    const tbody = document.createElement("tbody");
+    previewUploadData.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.stt}</td>
+            <td>${row.type}</td>
+            <td>${row.name}</td>
+            <td>${row.code}</td>
+            <td>${row.unit}</td>
+            <td>${row.quantity_needed}</td>
+            <td>${row.stock}</td>
+            <td>${row.need_to_buy.toLocaleString()}</td>
+            <td>${row.price.toLocaleString()}</td>
+            <td>${row.total.toLocaleString()}</td>
+            <td style="color: ${row.result === "PASS" ? 'green' : 'red'}; white-space: pre-line;">${row.result}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    document.getElementById("mass-upload-modal").style.display = 'block';
+}
+
+function confirmMassUpload() {
+    const hasErrors = previewUploadData.some(row => row.result !== "PASS");
+    if (hasErrors) {
+        alert("Chỉ được thêm nếu tất cả dòng đều PASS.");
+        return;
+    }
+    previewUploadData.forEach(item => {
+        const table = document.getElementById('bom-item-table').getElementsByTagName('tbody')[0];
+        const rowCount = table.rows.length + 1;
+
+        const row = table.insertRow();
+        row.innerHTML = `
+            <td>${rowCount}</td>
+            <td>${item.type}</td>
+            <td>${item.name}</td>
+            <td>${item.code}</td>
+            <td>${item.unit}</td>
+            <td>${item.quantity_needed}</td>
+            <td>${item.stock}</td>
+            <td>${item.need_to_buy.toLocaleString()}</td>
+            <td>${item.price.toLocaleString()}</td>
+            <td>${item.total.toLocaleString()}</td>
+            <td><button class="bom-clear" onclick="deleteRow(this)">Xóa</button></td>
+        `;
+    });
+
+    document.getElementById("mass-upload-modal").style.display = 'none';
+    updateBOMPrice();
+}
+
+// /////////////////
 async function get_crm_need_to_create_bom() {
     crmList = []
     startLoading()
