@@ -1529,6 +1529,7 @@ async function load_nhap() {
         .then(res => res.json())
         .then(data => {
             nhap_data = data.content;
+            nhap_data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
             console.log("Dữ liệu nhập đã tải xong.");
         });
 }
@@ -1804,7 +1805,7 @@ async function showFrame(id) {
                 stopInterval()
             } else if (id === 'onhand') {
                 // Load data and then show the frame
-                load_data_mml().then(() => {
+                load_onhand_export().then(() => {
                     activeFrame.classList.add('active');
                     console.log("Access granted to frame:", id);
                     stopInterval()
@@ -2714,14 +2715,175 @@ async function show_onhand() {
 
 }
 
+/////////////////////////////////////////////////////////////
+let onhand_export_data = [];
+
+async function load_onhand_export() {
+    startLoading()
+    return fetch('https://script.google.com/macros/s/AKfycbyz9iwzqC3ZWnKKFEtEkaVOqYrnUgbBjrkKa0ZNwO4feK5blUVKRaoSs9TNTtFJDXA/exec')
+        .then(res => res.json())
+        .then(data => {
+            onhand_export_data = data.content.slice(1); // Bỏ dòng đầu tiên là header
+            console.log("Dữ liệu onhand đã tải xong.");
+            onhand_initSearchUI();
+            onhand_renderTable(onhand_export_data);
+            endLoading()
+        });
+}
+
+function onhand_initSearchUI() {
+    const style = document.createElement('style');
+    style.textContent = `
+        #onhandFilter {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        #onhandFilter label {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        #onhandFilter input[type="text"],
+        #onhandFilter select {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            min-width: 180px;
+        }
+
+        #onhandFilter button {
+            margin-left: 10px;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        #onhandFilter button:last-of-type {
+            background-color: #6c757d;
+        }
+
+        #onhandFilter button:hover {
+            opacity: 0.9;
+        }
+    `;
+    document.head.appendChild(style);
+
+    const filterDiv = document.createElement('div');
+    filterDiv.id = "onhandFilter";
+    filterDiv.innerHTML = `
+        <label>Chi nhánh:
+            <select id="branchFilter">
+                <option value="">Tất cả</option>
+                <option value="HCM">HCM</option>
+                <option value="BN">BN</option>
+                <option value="QN">QN</option>
+            </select>
+        </label>
+        <label>Loại vật tư:
+            <input type="text" id="materialTypeFilter" placeholder="Nhập loại vật tư" required>
+        </label>
+        <label>Tên vật tư:
+            <input type="text" id="materialNameFilter" placeholder="Nhập tên vật tư">
+        </label>
+        <button onclick="onhand_applyFilter()">Tìm kiếm</button>
+        <button onclick="onhand_clearFilter()">Xoá lọc</button>
+    `;
+    document.getElementById('onhandTable').before(filterDiv);
+}
+
+function onhand_applyFilter() {
+    const branch = document.getElementById('branchFilter').value.toLowerCase();
+    const type = document.getElementById('materialTypeFilter').value.toLowerCase();
+    const name = document.getElementById('materialNameFilter').value.toLowerCase();
+
+    const filtered = onhand_export_data.filter(row => {
+        const matchesBranch = branch === "" || String(row[0]).toLowerCase().includes(branch);
+        const matchesType = type === "" || String(row[1]).toLowerCase().includes(type);
+        const matchesName = name === "" || String(row[11]).toLowerCase().includes(name);
+        return matchesBranch && matchesType && matchesName;
+    });
+    onhand_renderTable(filtered);
+}
+
+function onhand_clearFilter() {
+    document.getElementById('branchFilter').value = "";
+    document.getElementById('materialTypeFilter').value = "";
+    document.getElementById('materialNameFilter').value = "";
+    onhand_renderTable(onhand_export_data);
+}
+
+function onhand_renderTable(data) {
+    const container = document.getElementById('onhandTable');
+    container.innerHTML = "";
+    if (data.length === 0) {
+        container.innerHTML = "<p>Không có dữ liệu phù hợp.</p>";
+        return;
+    }
+
+    const headers = [
+        "Mã chi nhánh", "Loại vật tư", "Mã vật tư", "Location", "Ngày hết hạn", "Ngày nhập",
+        "Đơn giá lúc nhập", "Nhập", "Tồn đầu", "Xuất", "Tồn cuối", "Description / SKU",
+        "Đơn giá", "Thành tiền", "Đơn vị", "concat", "Near Expiry", "Mã nhà cung cấp", "Tên nhà cung cấp"
+    ];
+
+    const table = document.createElement('table');
+    table.className = "data-table";
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    const headerRow = document.createElement('tr');
+    headers.forEach(h => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    const limitedData = data === onhand_export_data ? data.slice(0, 100) : data;
+
+    limitedData.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach((cell, index) => {
+            const td = document.createElement('td');
+            if ([6, 12, 13].includes(index) && !isNaN(cell)) {
+                td.textContent = Number(cell).toLocaleString('en-US');
+            } else {
+                td.textContent = cell;
+            }
+            tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    container.appendChild(table);
+}
+// Gọi hàm load dữ liệu khi khởi động
+
+///////////////////////////////////////////////////////////////
+
 
 document.getElementById("refresh_onhand").addEventListener("click", async function() {
-    await load_data_mml()
+    await load_onhand_export()
+    onhand_clearFilter()
 });
 
 async function show_xuat() {
-    await load_xuat()
-    // Define columns based on the index of each data field
+    await load_xuat();
+
+    // Sort theo ngày xuất từ mới đến cũ
+    xuat_data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
     const columns = [
         { title: 'Ngày xuất', formatter: (cell) => cell.getData()[0] },
         { title: 'Thời gian xuất', formatter: (cell) => cell.getData()[1] },
@@ -2736,18 +2898,29 @@ async function show_xuat() {
         { title: 'Mã vật tư', formatter: (cell) => cell.getData()[10] },
         { title: 'Ngày hết hạn', formatter: (cell) => cell.getData()[11] },
         { title: 'Ngày nhập', formatter: (cell) => cell.getData()[12] },
-        { title: 'Đơn giá', formatter: (cell) => cell.getData()[13] },
-        { title: 'Thành tiền', formatter: (cell) => cell.getData()[14] },
+        {
+            title: 'Đơn giá',
+            formatter: (cell) => {
+                const value = cell.getData()[13];
+                return !isNaN(value) ? Number(value).toLocaleString('vi-VN') : value;
+            }
+        },
+        {
+            title: 'Thành tiền',
+            formatter: (cell) => {
+                const value = cell.getData()[14];
+                return !isNaN(value) ? Number(value).toLocaleString('vi-VN') : value;
+            }
+        },
         { title: 'Đơn vị', formatter: (cell) => cell.getData()[15] }
-
     ];
 
     const table = new Tabulator("#xuatTable", {
-        data: xuat_data,   // Dữ liệu của bảng
-        columns: columns,    // Cấu hình cột
-        layout: "fitDataTable",  // Tùy chọn layout
-        height: "800px",     // Đặt chiều cao để kích hoạt cuộn
-        virtualDom: true,    // Bật chế độ virtual DOM
+        data: xuat_data,
+        columns: columns,
+        layout: "fitDataTable",
+        height: "800px",
+        virtualDom: true,
         pagination: "local",
         paginationSize: 25,
         paginationSizeSelector: [25, 50, 100],
@@ -2964,8 +3137,11 @@ document.getElementById("export_onhand").addEventListener("click", function() {
 });
 
 async function show_nhap() {
-    await load_nhap()
-    // Define columns based on the index of each data field
+    await load_nhap();
+
+    // Sort theo ngày nhập từ mới đến cũ
+    nhap_data.sort((a, b) => new Date(b[0]) - new Date(a[0]));
+
     const columns = [
         { title: 'Ngày nhập', formatter: (cell) => cell.getData()[0] },
         { title: 'Thời gian nhập', formatter: (cell) => cell.getData()[1] },
@@ -2984,11 +3160,11 @@ async function show_nhap() {
     ];
 
     const table = new Tabulator("#nhapTable", {
-        data: nhap_data,   // Dữ liệu của bảng
-        columns: columns,    // Cấu hình cột
-        layout: "fitDataTable",  // Tùy chọn layout
-        height: "800px",     // Đặt chiều cao để kích hoạt cuộn
-        virtualDom: true,    // Bật chế độ virtual DOM
+        data: nhap_data,
+        columns: columns,
+        layout: "fitDataTable",
+        height: "800px",
+        virtualDom: true,
         pagination: "local",
         paginationSize: 25,
         paginationSizeSelector: [25, 50, 100],
@@ -2996,7 +3172,6 @@ async function show_nhap() {
         resizableRows: true,
     });
 }
-
 
 document.getElementById("refresh_nhap").addEventListener("click", async function() {
     await load_data_nhap_export()
