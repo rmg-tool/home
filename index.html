@@ -153,76 +153,77 @@
             <!-- Frames for each section -->
             <div id="home" class="frame active">
                 <h2 id="welcome"></h2>
-                <h3 style="margin-bottom: 20px;">Last Updated: 2025-05-31</h3>
+                <h3 style="margin-bottom: 20px;">Last Updated: 2025-06-04</h3>
 
                 <div style="width: 800px; margin-top: 50px; max-height: 600px; overflow-y: auto;">
                     <h1>📌 RELEASE NOTE</h1>
 
                     <ul class="tool-list">
                         <li class="tool-item">
+                            <div class="tool-title">04-06-2025 | Sort ngày Xuất và Nhập</div>
+                            <div class="tool-desc">Ở Module Export Xuất/Nhập data đang hiển thị ngày xa nhất, thay đổi hiển thị ngày gần nhất hiển thị lên trên đầu trang </div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
+                            <div class="tool-title">04-06-2025 | Thêm chức năng Filter Export Onhand</div>
+                            <div class="tool-desc">Thêm filter: Chi nhánh, loại vật tư, tên vật tư</div>
+                            <span class="badge-new">NEW</span>
+                        </li>
+
+                        <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - MFG / PUR</div>
                             <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - MFG / PUR</div>
                             <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - Delivery</div>
                             <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - Delivery</div>
                             <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm cột Pending Day tại Module Ops Mgmt - Payment</div>
                             <div class="tool-desc">Logic: Ngày hiện tài - Ngày thành toán, và Sort đơn hàng nào có Pending day lớn nhất</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">27-05-2025 | Thêm chức năng Filter tại Module Ops Mgmt - Payment</div>
                             <div class="tool-desc">Filter theo 2 trường: Chi nhánh và mã khách hàng</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">26-05-2025 | Hiển thị khung nhập Li do hủy khi bấm Reject trong module BOM Approval</div>
                             <div class="tool-desc">Hiển thị khung nhập lí do hủy khi bấm Reject, Không cho Reject khi chưa nhập lí do</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">26-05-2025 | Chỉnh sửa hiển thị giá tiền có dấu phân cách trong module BOM Approval</div>
                             <div class="tool-desc">Hiển thị tiền theo định dạng VN , ví dụ 1.000.000 thay vì 1000000</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                             <div class="tool-title">25-05-2025 | Thêm chức năng MML Mass Upload</div>
                             <div class="tool-desc">Mass Upload các vật tư mới và kiểm tra các điều kiện theo yêu cầu</div>
-                            <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                         <div class="tool-title">25-05-2025 | Thêm chức năng BOM Mass Upload</div>
                         <div class="tool-desc">Có thể Mass Upload các vật tư khi tạo BOM và kiểm tra các điều kiện theo yêu cầu</div>
-                        <span class="badge-new">NEW</span>
                         </li>
 
                         <li class="tool-item">
                         <div class="tool-title">25-05-2025 | Thêm các trường mới khi xuất PR, PO</div>
                         <div class="tool-desc">Thêm các cột theo request mới</div>
-                        <span class="badge-new">NEW</span>
                         </li>
                         
                         <li class="tool-item">
@@ -1908,11 +1909,12 @@
                 <div class="scrollable-frame">
                     <div id="tableContainer">
                         <div class="table-wrapper">
-                            <div id="onhandTable"></div> <!-- Tabulator table goes here -->
+                            <div id="onhandTable"></div>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div id="transaction_nhap" class="frame">
                 <h1>Transaction nhập</h1>
                 <button id="export_nhap" class="refresh-btn">Export</button>
