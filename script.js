@@ -1348,7 +1348,7 @@ async function load_customer() {
             console.log("Dữ liệu khách hàng đã tải xong.");
         });
 }
-load_customer()
+// load_customer()
 
 async function load_crm() {
     return fetch('https://script.google.com/macros/s/AKfycbxIEht5La88KujgKJsi8Vus7JrxeOToaC1wPD4fRACGKbR0Y_bF5KItAAr4_WRtRgXt/exec')
@@ -1548,7 +1548,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // promiss all
     await Promise.all([
         load_user(),
-        load_data_validation()
+        // load_data_validation()
     ]);
 
     const loginForm = document.getElementById("login-form");
@@ -12428,3 +12428,4 @@ document.getElementById("filter-po-date-to").addEventListener("change", applyFil
 document.getElementById("filter-creator-po").addEventListener("change", applyFilters_pur_summary);
 document.getElementById("filter-creator-pr").addEventListener("change", applyFilters_pur_summary);
 document.getElementById("pur-filter-branch").addEventListener("change", applyFilters_pur_summary);
+
