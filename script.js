@@ -817,24 +817,47 @@ async function exportCrmToExcel() {
 }
 
 
+// async function load_data_validation() {
+//     return fetch('https://script.google.com/macros/s/AKfycbyXec03ZIr3NgBmMqIEoa_CxItmq0bwQjT-tHhhHPdRQKwO2aVR7NInXwrKzf8P702xAw/exec')
+//         .then(res => res.json())
+//         .then(data => {
+//             const data_validation = data.content;
+//             // % VAT
+//             pct_validation = data_validation.map(row => row[0])
+//             pct_validation = data_validation.map(row => row[0]).filter(p => p !== '');
+
+//             // Đơn vị MML
+//             unit_validation = data_validation.map(row => row[1])
+//             unit_validation = data_validation.map(row => row[1]).filter(u => u !== '');
+//             apply_unit_validation()
+
+//             // Địa chỉ giao hàng
+//             address_validation = data_validation.map(row => row[2])
+//             address_validation = data_validation.map(row => row[2]).filter(a => a !== '');
+//             apply_address_validation()
+
+//             console.log("Đã load data validation thành công")
+//         });
+// }
+
 async function load_data_validation() {
-    return fetch('https://script.google.com/macros/s/AKfycbyXec03ZIr3NgBmMqIEoa_CxItmq0bwQjT-tHhhHPdRQKwO2aVR7NInXwrKzf8P702xAw/exec')
+    return fetch('https://script.google.com/macros/s/AKfycbyu_a72DeH1KhlAmOQugBGEp6Y40Phi1_spxM9EYtBy3u3kyZdTjgJx77rCM08N6QPZ/exec')
         .then(res => res.json())
         .then(data => {
             const data_validation = data.content;
             // % VAT
-            pct_validation = data_validation.map(row => row[0])
-            pct_validation = data_validation.map(row => row[0]).filter(p => p !== '');
+            // pct_validation = data_validation.map(row => row[0])
+            // pct_validation = data_validation.map(row => row[0]).filter(p => p !== '');
 
             // Đơn vị MML
-            unit_validation = data_validation.map(row => row[1])
-            unit_validation = data_validation.map(row => row[1]).filter(u => u !== '');
+            unit_validation = data_validation.map(row => row[0])
+            unit_validation = data_validation.map(row => row[0]).filter(u => u !== '');
             apply_unit_validation()
 
             // Địa chỉ giao hàng
-            address_validation = data_validation.map(row => row[2])
-            address_validation = data_validation.map(row => row[2]).filter(a => a !== '');
-            apply_address_validation()
+            // address_validation = data_validation.map(row => row[2])
+            // address_validation = data_validation.map(row => row[2]).filter(a => a !== '');
+            // apply_address_validation()
 
             console.log("Đã load data validation thành công")
         });
@@ -1548,7 +1571,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // promiss all
     await Promise.all([
         load_user(),
-        // load_data_validation()
+        load_data_validation()
     ]);
 
     const loginForm = document.getElementById("login-form");
